@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="container">
       <div class="footer-top">
         <div class="footer-brand">
-          <a href="index.html" class="brand">MIRWA</a>
+          <a href="index.html" class="brand">OrenkaFine</a>
           <p>The world is my catwalk. Fine and fashion jewelry designed for everyday elegance, since 1994.</p>
           <div class="footer-social">
             <a href="#" class="icon-btn" aria-label="Instagram">IG</a>
@@ -35,11 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
           </ul>
         </div>
         <div class="footer-col">
-          <h5>Mirwa</h5>
+          <h5>OrenkaFine</h5>
           <ul>
             <li><a href="about.html">The House</a></li>
-            <li><a href="about.html">Journey of a Jewel</a></li>
-            <li><a href="contact.html">Careers</a></li>
+            <li><a href="founder.html">Our Founder</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
@@ -54,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 Mirwa Jewelry B.V. All rights reserved.</span>
+        <span>&copy; 2026 OrenkaFine Jewelry B.V. All rights reserved.</span>
         <div class="legal-links">
           <a href="#">Disclaimer</a>
           <a href="#">Terms of Sale</a>

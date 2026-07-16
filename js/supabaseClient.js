@@ -1,5 +1,5 @@
 /* =========================================================
-   MIRWA — Supabase browser client
+   OrenkaFine — Supabase browser client
    Fill in your real values from Supabase Dashboard → Settings → API
    The anon/public key is safe to expose in frontend code.
    NEVER put the service_role key here.

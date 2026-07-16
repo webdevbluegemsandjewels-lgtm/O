@@ -1,11 +1,11 @@
-# Mirwa — Fine & Fashion Jewelry Website
+# OrenkaFine — Fine & Fashion Jewelry Website
 
 A multi-page jewelry brand website inspired by tirisi.com, built with plain HTML/CSS/JS
 (no build step required — just open `index.html` in a browser, or serve the folder).
 
 ## Structure
 ```
-mirwa/
+OrenkaFine/
 ├── index.html          Homepage — hero video, brand split, featured products, categories, journal, newsletter
 ├── collections.html    Shop page with category filtering
 ├── about.html           "The House" — brand story, values, timeline

@@ -1,15 +1,15 @@
 /* =========================================================
-   MIRWA — client-side cart (localStorage)
+   OrenkaFine — client-side cart (localStorage)
    Real order/payment writes happen server-side later via
    the Razorpay Edge Function; this just tracks the bag
    the user is building before checkout.
    ========================================================= */
 
-const MIRWA_CART_KEY = "mirwa_cart_v1";
+const OrenkaFine_CART_KEY = "OrenkaFine_cart_v1";
 
 function readCart() {
   try {
-    const raw = localStorage.getItem(MIRWA_CART_KEY);
+    const raw = localStorage.getItem(OrenkaFine_CART_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     console.error("Cart read error:", e);
@@ -18,9 +18,9 @@ function readCart() {
 }
 
 function writeCart(items) {
-  localStorage.setItem(MIRWA_CART_KEY, JSON.stringify(items));
+  localStorage.setItem(OrenkaFine_CART_KEY, JSON.stringify(items));
   updateCartBadge();
-  window.dispatchEvent(new CustomEvent("mirwa:cart-updated", { detail: { items } }));
+  window.dispatchEvent(new CustomEvent("OrenkaFine:cart-updated", { detail: { items } }));
 }
 
 function updateCartBadge() {
@@ -75,7 +75,7 @@ function getSubtotal() {
   return readCart().reduce((sum, i) => sum + i.price * i.qty, 0);
 }
 
-window.mirwaCart = {
+window.OrenkaFineCart = {
   getItems: readCart,
   addItem,
   updateQty,

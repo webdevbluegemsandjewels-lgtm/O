@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title id="pageTitle">Product — Mirwa</title>
-<meta name="description" id="pageDesc" content="Mirwa fine and fashion jewelry." />
+<title id="pageTitle">Product — OrenkaFine</title>
+<meta name="description" id="pageDesc" content="OrenkaFine fine and fashion jewelry." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
@@ -89,7 +89,7 @@
 
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="brand">MIRWA<small>Fine &amp; Light Weight Jewelry</small></a>
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewelry</small></a>
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html">Collections</a>
       <a href="about.html">The House</a>
@@ -141,7 +141,7 @@
 
         <div class="product-meta-row">
           <span>Material: <strong id="productMaterial">18 karat gold</strong></span>
-          <span>Brand: <strong id="productBrand">Mirwa</strong></span>
+          <span>Brand: <strong id="productBrand">OrenkaFine</strong></span>
         </div>
 
         <div class="product-colors" id="colorSection" style="display:none;">
@@ -209,7 +209,7 @@
 <footer class="site-footer" id="footer">
   <div class="container footer-top">
     <div class="footer-brand">
-      <a href="index.html" class="brand"><img src="https://tirisi.com/wp-content/uploads/2022/06/TirisiLogo-1.svg" alt="Mirwa" style="height:28px;vertical-align:middle;margin-right:.6rem;">MIRWA</a>
+      <a href="index.html" class="brand"><img src="https://tirisi.com/wp-content/uploads/2022/06/TirisiLogo-1.svg" alt="OrenkaFine" style="height:28px;vertical-align:middle;margin-right:.6rem;">OrenkaFine</a>
       <p class="footer-tag">The world is my catwalk</p>
       <h4>Subscribe to our newsletter</h4>
       <form class="footer-newsletter" action="#" onsubmit="event.preventDefault(); alert('Subscribed (demo)')">
@@ -260,7 +260,7 @@
   </div>
   <div class="footer-bottom container">
     <div class="popular-searches">Popular searches: RINGS | NECKLACES | BANGLES &amp; BRACELETS | EARRINGS</div>
-    <div class="copyright">Terms And Conditions · Privacy Policy · © 2026 Mirwa</div>
+    <div class="copyright">Terms And Conditions · Privacy Policy · © 2026 OrenkaFine</div>
   </div>
 </footer>
 
@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  document.getElementById("pageTitle").textContent = `${product.name} — Mirwa`;
+  document.getElementById("pageTitle").textContent = `${product.name} — OrenkaFine`;
   document.getElementById("pageDesc").setAttribute("content", (product.description || "").slice(0, 155));
   document.getElementById("breadcrumbName").textContent = product.name;
 
@@ -329,8 +329,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("productCat").textContent = product.category;
   document.getElementById("productName").textContent = product.name;
   document.getElementById("productMaterial").textContent = product.material || "18 karat gold";
-  document.getElementById("productBrand").textContent = product.brand || "Mirwa";
-  document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the Mirwa collection.";
+  document.getElementById("productBrand").textContent = product.brand || "OrenkaFine";
+  document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the OrenkaFine collection.";
 
   if (product.rating) {
     document.getElementById("productRating").innerHTML = `${product.rating} <span class="star">★</span>`;
@@ -397,7 +397,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("addToCartBtn").addEventListener("click", () => {
     const qty = parseInt(qtyInput.value, 10) || 1;
-    window.mirwaCart.addItem({
+    window.OrenkaFineCart.addItem({
       id: product.id,
       slug: product.slug,
       name: product.name,
@@ -479,7 +479,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     reviewsList.innerHTML = reviews.map((r) => {
       const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
       const date = new Date(r.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
-      const name = r.reviewer_name || "Mirwa customer";
+      const name = r.reviewer_name || "OrenkaFine customer";
       return `
         <div style="border-bottom:1px solid var(--line); padding-bottom:1.2rem;">
           <div style="color:var(--gold); font-size:1rem; margin-bottom:.3rem;">${stars}</div>

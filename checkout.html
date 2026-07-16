@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — OrenkaFine</title>
+<meta name="description" content="Complete your OrenkaFine order." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  .checkout-section{ padding: 2.4rem 0 5rem; }
+  .checkout-layout{ display:grid; grid-template-columns: 1.5fr 1fr; gap: 2.6rem; align-items:start; }
+  .checkout-form{ background:#fff; border:1px solid var(--line); border-radius:12px; padding: 1.8rem; }
+  .checkout-form h3{ font-size:1.15rem; margin-bottom:1.2rem; }
+  .form-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group{ margin-bottom: 1rem; }
+  .form-group label{ display:block; font-size:.82rem; color:var(--ink-soft); margin-bottom:.4rem; }
+  .form-group input{
+    width:100%; padding:.7rem .9rem; border:1px solid var(--line); border-radius:8px;
+    font-family: var(--font-body); font-size:.92rem;
+  }
+  .checkout-summary{
+    background:#fff; border:1px solid var(--line); border-radius:12px; padding: 1.6rem;
+    position: sticky; top: 100px;
+  }
+  .checkout-summary h3{ font-size:1.2rem; margin-bottom:1.2rem; }
+  .co-item{ display:flex; justify-content:space-between; font-size:.88rem; margin-bottom:.6rem; color:var(--ink-soft); }
+  .summary-line{ display:flex; justify-content:space-between; font-size:.92rem; color:var(--ink-soft); margin-bottom:.7rem; }
+  .summary-line.total{ color:var(--ink); font-weight:500; font-size:1.05rem; border-top:1px solid var(--line); padding-top:.9rem; margin-top:.9rem; }
+  .pay-btn{ width:100%; justify-content:center; margin-top:1.4rem; }
+  #checkoutError{ color:#b3261e; font-size:.85rem; margin-top:1rem; display:none; }
+  @media (max-width: 860px){
+    .checkout-layout{ grid-template-columns: 1fr; }
+    .form-row{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewelry</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="checkout-section">
+  <div class="container">
+    <p class="eyebrow">Checkout</p>
+    <h1 class="section-title" style="margin-bottom:2rem;">Shipping &amp; Payment</h1>
+
+    <div class="checkout-layout">
+      <form class="checkout-form" id="shippingForm">
+        <h3>Shipping Address</h3>
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" required />
+          </div>
+          <div class="form-group">
+            <label for="pincode">Pincode</label>
+            <input type="text" id="pincode" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" required />
+          </div>
+          <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" id="state" required />
+          </div>
+        </div>
+      </form>
+
+      <div class="checkout-summary">
+        <h3>Order Summary</h3>
+        <div id="coItems"></div>
+        <div class="summary-line total"><span>Total</span><span id="coTotal">₹0</span></div>
+        <button type="button" class="btn btn-gold pay-btn" id="payBtn">Pay Now</button>
+        <p id="checkoutError"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+
+<script src="js/supabaseClient.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/main.js"></script>
+<script>
+// IMPORTANT: replace with your deployed Edge Function project URL
+const FUNCTIONS_BASE = SUPABASE_URL + "/functions/v1";
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth();
+  if (!user) return;
+
+  const items = window.OrenkaFineCart.getItems();
+  if (!items.length) {
+    window.location.href = "cart.html";
+    return;
+  }
+
+  function money(n) {
+    return `₹${Number(n).toLocaleString("en-IN")}`;
+  }
+
+  const coItems = document.getElementById("coItems");
+  coItems.innerHTML = items.map(i => `
+    <div class="co-item"><span>${i.name} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>
+  `).join("");
+  document.getElementById("coTotal").textContent = money(window.OrenkaFineCart.getSubtotal());
+
+  const errorEl = document.getElementById("checkoutError");
+  const payBtn = document.getElementById("payBtn");
+
+  payBtn.addEventListener("click", async () => {
+    const form = document.getElementById("shippingForm");
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    payBtn.disabled = true;
+    payBtn.textContent = "Processing...";
+    errorEl.style.display = "none";
+
+    const shipping = {
+      name: document.getElementById("fullName").value,
+      phone: document.getElementById("phone").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      state: document.getElementById("state").value,
+      pincode: document.getElementById("pincode").value,
+    };
+
+    const orderItems = items.map(i => ({
+      product_id: i.id,
+      quantity: i.qty,
+      color: i.color || null,
+    }));
+
+    try {
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+      const token = sessionData.session.access_token;
+
+      // 1. Ask our Edge Function to create the order + Razorpay order
+      const res = await fetch(`${FUNCTIONS_BASE}/create-razorpay-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          apikey: SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ items: orderItems, shipping }),
+      });
+      const orderData = await res.json();
+      if (!res.ok) throw new Error(orderData.error || "Could not create order");
+
+      // 2. Open Razorpay Checkout
+      const rzp = new Razorpay({
+        key: orderData.key_id,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "OrenkaFine",
+        description: "Order payment",
+        order_id: orderData.razorpay_order_id,
+        prefill: { name: shipping.name, contact: shipping.phone },
+        theme: { color: "#b8975a" },
+        handler: async function (response) {
+          // 3. Verify payment server-side
+          const verifyRes = await fetch(`${FUNCTIONS_BASE}/verify-razorpay-payment`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+              apikey: SUPABASE_ANON_KEY,
+            },
+            body: JSON.stringify({
+              order_id: orderData.order_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.verified) {
+            window.OrenkaFineCart.clearCart();
+            window.location.href = `order-success.html?order_id=${orderData.order_id}`;
+          } else {
+            errorEl.textContent = "Payment could not be verified. Please contact support.";
+            errorEl.style.display = "block";
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+          },
+        },
+      });
+
+      rzp.open();
+    } catch (e) {
+      errorEl.textContent = e.message || "Something went wrong. Please try again.";
+      errorEl.style.display = "block";
+      payBtn.disabled = false;
+      payBtn.textContent = "Pay Now";
+    }
+  });
+});
+</script>
+</body>
+</html>

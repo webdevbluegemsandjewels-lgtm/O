@@ -3,8 +3,8 @@
   <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Collections — Mirwa Fine &amp; Light Weight Jewellery</title>
-  <meta name="description" content="Browse Mirwa's collection of rings, necklaces, earrings, bracelets and pendants across our Fine Jewelry and Moda lines." />
+  <title>Collections — OrenkaFine Fine &amp; Light Weight Jewellery</title>
+  <meta name="description" content="Browse OrenkaFine's collection of rings, necklaces, earrings, bracelets and pendants across our Fine Jewelry and Moda lines." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
@@ -21,7 +21,7 @@
 
   <header class="site-header">
     <div class="container">
-      <a href="index.html" class="brand">MIRWA<small>Fine &amp; Fashion Jewelry</small></a>
+      <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Fashion Jewelry</small></a>
       <nav class="main-nav" aria-label="Primary">
         <a href="collections.html" class="active">Collections</a>
         <a href="about.html">The House</a>
@@ -57,7 +57,7 @@
       <div class="section-head">
         <div>
           <p class="eyebrow">Fine Jewellery</p>
-          <h2 class="section-title">Mirwa Jewelry Collection</h2>
+          <h2 class="section-title">OrenkaFine Jewelry Collection</h2>
         </div>
         <p class="section-desc" id="loadStatus">Loading products…</p>
       </div>
@@ -134,7 +134,7 @@
   <footer class="site-footer" id="footer">
     <div class="container footer-top">
       <div class="footer-brand">
-        <a href="index.html" class="brand"><img src="https://tirisi.com/wp-content/uploads/2022/06/TirisiLogo-1.svg" alt="Mirwa" style="height:28px;vertical-align:middle;margin-right:.6rem;">MIRWA</a>
+        <a href="index.html" class="brand"><img src="https://tirisi.com/wp-content/uploads/2022/06/TirisiLogo-1.svg" alt="OrenkaFine" style="height:28px;vertical-align:middle;margin-right:.6rem;">OrenkaFine</a>
         <p class="footer-tag">The world is my catwalk</p>
         <h4>Subscribe to our newsletter</h4>
         <form class="footer-newsletter" action="#" onsubmit="event.preventDefault(); alert('Subscribed (demo)')">
@@ -189,7 +189,7 @@
     </div>
     <div class="footer-bottom container">
       <div class="popular-searches">Popular searches: RINGS | NECKLACES | BANGLES &amp; BRACELETS | EARRINGS</div>
-      <div class="copyright">Terms And Conditions · Privacy Policy · © 2026 Mirwa</div>
+      <div class="copyright">Terms And Conditions · Privacy Policy · © 2026 OrenkaFine</div>
     </div>
   </footer>
 
@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const HOUSE_OPTIONS = [...new Set(SHOP_PRODUCTS.map((p) => p.brand))];
   const CATEGORY_OPTIONS = SHOP_CATS.filter((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat));
   const state = { maxPrice: 0, colors: new Set(), materials: new Set(), category: initialCategory, house: HOUSE_OPTIONS[0] };
-  const houseDisplayName = (brand) => (brand === "Mirwa Jewelry" ? "Fine Jewellery" : "Light Weight Jewellery");
+  const houseDisplayName = (brand) => (brand === "OrenkaFine Jewelry" ? "Fine Jewellery" : "Light Weight Jewellery");
 
   function renderTopMenus() {
     if (houseToggle) {

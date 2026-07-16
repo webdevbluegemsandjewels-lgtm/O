@@ -1,11 +1,11 @@
 /* =========================================================
-   MIRWA — site behavior
+   OrenkaFine — site behavior
    ========================================================= */
 const DEFAULT_SUPABASE_S3_ENDPOINT = "https://xjepiecjsomrallliifj.storage.supabase.co/storage/v1/s3";
 const DEFAULT_SUPABASE_BUCKET = "Images";
 
-const SUPABASE_S3_ENDPOINT = window.MIRWA_SUPABASE_S3_ENDPOINT || DEFAULT_SUPABASE_S3_ENDPOINT;
-const SUPABASE_BUCKET_NAME = window.MIRWA_SUPABASE_BUCKET_NAME || DEFAULT_SUPABASE_BUCKET;
+const SUPABASE_S3_ENDPOINT = window.OrenkaFine_SUPABASE_S3_ENDPOINT || DEFAULT_SUPABASE_S3_ENDPOINT;
+const SUPABASE_BUCKET_NAME = window.OrenkaFine_SUPABASE_BUCKET_NAME || DEFAULT_SUPABASE_BUCKET;
 const SUPABASE_PUBLIC_BASE = `${SUPABASE_S3_ENDPOINT.replace(/\/s3\/?$/, "")}/object/public/${SUPABASE_BUCKET_NAME}`;
 
 function normalizeBucketKey(path) {
@@ -143,10 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (window.mirwaCart && typeof window.mirwaCart.getItems === "function") {
+  if (window.OrenkaFineCart && typeof window.OrenkaFineCart.getItems === "function") {
     // badge is also updated on its own DOMContentLoaded inside cart.js,
     // but re-run here in case main.js's listener fires after items are rendered
-    const count = window.mirwaCart.getItems().reduce((sum, i) => sum + i.qty, 0);
+    const count = window.OrenkaFineCart.getItems().reduce((sum, i) => sum + i.qty, 0);
     document.querySelectorAll("[data-cart-count]").forEach((el) => {
       el.textContent = count > 0 ? String(count) : "";
       el.style.display = count > 0 ? "inline-flex" : "none";

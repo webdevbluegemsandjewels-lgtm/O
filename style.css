@@ -1,5 +1,5 @@
 /* =========================================================
-   MIRWA — Fine Jewelry
+   OrenkaFine — Fine Jewelry
    Design tokens
    ========================================================= */
 :root{
@@ -1548,4 +1548,8 @@ section{ padding: 3rem 0; }
   .eyebrow{ font-size: .65rem; letter-spacing: .2em; }
   .section-title{ font-size: clamp(1.6rem, 8vw, 1.9rem); }
   .footer-bottom{ font-size: .7rem; }
+}
+
+.product-card-link{
+  display: contents;
 }

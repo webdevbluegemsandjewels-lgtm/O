@@ -15,7 +15,7 @@ const PRODUCTS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Ring ${ringNo} ${style}`,
-		brand: i < 25 ? "Mirwa Jewelry" : "Mirwa Moda",
+		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
 		cat: "Rings",
 		price: `₹${amount}`,
 		image: `products/rings/${imageIndex}.png`,
@@ -41,7 +41,7 @@ const BRACELETS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Bracelet ${braceletNo} ${style}`,
-		brand: i < 25 ? "Mirwa Jewelry" : "Mirwa Moda",
+		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
 		cat: "Bracelets",
 		price: `₹${amount}`,
 		image: `products/braclet/${imageIndex}.png`,
@@ -67,7 +67,7 @@ const NECKLACES = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Necklace ${necklaceNo} ${style}`,
-		brand: i < 25 ? "Mirwa Jewelry" : "Mirwa Moda",
+		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
 		cat: "Necklaces",
 		price: `₹${amount}`,
 		image: `products/necklacs/${imageIndex}.png`,
@@ -93,7 +93,7 @@ const EARRINGS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Earring ${earringNo} ${style}`,
-		brand: i < 25 ? "Mirwa Jewelry" : "Mirwa Moda",
+		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
 		cat: "Earrings",
 		price: `₹${amount}`,
 		image: `products/earring/${imageIndex}.png`,
@@ -119,7 +119,7 @@ const EAR_CUFFS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Ear Cuff ${cuffNo} ${style}`,
-		brand: i < 25 ? "Mirwa Jewelry" : "Mirwa Moda",
+		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
 		cat: "Ear Cuffs",
 		price: `₹${amount}`,
 		image: `products/ear-cuffs/${imageIndex}.png`,
@@ -160,7 +160,7 @@ PRODUCTS.forEach((p, i) => {
 });
 
 /* =========================================================
-	 MIRWA — shared product & image data
+	 OrenkaFine — shared product & image data
 	 ========================================================= */
 
 const IMG = {

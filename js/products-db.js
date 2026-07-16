@@ -1,5 +1,5 @@
 /* =========================================================
-   MIRWA — loads products from Supabase, reshaped to match
+   OrenkaFine — loads products from Supabase, reshaped to match
    the field names productCardHTML() in main.js expects
    (image, secondaryImage, oldPrice, cat, etc.)
    ========================================================= */
@@ -9,7 +9,7 @@ function mapDbProductToCard(row) {
     id: row.id,
     slug: row.slug,
     name: row.name,
-    brand: row.brand || "Mirwa Jewelry",
+    brand: row.brand || "OrenkaFine Jewelry",
     cat: row.category,
     price: `₹${Number(row.price).toLocaleString("en-IN")}`,
     oldPrice: row.old_price ? `₹${Number(row.old_price).toLocaleString("en-IN")}` : null,
