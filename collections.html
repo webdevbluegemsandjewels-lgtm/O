@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collections — Mirwa Fine &amp; Light Weight Jewellery</title>
+  <meta name="description" content="Browse Mirwa's collection of rings, necklaces, earrings, bracelets and pendants across our Fine Jewelry and Moda lines." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+
+  <div class="utility-bar">
+    <div class="container">
+      <span>Complimentary gift wrapping on every order</span>
+      <span>Fast delivery &middot; Secure checkout</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand">MIRWA<small>Fine &amp; Fashion Jewelry</small></a>
+      <nav class="main-nav" aria-label="Primary">
+        <a href="collections.html" class="active">Collections</a>
+        <a href="about.html">The House</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-icons">
+        <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+        <button class="icon-btn" aria-label="Shopping bag"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button>
+        <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <section class="collections-hero">
+    <div class="hero-video">
+      <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1551847144-8e2eb15616bc?auto=format&fit=crop&w=1600&q=80">
+        <source src="Assets/Hero/hero2.mp4" type="video/mp4" />
+      </video>
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="container hero-copy">
+      <p class="eyebrow">All Collections</p>
+      <h1>Discover Our Collections</h1>
+      <p>Every piece tells a story of craftsmanship, elegance, and individuality. From everyday essentials to extraordinary statements.</p>
+      <a href="#new-arrivals" class="btn btn-gold">Explore Collection</a>
+    </div>
+  </section>
+
+  <!-- Shop with sidebar filters and toolbar -->
+  <section class="section-dim">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Fine Jewellery</p>
+          <h2 class="section-title">Mirwa Jewelry Collection</h2>
+        </div>
+        <p class="section-desc" id="loadStatus">Loading products…</p>
+      </div>
+
+      <div class="shop-layout" id="shopLayout">
+        <aside class="shop-sidebar" id="shopSidebar">
+          <div class="filter-menu sidebar-drop open" id="priceDrop">
+            <button class="filter-menu-trigger" type="button" aria-expanded="true">
+              <span>Filter by Price</span>
+              <span class="menu-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="filter-drop-panel" id="pricePanel">
+              <input type="range" class="price-slider" id="priceMax" min="0" max="0" value="0">
+              <p class="price-slider-value" id="priceMaxLabel">₹0 to ₹0</p>
+            </div>
+          </div>
+
+          <div class="filter-menu sidebar-drop open" id="colorDrop">
+            <button class="filter-menu-trigger" type="button" aria-expanded="true">
+              <span>Color</span>
+              <span class="menu-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="filter-drop-panel" id="colorFilters"></div>
+          </div>
+
+          <div class="filter-menu sidebar-drop open" id="materialDrop">
+            <button class="filter-menu-trigger" type="button" aria-expanded="true">
+              <span>Material</span>
+              <span class="menu-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="filter-drop-panel" id="materialFilters"></div>
+          </div>
+        </aside>
+
+        <div>
+          <div class="shop-toolbar">
+            <button class="filter-drawer-toggle" id="filterToggle" aria-controls="shopSidebar" aria-expanded="false" type="button" aria-label="Toggle filters">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+              <span>Filter</span>
+            </button>
+            <div class="filter-menu" id="houseMenu">
+              <button class="filter-menu-trigger" id="houseTrigger" aria-haspopup="menu" aria-expanded="false" type="button">
+                <span>House:</span>
+                <strong id="houseLabel">Fine Jewellery</strong>
+                <span class="menu-caret" aria-hidden="true">▾</span>
+              </button>
+              <div class="filter-menu-list" id="houseToggle" role="menu"></div>
+            </div>
+            <div class="filter-menu" id="catMenu">
+              <button class="filter-menu-trigger" id="catTrigger" aria-haspopup="menu" aria-expanded="false" type="button">
+                <span>Category:</span>
+                <strong id="catLabel">Rings</strong>
+                <span class="menu-caret" aria-hidden="true">▾</span>
+              </button>
+              <div class="filter-menu-list" id="catToggle" role="menu"></div>
+            </div>
+            <span id="resultCount">Loading…</span>
+            <select id="sortSelect">
+              <option value="default">Default sorting</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
+          <div class="product-grid" id="fine-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="footer">
+    <div class="container footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand"><img src="https://tirisi.com/wp-content/uploads/2022/06/TirisiLogo-1.svg" alt="Mirwa" style="height:28px;vertical-align:middle;margin-right:.6rem;">MIRWA</a>
+        <p class="footer-tag">The world is my catwalk</p>
+        <h4>Subscribe to our newsletter</h4>
+        <form class="footer-newsletter" action="#" onsubmit="event.preventDefault(); alert('Subscribed (demo)')">
+          <input type="email" placeholder="Email address" aria-label="Email address" required>
+          <button class="btn btn-gold">Subscribe <img src="https://tirisi.com/wp-content/themes/tirisi/assets/images/whiteArrow.svg" alt="arrow" style="height:12px;margin-left:.5rem;vertical-align:middle"></button>
+        </form>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <h5>Socials</h5>
+          <ul>
+            <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/instagram.svg" alt="Instagram"> Instagram</a></li>
+            <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/facebook.svg" alt="Facebook"> Facebook</a></li>
+            <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/linkedin.svg" alt="Linkedin"> Linkedin</a></li>
+            <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/youtube.svg" alt="Youtube"> Youtube</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="#">Our Services</a></li>
+            <li><a href="#">Point of Sale</a></li>
+            <li><a href="#">Care Guide</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Legal &amp; Conditions</h5>
+          <ul>
+            <li><a href="#">Disclaimer</a></li>
+            <li><a href="#">Terms and Conditions</a></li>
+            <li><a href="#">Terms of Sales</a></li>
+            <li><a href="#">Warranty</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#">The House</a></li>
+            <li><a href="#">Journey of a Jewel</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom container">
+      <div class="popular-searches">Popular searches: RINGS | NECKLACES | BANGLES &amp; BRACELETS | EARRINGS</div>
+      <div class="copyright">Terms And Conditions · Privacy Policy · © 2026 Mirwa</div>
+    </div>
+  </footer>
+
+  <button class="to-top" aria-label="Back to top">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+  </button>
+
+  <script src="js/products.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/products-db.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/footer.js"></script>
+  <script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const SHOP_CATS = ["Rings", "Bracelets", "Necklaces", "Earrings", "Ear Cuffs", "Charms & Pendants"];
+
+  const loadStatus = document.getElementById("loadStatus");
+  const DB_PRODUCTS = await loadProductsFromDB();
+  const SHOP_PRODUCTS = DB_PRODUCTS.filter((p) => SHOP_CATS.includes(p.cat));
+
+  if (loadStatus) {
+    loadStatus.textContent = SHOP_PRODUCTS.length
+      ? `A curated selection of ${SHOP_PRODUCTS.length} pieces.`
+      : "No products found — check your Supabase connection.";
+  }
+
+  const grid = document.getElementById("fine-grid");
+  const countEl = document.getElementById("resultCount");
+  const priceMax = document.getElementById("priceMax");
+  const priceMaxLabel = document.getElementById("priceMaxLabel");
+  const sortSelect = document.getElementById("sortSelect");
+  const houseToggle = document.getElementById("houseToggle");
+  const catToggle = document.getElementById("catToggle");
+  const houseMenu = document.getElementById("houseMenu");
+  const catMenu = document.getElementById("catMenu");
+  const houseTrigger = document.getElementById("houseTrigger");
+  const catTrigger = document.getElementById("catTrigger");
+  const houseLabel = document.getElementById("houseLabel");
+  const catLabel = document.getElementById("catLabel");
+  const shopLayout = document.getElementById("shopLayout");
+  const filterToggle = document.getElementById("filterToggle");
+  const sidebarDrops = document.querySelectorAll(".sidebar-drop");
+
+  if (!SHOP_PRODUCTS.length) {
+    if (countEl) countEl.textContent = "0 results";
+    return; // nothing to wire up if there's no data
+  }
+
+  const initialCategory = SHOP_CATS.find((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat)) || SHOP_CATS[0];
+  const HOUSE_OPTIONS = [...new Set(SHOP_PRODUCTS.map((p) => p.brand))];
+  const CATEGORY_OPTIONS = SHOP_CATS.filter((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat));
+  const state = { maxPrice: 0, colors: new Set(), materials: new Set(), category: initialCategory, house: HOUSE_OPTIONS[0] };
+  const houseDisplayName = (brand) => (brand === "Mirwa Jewelry" ? "Fine Jewellery" : "Light Weight Jewellery");
+
+  function renderTopMenus() {
+    if (houseToggle) {
+      houseToggle.innerHTML = HOUSE_OPTIONS.map((house) => `
+        <button class="filter-menu-item ${state.house === house ? "active" : ""}" data-house="${house}" type="button" role="menuitem">${houseDisplayName(house)}</button>
+      `).join("");
+    }
+    if (catToggle) {
+      catToggle.innerHTML = CATEGORY_OPTIONS.map((cat) => `
+        <button class="filter-menu-item ${state.category === cat ? "active" : ""}" data-cat="${cat}" type="button" role="menuitem">${cat}</button>
+      `).join("");
+    }
+    if (houseLabel) houseLabel.textContent = houseDisplayName(state.house);
+    if (catLabel) catLabel.textContent = state.category;
+  }
+
+  const closeMenus = () => {
+    [houseMenu, catMenu].forEach((menu) => {
+      if (!menu) return;
+      menu.classList.remove("open");
+      const trigger = menu.querySelector(".filter-menu-trigger");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    });
+  };
+
+  const toggleMenu = (menuEl) => {
+    if (!menuEl) return;
+    const willOpen = !menuEl.classList.contains("open");
+    closeMenus();
+    menuEl.classList.toggle("open", willOpen);
+    const trigger = menuEl.querySelector(".filter-menu-trigger");
+    if (trigger) trigger.setAttribute("aria-expanded", String(willOpen));
+  };
+
+  const categoryBase = () => SHOP_PRODUCTS.filter((p) => p.cat === state.category && p.brand === state.house);
+
+  function priceNumber(p) {
+    return parseInt(String(p.price).replace(/[^\d]/g, ""), 10) || 0;
+  }
+
+  function syncPriceBounds() {
+    const base = categoryBase();
+    if (!base.length) {
+      priceMax.min = "0"; priceMax.max = "0"; priceMax.value = "0";
+      priceMaxLabel.textContent = "₹0 to ₹0";
+      return;
+    }
+    const prices = base.map(priceNumber);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    priceMax.min = String(min);
+    priceMax.max = String(max);
+    if (!state.maxPrice || state.maxPrice < min || state.maxPrice > max) {
+      state.maxPrice = max;
+      priceMax.value = String(max);
+    }
+    priceMaxLabel.textContent = `₹${min} to ₹${state.maxPrice}`;
+  }
+
+  function renderFilterLists() {
+    const base = categoryBase();
+    const colorCounts = {};
+    base.forEach((p) => (p.colors || []).forEach((c) => {
+      colorCounts[c] = (colorCounts[c] || 0) + 1;
+    }));
+    document.getElementById("colorFilters").innerHTML = Object.keys(colorCounts).length
+      ? Object.keys(colorCounts).map((c) => `
+        <label class="filter-check-row">
+          <span class="swatch-label">
+            <span class="swatch" style="background:${(typeof COLOR_SWATCHES !== "undefined" && COLOR_SWATCHES[c]) || "#ccc"}"></span> ${c}
+          </span>
+          <span class="count">${colorCounts[c]}</span>
+          <input type="checkbox" data-color="${c}" style="margin-left:.5rem;">
+        </label>
+      `).join("")
+      : `<p style="font-size:.85rem;color:var(--ink-soft);">No color data yet</p>`;
+
+    const materialCounts = {};
+    base.forEach((p) => {
+      const m = p.material || "18 karat gold";
+      materialCounts[m] = (materialCounts[m] || 0) + 1;
+    });
+    document.getElementById("materialFilters").innerHTML = Object.keys(materialCounts).map((m) => `
+      <label class="filter-check-row">
+        <span class="swatch-label">${m}</span>
+        <span class="count">${materialCounts[m]}</span>
+        <input type="checkbox" data-material="${m}" style="margin-left:.5rem;">
+      </label>
+    `).join("");
+  }
+
+  function render() {
+    const base = categoryBase();
+    let list = base.filter((p) => {
+      const price = priceNumber(p);
+      if (price > state.maxPrice) return false;
+      if (state.colors.size && !(p.colors || []).some((c) => state.colors.has(c))) return false;
+      if (state.materials.size && !state.materials.has(p.material)) return false;
+      return true;
+    });
+
+    if (sortSelect.value === "price-asc") list.sort((a, b) => priceNumber(a) - priceNumber(b));
+    if (sortSelect.value === "price-desc") list.sort((a, b) => priceNumber(b) - priceNumber(a));
+
+    grid.innerHTML = list.map(productCardHTML).join("");
+    countEl.textContent = `Showing ${list.length ? 1 : 0}-${list.length} of ${base.length} results`;
+    if (typeof attachProductHoverSwap === "function") attachProductHoverSwap();
+  }
+
+  if (filterToggle && shopLayout) {
+    filterToggle.addEventListener("click", () => {
+      const willOpen = !shopLayout.classList.contains("filters-open");
+      shopLayout.classList.toggle("filters-open", willOpen);
+      filterToggle.setAttribute("aria-expanded", String(willOpen));
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) {
+        shopLayout.classList.remove("filters-open");
+        filterToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  if (houseTrigger) houseTrigger.addEventListener("click", (e) => { e.stopPropagation(); toggleMenu(houseMenu); });
+  if (catTrigger) catTrigger.addEventListener("click", (e) => { e.stopPropagation(); toggleMenu(catMenu); });
+
+  sidebarDrops.forEach((drop) => {
+    const trigger = drop.querySelector(".filter-menu-trigger");
+    if (!trigger) return;
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const willOpen = !drop.classList.contains("open");
+      drop.classList.toggle("open", willOpen);
+      trigger.setAttribute("aria-expanded", String(willOpen));
+    });
+  });
+
+  document.addEventListener("click", (e) => { if (!e.target.closest(".filter-menu")) closeMenus(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenus(); });
+
+  priceMax.addEventListener("input", () => {
+    state.maxPrice = parseInt(priceMax.value, 10);
+    priceMaxLabel.textContent = `₹${priceMax.min} to ₹${state.maxPrice}`;
+    render();
+  });
+
+  if (catToggle) {
+    catToggle.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-menu-item[data-cat]");
+      if (!btn) return;
+      state.category = btn.dataset.cat;
+      state.colors.clear(); state.materials.clear();
+      renderTopMenus(); syncPriceBounds(); renderFilterLists(); render();
+      closeMenus();
+    });
+  }
+
+  if (houseToggle) {
+    houseToggle.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-menu-item[data-house]");
+      if (!btn) return;
+      state.house = btn.dataset.house;
+      state.colors.clear(); state.materials.clear();
+      renderTopMenus(); syncPriceBounds(); renderFilterLists(); render();
+      closeMenus();
+    });
+  }
+
+  document.getElementById("colorFilters").addEventListener("change", (e) => {
+    const c = e.target.dataset.color;
+    if (!c) return;
+    if (e.target.checked) state.colors.add(c); else state.colors.delete(c);
+    render();
+  });
+
+  document.getElementById("materialFilters").addEventListener("change", (e) => {
+    const m = e.target.dataset.material;
+    if (!m) return;
+    if (e.target.checked) state.materials.add(m); else state.materials.delete(m);
+    render();
+  });
+
+  sortSelect.addEventListener("change", render);
+  renderTopMenus();
+  syncPriceBounds();
+  renderFilterLists();
+  render();
+});
+  </script>
+  </body>
+  </html>
