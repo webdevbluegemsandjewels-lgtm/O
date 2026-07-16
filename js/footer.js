@@ -1,7 +1,7 @@
 /* Injects the shared site footer into <footer id="footer"></footer> */
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("footer");
-  if (!el) return;
+  if (!el || el.children.length) return;
   el.innerHTML = `
     <div class="container">
       <div class="footer-top">
@@ -38,17 +38,18 @@ document.addEventListener("DOMContentLoaded", () => {
           <h5>OrenkaFine</h5>
           <ul>
             <li><a href="about.html">The House</a></li>
-            <li><a href="founder.html">Our Founder</a></li>
+            <li><a href="about.html">Journey of a Jewel</a></li>
+            <li><a href="contact.html">Careers</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h5>Legal</h5>
           <ul>
-            <li><a href="#">Terms &amp; Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Warranty</a></li>
-            <li><a href="#">Cookie Policy</a></li>
+            <li><a href="about.html">Terms &amp; Conditions</a></li>
+            <li><a href="about.html">Privacy Policy</a></li>
+            <li><a href="about.html">Warranty</a></li>
+            <li><a href="about.html">Cookie Policy</a></li>
           </ul>
         </div>
       </div>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Account — OrenkaFine</title>
+<meta name="description" content="Manage your OrenkaFine account details." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .account-section{ padding: 3.6rem 0 5rem; }
+  .account-header{ display:flex; align-items:center; gap:1.2rem; margin-bottom: 2.6rem; }
+  #acctAvatarBig .account-avatar{ width:84px; height:84px; font-size:2rem; }
+  .account-header h1{ font-size:1.7rem; margin:0 0 .3rem; }
+  .account-header p{ color: var(--ink-soft); font-size:.92rem; margin:0; }
+  .account-card{
+    max-width: 640px;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 14px; padding: 2.2rem 2rem;
+    box-shadow: 0 12px 28px rgba(22,20,15,.08);
+  }
+  .account-card h2{ font-size:1.1rem; margin: 0 0 1.4rem; }
+  .account-field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .account-field{ margin-bottom: 1.1rem; }
+  .account-field label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.5rem; }
+  .account-field label .hint-inline{ text-transform:none; letter-spacing:normal; font-size:.72rem; color: var(--ink-soft); opacity:.75; }
+  .account-field input{
+    width:100%; background:#fff; border: 1.5px solid #cfc7b6; border-radius: 8px;
+    padding: .72rem .85rem; font-family: inherit; font-size: .95rem; color: var(--ink);
+  }
+  .account-field input:focus{ border-color: var(--gold); outline:none; box-shadow: 0 0 0 3px rgba(169,130,76,.15); }
+  .account-field input[disabled]{ color: var(--ink-soft); background: var(--paper-dim, #f4f1ec); }
+  .account-actions{ display:flex; align-items:center; gap:1rem; margin-top: .6rem; flex-wrap:wrap; }
+  .account-status{ font-size:.85rem; margin: 0; }
+  .account-status.auth-error{ color:#a9432f; }
+  .account-status.auth-success{ color: var(--emerald); }
+  .account-logout{ margin-top: 2rem; }
+  @media (max-width: 480px){
+    .account-field-row{ grid-template-columns: 1fr; }
+    .account-card{ padding: 1.8rem 1.4rem; }
+    .account-header{ gap: .9rem; }
+    #acctAvatarBig .account-avatar{ width:64px; height:64px; font-size:1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewelry</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="account-section">
+  <div class="container">
+    <div class="account-header">
+      <div id="acctAvatarBig"></div>
+      <div>
+        <h1 id="acctName">Your account</h1>
+        <p id="acctEmail"></p>
+      </div>
+    </div>
+
+    <div class="account-card">
+      <h2>Contact &amp; shipping details</h2>
+      <p class="account-status" id="acctStatus" style="display:none;"></p>
+
+      <form id="accountForm">
+        <div class="account-field">
+          <label>Phone</label>
+          <input id="phone" type="tel" autocomplete="tel" />
+        </div>
+        <div class="account-field">
+          <label>Address line 1</label>
+          <input id="address1" type="text" autocomplete="address-line1" />
+        </div>
+        <div class="account-field">
+          <label>Address line 2 <span class="hint-inline">(optional)</span></label>
+          <input id="address2" type="text" autocomplete="address-line2" />
+        </div>
+        <div class="account-field-row">
+          <div class="account-field">
+            <label>City</label>
+            <input id="city" type="text" autocomplete="address-level2" />
+          </div>
+          <div class="account-field">
+            <label>State</label>
+            <input id="state" type="text" autocomplete="address-level1" />
+          </div>
+        </div>
+        <div class="account-field">
+          <label>Pincode</label>
+          <input id="pincode" type="text" inputmode="numeric" autocomplete="postal-code" />
+        </div>
+
+        <div class="account-actions">
+          <button type="submit" class="btn btn-gold" id="saveBtn">Save changes</button>
+        </div>
+      </form>
+
+      <div class="account-logout">
+        <button type="button" class="btn btn-outline-dark" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/footer.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await getCurrentUser();
+  if (!user) {
+    window.location.href = "login.html?redirect=" + encodeURIComponent("account.html");
+    return;
+  }
+
+  const fullName = (user.user_metadata && user.user_metadata.full_name) || "Your account";
+  document.getElementById("acctName").textContent = fullName;
+  document.getElementById("acctEmail").textContent = user.email || "";
+  renderAccountAvatar(document.getElementById("acctAvatarBig"), user);
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (profile) {
+    document.getElementById("phone").value = profile.phone || "";
+    document.getElementById("address1").value = profile.address_line1 || "";
+    document.getElementById("address2").value = profile.address_line2 || "";
+    document.getElementById("city").value = profile.city || "";
+    document.getElementById("state").value = profile.state || "";
+    document.getElementById("pincode").value = profile.pincode || "";
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", () => logout());
+
+  document.getElementById("accountForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("acctStatus");
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    statusEl.style.display = "none";
+
+    const updates = {
+      phone: document.getElementById("phone").value.trim(),
+      address_line1: document.getElementById("address1").value.trim(),
+      address_line2: document.getElementById("address2").value.trim(),
+      city: document.getElementById("city").value.trim(),
+      state: document.getElementById("state").value.trim(),
+      pincode: document.getElementById("pincode").value.trim(),
+    };
+
+    const { error } = await supabaseClient.from("profiles").update(updates).eq("id", user.id);
+
+    btn.disabled = false;
+    btn.textContent = "Save changes";
+
+    statusEl.textContent = error ? error.message : "Saved.";
+    statusEl.className = "account-status " + (error ? "auth-error" : "auth-success");
+    statusEl.style.display = "block";
+  });
+});
+</script>
+</body>
+</html>

@@ -101,8 +101,10 @@
 
 <script src="js/supabaseClient.js"></script>
 <script src="js/cart.js"></script>
+<script src="js/auth-modal.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/footer.js"></script>
+<script src="js/main.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const cartEmpty = document.getElementById("cartEmpty");
@@ -173,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   checkoutBtn.addEventListener("click", async () => {
-    const user = await requireAuth(); // sends to login.html?redirect=cart.html if not signed in
+    const user = await requireAuth(); // opens login/signup popup if not signed in
     if (!user) return;
     window.location.href = "checkout.html";
   });
