@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign Up — Mirwa</title>
+<meta name="description" content="Create your Mirwa account." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .auth-section{ padding: 4rem 0 5rem; }
+  .auth-card{
+    max-width: 420px; margin: 0 auto;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 14px; padding: 2.4rem 2rem;
+    box-shadow: 0 12px 28px rgba(22,20,15,.08);
+  }
+  .auth-card h1{ font-size: 1.8rem; margin-bottom: .4rem; }
+  .auth-card .sub{ color: var(--ink-soft); font-size: .92rem; margin-bottom: 1.8rem; }
+  .auth-field{ margin-bottom: 1.2rem; }
+  .auth-field label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.5rem; }
+  .auth-field input{
+    width:100%; border: 1px solid var(--line); border-radius: 8px;
+    padding: .75rem .85rem; font-family: inherit; font-size: .95rem; color: var(--ink);
+  }
+  .auth-field input:focus{ border-color: var(--gold); outline:none; }
+  .auth-field .hint{ font-size:.76rem; color: var(--ink-soft); margin-top:.4rem; }
+  .auth-submit{ width:100%; justify-content:center; margin-top:.4rem; }
+  .auth-error{ color:#a9432f; font-size:.85rem; margin-bottom:1rem; display:none; }
+  .auth-success{ color: var(--emerald); font-size:.88rem; margin-bottom:1rem; display:none; line-height:1.6; }
+  .auth-switch{ text-align:center; margin-top:1.6rem; font-size:.9rem; color: var(--ink-soft); }
+  .auth-switch a{ color: var(--gold); text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">MIRWA<small>Fine &amp; Light Weight Jewelry</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="auth-section">
+  <div class="container">
+    <div class="auth-card">
+      <p class="eyebrow">Join Mirwa</p>
+      <h1>Create your account</h1>
+      <p class="sub">You'll need an account to write reviews and place orders.</p>
+
+      <p class="auth-error" id="authError"></p>
+      <p class="auth-success" id="authSuccess"></p>
+
+      <form id="signupForm">
+        <div class="auth-field">
+          <label for="fullName">Full name</label>
+          <input id="fullName" type="text" required autocomplete="name" />
+        </div>
+        <div class="auth-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" required autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" required minlength="6" autocomplete="new-password" />
+          <p class="hint">At least 6 characters.</p>
+        </div>
+        <button type="submit" class="btn btn-gold auth-submit" id="submitBtn">Sign Up</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+
+<script src="js/supabaseClient.js"></script>
+<script src="js/footer.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("signupForm");
+  const errorEl = document.getElementById("authError");
+  const successEl = document.getElementById("authSuccess");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+    successEl.style.display = "none";
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating account…";
+
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } },
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Sign Up";
+
+    if (error) {
+      errorEl.textContent = error.message;
+      errorEl.style.display = "block";
+      return;
+    }
+
+    // If email confirmation is required, there's no session yet.
+    if (data.session) {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      window.location.href = redirect ? decodeURIComponent(redirect) : "index.html";
+    } else {
+      form.reset();
+      successEl.textContent = "Account created! Check your email to confirm, then log in.";
+      successEl.style.display = "block";
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -97,8 +97,12 @@
     </nav>
     <div class="header-icons">
       <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
       <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
-      <a class="icon-btn" href="cart.html" aria-label="Shopping bag"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></a>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
       <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     </div>
   </div>
@@ -167,6 +171,37 @@
     <div id="relatedSection" style="display:none;">
       <h2 class="section-title related-heading">You may also like</h2>
       <div class="product-grid" id="relatedGrid"></div>
+    </div>
+
+    <div id="reviewsSection" style="display:none; margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--line);">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.6rem;">
+        <h2 class="section-title" style="margin:0;">Reviews <span id="reviewCount" style="font-size:1.1rem; color:var(--ink-soft);"></span></h2>
+        <button class="btn btn-outline-dark" id="writeReviewBtn" type="button">Write a Review</button>
+      </div>
+
+      <div id="reviewFormWrap" style="display:none; background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.6rem; margin-bottom:2rem; max-width:560px;">
+        <p class="auth-error" id="reviewError" style="color:#a9432f; font-size:.85rem; margin-bottom:1rem; display:none;"></p>
+        <form id="reviewForm">
+          <div style="margin-bottom:1rem;">
+            <label style="display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.5rem;">Rating</label>
+            <div id="ratingStars" style="display:flex; gap:.3rem; font-size:1.5rem; color:var(--line);">
+              <span data-star="1" style="cursor:pointer;">★</span>
+              <span data-star="2" style="cursor:pointer;">★</span>
+              <span data-star="3" style="cursor:pointer;">★</span>
+              <span data-star="4" style="cursor:pointer;">★</span>
+              <span data-star="5" style="cursor:pointer;">★</span>
+            </div>
+          </div>
+          <div style="margin-bottom:1.2rem;">
+            <label for="reviewComment" style="display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.5rem;">Your review</label>
+            <textarea id="reviewComment" required rows="4" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:.75rem .85rem; font-family:inherit; font-size:.95rem; resize:vertical;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-gold" id="submitReviewBtn">Submit Review</button>
+        </form>
+      </div>
+
+      <div id="reviewsList" style="display:flex; flex-direction:column; gap:1.4rem;"></div>
+      <p id="noReviews" style="display:none; color:var(--ink-soft);">No reviews yet — be the first to share your thoughts.</p>
     </div>
   </div>
 </section>
@@ -237,6 +272,7 @@
 <script src="js/supabaseClient.js"></script>
 <script src="js/products-db.js"></script>
 <script src="js/cart.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script src="js/footer.js"></script>
 <script>
@@ -392,6 +428,119 @@ document.addEventListener("DOMContentLoaded", async () => {
     relatedSection.style.display = "block";
     if (typeof attachProductHoverSwap === "function") attachProductHoverSwap();
   }
+
+  // ---------- Reviews ----------
+  const reviewsSection = document.getElementById("reviewsSection");
+  const reviewsList = document.getElementById("reviewsList");
+  const noReviews = document.getElementById("noReviews");
+  const reviewCount = document.getElementById("reviewCount");
+  const writeReviewBtn = document.getElementById("writeReviewBtn");
+  const reviewFormWrap = document.getElementById("reviewFormWrap");
+  const reviewForm = document.getElementById("reviewForm");
+  const reviewError = document.getElementById("reviewError");
+  const ratingStars = document.getElementById("ratingStars");
+  let selectedRating = 0;
+
+  function paintStars() {
+    ratingStars.querySelectorAll("[data-star]").forEach((star) => {
+      star.style.color = Number(star.dataset.star) <= selectedRating ? "var(--gold)" : "var(--line)";
+    });
+  }
+  ratingStars.addEventListener("click", (e) => {
+    const star = e.target.closest("[data-star]");
+    if (!star) return;
+    selectedRating = Number(star.dataset.star);
+    paintStars();
+  });
+
+  async function loadReviews() {
+    const { data: reviews, error: reviewsErr } = await supabaseClient
+      .from("reviews")
+      .select("*")
+      .eq("product_id", product.id)
+      .order("created_at", { ascending: false });
+
+    reviewsSection.style.display = "block";
+
+    if (reviewsErr) {
+      console.error("Failed to load reviews:", reviewsErr.message);
+      return;
+    }
+
+    reviewCount.textContent = reviews.length ? `(${reviews.length})` : "";
+
+    if (!reviews.length) {
+      noReviews.style.display = "block";
+      reviewsList.innerHTML = "";
+      return;
+    }
+
+    noReviews.style.display = "none";
+    reviewsList.innerHTML = reviews.map((r) => {
+      const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+      const date = new Date(r.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
+      const name = r.reviewer_name || "Mirwa customer";
+      return `
+        <div style="border-bottom:1px solid var(--line); padding-bottom:1.2rem;">
+          <div style="color:var(--gold); font-size:1rem; margin-bottom:.3rem;">${stars}</div>
+          <p style="color:var(--ink-soft); line-height:1.7; margin-bottom:.5rem;">${(r.comment || "").replace(/</g, "&lt;")}</p>
+          <p style="font-size:.8rem; color:var(--ink-soft);"><strong style="color:var(--ink);">${name}</strong> &middot; ${date}</p>
+        </div>
+      `;
+    }).join("");
+  }
+
+  writeReviewBtn.addEventListener("click", async () => {
+    const user = await requireAuth(); // redirects to login.html?redirect=this-page if not signed in
+    if (!user) return; // requireAuth already redirected
+    reviewFormWrap.style.display = reviewFormWrap.style.display === "none" ? "block" : "none";
+  });
+
+  reviewForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    reviewError.style.display = "none";
+
+    const user = await requireAuth();
+    if (!user) return;
+
+    if (!selectedRating) {
+      reviewError.textContent = "Please select a star rating.";
+      reviewError.style.display = "block";
+      return;
+    }
+
+    const comment = document.getElementById("reviewComment").value.trim();
+    const submitBtn = document.getElementById("submitReviewBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+
+    const { error: insertErr } = await supabaseClient.from("reviews").insert({
+      product_id: product.id,
+      user_id: user.id,
+      reviewer_name: user.user_metadata?.full_name || null,
+      rating: selectedRating,
+      comment,
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Review";
+
+    if (insertErr) {
+      reviewError.textContent = insertErr.message.includes("duplicate")
+        ? "You've already reviewed this product."
+        : insertErr.message;
+      reviewError.style.display = "block";
+      return;
+    }
+
+    reviewForm.reset();
+    selectedRating = 0;
+    paintStars();
+    reviewFormWrap.style.display = "none";
+    loadReviews();
+  });
+
+  loadReviews();
 });
 </script>
 </body>
