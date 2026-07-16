@@ -142,6 +142,16 @@ document.addEventListener("DOMContentLoaded", () => {
       hotspots.forEach((x) => x.classList.remove("active"));
     });
   }
+
+  if (window.mirwaCart && typeof window.mirwaCart.getItems === "function") {
+    // badge is also updated on its own DOMContentLoaded inside cart.js,
+    // but re-run here in case main.js's listener fires after items are rendered
+    const count = window.mirwaCart.getItems().reduce((sum, i) => sum + i.qty, 0);
+    document.querySelectorAll("[data-cart-count]").forEach((el) => {
+      el.textContent = count > 0 ? String(count) : "";
+      el.style.display = count > 0 ? "inline-flex" : "none";
+    });
+  }
 });
 
 function attachProductHoverSwap() {
@@ -175,12 +185,19 @@ function productCardHTML(p) {
        <span class="price-save">SAVE ${p.oldPrice.replace(/[^\d₹]/g, "")}</span>`
     : `<span class="price-now">${p.price}</span>`;
 
+  // Real DB-backed products have a slug -> link to the product detail page.
+  // Legacy static placeholder products (no slug) stay unlinked for now.
+  const href = p.slug ? `product.html?slug=${encodeURIComponent(p.slug)}` : null;
+  const openTag = href ? `<a href="${href}" class="product-card-link">` : "";
+  const closeTag = href ? `</a>` : "";
+
   return `
     <article class="product-card">
+      ${openTag}
       <div class="product-media">
         ${p.discount ? `<span class="discount-ribbon">${p.discount}<br>OFF</span>` : ""}
         ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ""}
-        <button class="product-wish" aria-label="Add ${p.name} to wishlist">&hearts;</button>
+        <button class="product-wish" aria-label="Add ${p.name} to wishlist" onclick="event.preventDefault()">&hearts;</button>
         <img src="${primaryImage}" data-secondary="${secondaryImage}" alt="${p.name}" loading="lazy" />
       </div>
       <div class="product-info">
@@ -189,6 +206,7 @@ function productCardHTML(p) {
         <p class="product-cat">${p.material || p.cat}</p>
         <div class="swatch-row">${swatches}</div>
       </div>
+      ${closeTag}
     </article>
   `;
 }

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title id="pageTitle">Product — Mirwa</title>
+<meta name="description" id="pageDesc" content="Mirwa fine and fashion jewelry." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .product-page-section{ padding: 2.4rem 0 4rem; }
+  .product-page-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.2rem;
+    align-items:flex-start;
+  }
+  .product-gallery{ display:flex; flex-direction:column; gap: .9rem; position: sticky; top: 100px; }
+  .product-gallery-main{
+    aspect-ratio: 1/1.05;
+    overflow:hidden;
+    background: var(--bone-dim);
+    border: 1px solid var(--line);
+  }
+  .product-gallery-main img{ width:100%; height:100%; object-fit:cover; }
+  .product-gallery-thumbs{ display:flex; gap:.7rem; flex-wrap:wrap; }
+  .product-gallery-thumbs img{
+    width: 74px; height: 74px; object-fit:cover;
+    border: 1px solid var(--line); cursor:pointer; opacity:.7;
+    transition: opacity .2s, border-color .2s;
+  }
+  .product-gallery-thumbs img:hover,
+  .product-gallery-thumbs img.active{ opacity:1; border-color: var(--gold); }
+
+  .product-detail .eyebrow{ margin-bottom:.4rem; }
+  .product-detail h1{ font-size: clamp(1.9rem, 3vw, 2.6rem); margin-bottom: .6rem; line-height:1.1; }
+  .product-detail-rating{ font-size:.85rem; color:var(--ink-soft); margin-bottom: 1rem; }
+  .product-detail-rating .star{ color: var(--gold); }
+  .product-detail-price{ display:flex; align-items:baseline; gap:.8rem; margin-bottom: 1.4rem; }
+  .product-detail-price .now{ font-size: 1.7rem; font-family: var(--font-display); color: var(--ink); }
+  .product-detail-price .old{ font-size: 1.1rem; color: var(--ink-soft); text-decoration: line-through; }
+  .product-detail-price .save{ font-size:.82rem; color: var(--emerald); font-weight:500; }
+  .product-detail-desc{ color: var(--ink-soft); line-height: 1.8; margin-bottom: 1.6rem; max-width: 52ch; }
+
+  .product-meta-row{ display:flex; gap: 1.6rem; flex-wrap:wrap; margin-bottom: 1.6rem; font-size:.85rem; color: var(--ink-soft); }
+  .product-meta-row strong{ color: var(--ink); font-weight:500; }
+
+  .product-colors{ margin-bottom: 1.6rem; }
+  .product-colors h4{ font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color: var(--gold); margin-bottom:.7rem; }
+  .product-color-row{ display:flex; gap:.6rem; }
+  .product-color-swatch{
+    width: 30px; height: 30px; border-radius:50%;
+    border: 1px solid var(--line); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .product-color-swatch.active{ outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .qty-add-row{ display:flex; gap: 1rem; align-items:center; margin-bottom: 1.4rem; flex-wrap:wrap; }
+  .qty-stepper{ display:flex; align-items:center; border: 1px solid var(--line); }
+  .qty-stepper button{ width: 40px; height: 46px; background: transparent; border:none; font-size:1.1rem; }
+  .qty-stepper input{
+    width: 46px; text-align:center; border:none; border-left:1px solid var(--line); border-right:1px solid var(--line);
+    height: 46px; font-family: inherit; font-size: 1rem;
+  }
+  .add-to-cart-btn{ flex:1; min-width: 220px; justify-content:center; }
+  .stock-note{ font-size:.82rem; color: var(--ink-soft); margin-bottom: 2rem; }
+  .stock-note.low{ color:#a9432f; }
+
+  .trust-row{ display:flex; flex-direction:column; gap:.7rem; padding-top: 1.6rem; border-top: 1px solid var(--line); font-size:.85rem; color: var(--ink-soft); }
+
+  .related-heading{ margin: 3.5rem 0 1.6rem; }
+
+  @media (max-width: 900px){
+    .product-page-grid{ grid-template-columns: 1fr; gap: 1.8rem; }
+    .product-gallery{ position: static; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">MIRWA<small>Fine &amp; Light Weight Jewelry</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="product-page-section">
+  <div class="container">
+    <p class="breadcrumb" id="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; <a href="collections.html">Collections</a> &nbsp;/&nbsp; <span id="breadcrumbName">Loading…</span></p>
+
+    <div id="loadingState" style="padding: 4rem 0; text-align:center; color: var(--ink-soft);">Loading product…</div>
+    <div id="notFoundState" style="display:none; padding: 4rem 0; text-align:center; color: var(--ink-soft);">
+      <p>We couldn't find that product.</p>
+      <a href="collections.html" class="btn btn-outline-dark" style="margin-top:1rem;">Back to Collections</a>
+    </div>
+
+    <div class="product-page-grid" id="productContent" style="display:none;">
+      <div class="product-gallery">
+        <div class="product-gallery-main">
+          <img id="mainImage" src="" alt="" />
+        </div>
+        <div class="product-gallery-thumbs" id="galleryThumbs"></div>
+      </div>
+
+      <div class="product-detail">
+        <p class="eyebrow" id="productCat">Category</p>
+        <h1 id="productName">Product name</h1>
+        <p class="product-detail-rating" id="productRating"></p>
+
+        <div class="product-detail-price">
+          <span class="now" id="priceNow">₹0</span>
+          <span class="old" id="priceOld" style="display:none;"></span>
+          <span class="save" id="priceSave" style="display:none;"></span>
+        </div>
+
+        <p class="product-detail-desc" id="productDesc">Description loading…</p>
+
+        <div class="product-meta-row">
+          <span>Material: <strong id="productMaterial">18 karat gold</strong></span>
+          <span>Brand: <strong id="productBrand">Mirwa</strong></span>
+        </div>
+
+        <div class="product-colors" id="colorSection" style="display:none;">
+          <h4>Color</h4>
+          <div class="product-color-row" id="colorRow"></div>
+        </div>
+
+        <div class="qty-add-row">
+          <div class="qty-stepper">
+            <button type="button" id="qtyMinus" aria-label="Decrease quantity">&minus;</button>
+            <input type="text" id="qtyInput" value="1" inputmode="numeric" aria-label="Quantity" />
+            <button type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="btn btn-gold add-to-cart-btn" id="addToCartBtn">Add to Bag</button>
+        </div>
+
+        <p class="stock-note" id="stockNote"></p>
+
+        <div class="trust-row">
+          <span>✓ BIS hallmarked gold, certified diamonds</span>
+          <span>✓ Fast &amp; secure shipping, fully insured</span>
+          <span>✓ 15-day returns &middot; lifetime exchange &amp; buyback</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="relatedSection" style="display:none;">
+      <h2 class="section-title related-heading">You may also like</h2>
+      <div class="product-grid" id="relatedGrid"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer">
+  <div class="container footer-top">
+    <div class="footer-brand">
+      <a href="index.html" class="brand"><img src="https://tirisi.com/wp-content/uploads/2022/06/TirisiLogo-1.svg" alt="Mirwa" style="height:28px;vertical-align:middle;margin-right:.6rem;">MIRWA</a>
+      <p class="footer-tag">The world is my catwalk</p>
+      <h4>Subscribe to our newsletter</h4>
+      <form class="footer-newsletter" action="#" onsubmit="event.preventDefault(); alert('Subscribed (demo)')">
+        <input type="email" placeholder="Email address" aria-label="Email address" required>
+        <button class="btn btn-gold">Subscribe <img src="https://tirisi.com/wp-content/themes/tirisi/assets/images/whiteArrow.svg" alt="arrow" style="height:12px;margin-left:.5rem;vertical-align:middle"></button>
+      </form>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h5>Socials</h5>
+        <ul>
+          <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/instagram.svg" alt="Instagram"> Instagram</a></li>
+          <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/facebook.svg" alt="Facebook"> Facebook</a></li>
+          <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/linkedin.svg" alt="Linkedin"> Linkedin</a></li>
+          <li><a href="#"><img src="https://tirisi.com/wp-content/uploads/2022/06/youtube.svg" alt="Youtube"> Youtube</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="#">Our Services</a></li>
+          <li><a href="#">Point of Sale</a></li>
+          <li><a href="#">Care Guide</a></li>
+          <li><a href="#">News</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Legal &amp; Conditions</h5>
+        <ul>
+          <li><a href="#">Disclaimer</a></li>
+          <li><a href="#">Terms and Conditions</a></li>
+          <li><a href="#">Terms of Sales</a></li>
+          <li><a href="#">Warranty</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">The House</a></li>
+          <li><a href="#">Journey of a Jewel</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <div class="popular-searches">Popular searches: RINGS | NECKLACES | BANGLES &amp; BRACELETS | EARRINGS</div>
+    <div class="copyright">Terms And Conditions · Privacy Policy · © 2026 Mirwa</div>
+  </div>
+</footer>
+
+<button class="to-top" aria-label="Back to top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<script src="js/products.js"></script>
+<script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script src="js/footer.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("slug");
+
+  const loadingState = document.getElementById("loadingState");
+  const notFoundState = document.getElementById("notFoundState");
+  const productContent = document.getElementById("productContent");
+  const relatedSection = document.getElementById("relatedSection");
+
+  if (!slug) {
+    loadingState.style.display = "none";
+    notFoundState.style.display = "block";
+    return;
+  }
+
+  const { data: product, error } = await supabaseClient
+    .from("products")
+    .select("*")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .single();
+
+  loadingState.style.display = "none";
+
+  if (error || !product) {
+    notFoundState.style.display = "block";
+    return;
+  }
+
+  document.getElementById("pageTitle").textContent = `${product.name} — Mirwa`;
+  document.getElementById("pageDesc").setAttribute("content", (product.description || "").slice(0, 155));
+  document.getElementById("breadcrumbName").textContent = product.name;
+
+  const images = (product.gallery && product.gallery.length ? product.gallery : [product.image, product.secondary_image]).filter(Boolean);
+  const mainImage = document.getElementById("mainImage");
+  mainImage.src = images[0] || "";
+  mainImage.alt = product.name;
+
+  const thumbsEl = document.getElementById("galleryThumbs");
+  thumbsEl.innerHTML = images.map((src, i) => `
+    <img src="${src}" alt="${product.name} view ${i + 1}" class="${i === 0 ? "active" : ""}" data-src="${src}" />
+  `).join("");
+  thumbsEl.addEventListener("click", (e) => {
+    const img = e.target.closest("img[data-src]");
+    if (!img) return;
+    mainImage.src = img.dataset.src;
+    thumbsEl.querySelectorAll("img").forEach((t) => t.classList.remove("active"));
+    img.classList.add("active");
+  });
+
+  document.getElementById("productCat").textContent = product.category;
+  document.getElementById("productName").textContent = product.name;
+  document.getElementById("productMaterial").textContent = product.material || "18 karat gold";
+  document.getElementById("productBrand").textContent = product.brand || "Mirwa";
+  document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the Mirwa collection.";
+
+  if (product.rating) {
+    document.getElementById("productRating").innerHTML = `${product.rating} <span class="star">★</span>`;
+  }
+
+  const price = Number(product.price) || 0;
+  const oldPrice = product.old_price ? Number(product.old_price) : null;
+  document.getElementById("priceNow").textContent = `₹${price.toLocaleString("en-IN")}`;
+  if (oldPrice && oldPrice > price) {
+    const saveAmt = oldPrice - price;
+    const savePct = Math.round((saveAmt / oldPrice) * 100);
+    const oldEl = document.getElementById("priceOld");
+    const saveEl = document.getElementById("priceSave");
+    oldEl.textContent = `₹${oldPrice.toLocaleString("en-IN")}`;
+    oldEl.style.display = "inline";
+    saveEl.textContent = `SAVE ${savePct}%`;
+    saveEl.style.display = "inline";
+  }
+
+  let selectedColor = null;
+  if (product.colors && product.colors.length) {
+    selectedColor = product.colors[0];
+    document.getElementById("colorSection").style.display = "block";
+    const colorRow = document.getElementById("colorRow");
+    colorRow.innerHTML = product.colors.map((c, i) => `
+      <button type="button" class="product-color-swatch ${i === 0 ? "active" : ""}" data-color="${c}"
+        style="background:${(typeof COLOR_SWATCHES !== "undefined" && COLOR_SWATCHES[c]) || "#ccc"}" title="${c}"></button>
+    `).join("");
+    colorRow.addEventListener("click", (e) => {
+      const btn = e.target.closest(".product-color-swatch");
+      if (!btn) return;
+      selectedColor = btn.dataset.color;
+      colorRow.querySelectorAll(".product-color-swatch").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  }
+
+  const stockNote = document.getElementById("stockNote");
+  const stock = typeof product.stock === "number" ? product.stock : 100;
+  if (stock <= 0) {
+    stockNote.textContent = "Currently out of stock.";
+    stockNote.classList.add("low");
+    document.getElementById("addToCartBtn").disabled = true;
+    document.getElementById("addToCartBtn").style.opacity = ".5";
+  } else if (stock <= 5) {
+    stockNote.textContent = `Only ${stock} left in stock.`;
+    stockNote.classList.add("low");
+  } else {
+    stockNote.textContent = "In stock, ready to ship.";
+  }
+
+  const qtyInput = document.getElementById("qtyInput");
+  document.getElementById("qtyMinus").addEventListener("click", () => {
+    qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
+  });
+  document.getElementById("qtyPlus").addEventListener("click", () => {
+    qtyInput.value = Math.min(stock || 99, (parseInt(qtyInput.value, 10) || 1) + 1);
+  });
+  qtyInput.addEventListener("change", () => {
+    let v = parseInt(qtyInput.value, 10) || 1;
+    v = Math.max(1, Math.min(stock || 99, v));
+    qtyInput.value = v;
+  });
+
+  document.getElementById("addToCartBtn").addEventListener("click", () => {
+    const qty = parseInt(qtyInput.value, 10) || 1;
+    window.mirwaCart.addItem({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      image: images[0] || "",
+      price,
+      color: selectedColor,
+    }, qty);
+
+    const btn = document.getElementById("addToCartBtn");
+    const original = btn.textContent;
+    btn.textContent = "Added ✓";
+    setTimeout(() => { btn.textContent = original; }, 1600);
+  });
+
+  productContent.style.display = "grid";
+
+  const { data: related } = await supabaseClient
+    .from("products")
+    .select("*")
+    .eq("category", product.category)
+    .eq("is_active", true)
+    .neq("id", product.id)
+    .limit(4);
+
+  if (related && related.length) {
+    const relatedCards = related.map(mapDbProductToCard);
+    document.getElementById("relatedGrid").innerHTML = relatedCards.map(productCardHTML).join("");
+    relatedSection.style.display = "block";
+    if (typeof attachProductHoverSwap === "function") attachProductHoverSwap();
+  }
+});
+</script>
+</body>
+</html>
