@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Our Story — OrenkaFine</title>
+<meta name="description" content="The story of OrenkaFine — founded in Mumbai in 1996, a brand built to manufacture confidence for jewellery retailers across India." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .founder-prose{ max-width: none; }
+  .founder-prose p{ font-size: 1.02rem; color: var(--ink-soft); line-height:1.8; margin-bottom: 1.2rem; }
+
+  .founder-profile{
+    display:grid; grid-template-columns: 1.15fr .85fr; gap: 2.4rem; align-items:center;
+  }
+  .founder-profile-reverse{ grid-template-columns: .85fr 1.15fr; }
+  .founder-profile-reverse .founder-profile-img{ order: 2; }
+  .founder-profile-text .eyebrow{ color: var(--gold); }
+  .founder-profile-text h2{ font-size: clamp(1.85rem, 2.8vw, 2.4rem); margin: .4rem 0 1rem; }
+  .founder-profile-text p{ font-size: .98rem; color: var(--ink-soft); line-height:1.8; max-width: 52ch; }
+  .founder-profile-img{ width:100%; aspect-ratio: 4/5; object-fit:cover; max-width:380px; justify-self:center; }
+  @media (max-width: 760px){
+    .founder-profile, .founder-profile-reverse{ grid-template-columns: 1fr; }
+    .founder-profile-reverse .founder-profile-img{ order: 0; }
+    .founder-profile-img{ max-width: 100%; }
+  }
+  .founder-list{
+    display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; margin-top: 2rem;
+  }
+  .founder-list li{
+    list-style:none; padding: 1.1rem 1.3rem; background: var(--bone-dim); border:1px solid var(--line);
+    color: var(--ink-soft); font-size:.92rem; line-height:1.6;
+  }
+  .founder-list li::before{ content:"—"; color: var(--gold); margin-right:.6rem; }
+  @media (max-width: 640px){ .founder-list{ grid-template-columns: 1fr; } }
+
+  .founder-page section:not(.hero){ padding: 0; }
+
+  .reveal{
+    --reveal: 0;
+    opacity: var(--reveal);
+    transform: translateY(calc((1 - var(--reveal)) * 40px)) scale(calc(0.98 + var(--reveal) * 0.02));
+    transition: opacity .35s linear, transform .35s linear;
+    will-change: opacity, transform;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body class="about-page founder-page">
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewelry</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="founder.html" class="active">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <button class="icon-btn" aria-label="Shopping bag"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero page-hero">
+  <div class="hero-media">
+    <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1614606139527-3afb46eebcd7?auto=format&fit=crop&w=1600&q=80">
+      <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Assets/Hero/hero5.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="container hero-content">
+    <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Our Story</p>
+    <p class="eyebrow">Business Begins With Trust</p>
+    <h1>Our Story</h1>
+    <p style="max-width:56ch; color:var(--bone-dim); margin-top:1rem; font-size:1.05rem;">A brand built to manufacture confidence for jewellery retailers across India.</p>
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Since 1996</p>
+        <h2 class="section-title">Business Begins With Trust</h2>
+      </div>
+    </div>
+    <div class="founder-prose">
+      <p>Before a design is selected, before a diamond is set, and before a piece reaches the display counter, there is one question that matters most: can the retailer trust the people behind the jewellery?</p>
+      <p>OrenkaFine was built to answer that question with confidence. Founded in Mumbai in 1996, the brand began with a deep respect for the discipline of the gems and jewellery trade and a clear purpose: to manufacture fine jewellery that retailers could sell with pride and certainty.</p>
+      <p>Every piece had to carry more than design. It had to carry accuracy, finish, durability, documentation, and the assurance that the work behind it was honest and dependable.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-dim reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Our craft</p>
+        <h2 class="section-title">A Story Built on Craftsmanship</h2>
+      </div>
+    </div>
+    <div class="founder-prose">
+      <p>The journey of OrenkaFine has always been connected to craftsmanship. Jewellery is a refined art, but it is also a serious responsibility. A small difference in stone selection, setting, polish, proportion, or finish can change the value and beauty of a piece.</p>
+      <p>For nearly three decades, the company has grown by respecting detail, learning from the trade, listening to retailers, and treating every order as a commitment.</p>
+      <p>The company continues to bring together skilled craftsmanship, careful processes, and a deep understanding of jewellery excellence. Trust remains central. Quality remains essential. Integrity remains the difference between a transaction and a lasting relationship.</p>
+    </div>
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Growth</p>
+        <h2 class="section-title">From Craft to Company</h2>
+      </div>
+    </div>
+    <div class="founder-prose">
+      <p>OrenkaFine began as a manufacturing business with a clear purpose: to create fine jewellery that retailers could sell with confidence.</p>
+      <p>Over the years, the company built its strength quietly and steadily. Retailers returned because quality was consistent, communication was clear, delivery commitments were respected, and the founders remained accessible.</p>
+      <p>Throughout this journey, every stage of growth was guided by the same philosophy: long-term relationships are built through reliability, transparency, and attention to detail. Rather than pursuing rapid expansion, the company focused on strengthening its capabilities, refining its craftsmanship, and creating a foundation that retailers could continue to trust.</p>
+      <p>As the business evolved, OrenkaFine strengthened its systems, expanded its manufacturing discipline, and invested in better processes without losing the personal accountability that shaped the company from the beginning.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-dim reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Rooted in Mumbai</p>
+        <h2 class="section-title">The Mumbai Foundation</h2>
+      </div>
+    </div>
+    <div class="founder-prose">
+      <p>Mumbai has always been at the heart of OrenkaFine. As one of India's leading centres for diamonds, jewellery, manufacturing, and trade, the city provides the ideal environment where craftsmanship, expertise, and commerce come together.</p>
+      <p>OrenkaFine operates from its trade office at Bharat Diamond Bourse, BKC, and its manufacturing facility in Andheri East. This strategic presence enables the company to maintain close coordination between production and trade while ensuring every piece is crafted under direct supervision.</p>
+      <p>With complete oversight of the manufacturing process and a strong connection to the jewellery trade, the company delivers consistent quality, timely execution, and the flexibility to meet the evolving requirements of retailers and business partners.</p>
+      <p>This integrated Mumbai-based foundation reflects OrenkaFine's commitment to precision, reliability, and lasting business relationships, combining skilled craftsmanship with efficient operations to serve customers with confidence.</p>
+    </div>
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">The people behind the name</p>
+        <h2 class="section-title">The Craft Behind the Name</h2>
+      </div>
+    </div>
+    <div class="founder-prose" style="margin-bottom:1rem;">
+      <p>At OrenkaFine, the craft begins with understanding the piece: its purpose, design language, material, stones, karat, finish, and the customer it is meant for.</p>
+      <p>The company works in 18K, 14K, and 9K gold, with designs made in yellow gold, white gold, and rose gold finishes. Each piece is handled with attention to proportion, setting security, wearability, polish, and commercial suitability. Our process is shaped by disciplined development: understanding the requirement, analysing practicality, refining the design, preparing materials, executing with skill, and checking the finished piece before delivery.</p>
+    </div>
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="container founder-profile">
+    <div class="founder-profile-text">
+      <p class="eyebrow">Factory &amp; quality</p>
+      <h2>Mr. Shalabh Goyal</h2>
+      <p>Mr. Shalabh Goyal remains closely involved in factory standards, quality decisions, client relationships, and business direction. His experience gives the company practical insight into both manufacturing and the retail jewellery market.</p>
+    </div>
+    <img class="founder-profile-img" src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Sir.png" alt="Mr. Shalabh Goyal" />
+  </div>
+</section>
+
+<section class="section-dim reveal">
+  <div class="container founder-profile founder-profile-reverse">
+    <div class="founder-profile-text">
+      <p class="eyebrow">Operations &amp; client relationships</p>
+      <h2>Mrs. Shweta Goyal</h2>
+      <p>Mrs. Shweta Goyal brings operational precision, business judgement, and client relationship depth. Her oversight across quality management, client commitments, and business operations helps ensure that promises are followed through with discipline.</p>
+    </div>
+    <img class="founder-profile-img" src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Maam.jpeg" alt="Mrs. Shweta Goyal" />
+  </div>
+</section>
+
+<section class="reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">The difference</p>
+        <h2 class="section-title">What Makes OrenkaFine Different</h2>
+      </div>
+    </div>
+    <ul class="founder-list">
+      <li>In-house manufacturing with direct control over quality, process, and timelines</li>
+      <li>Product development shaped by retailer needs and customer expectations</li>
+      <li>Documented, certified, and BIS hallmarked jewellery where applicable</li>
+      <li>GJEPC membership and trade presence at Bharat Diamond Bourse, BKC</li>
+      <li>Client visits to the manufacturing facility for greater transparency</li>
+      <li>Long-term relationships built through reliable delivery and honest communication</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section-dim reveal">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Looking ahead</p>
+        <h2 class="section-title">The Next Chapter</h2>
+      </div>
+    </div>
+    <div class="founder-prose">
+      <p>The goal ahead is to grow stronger: with better systems, wider reach, deeper retailer relationships, and continued commitment to certified, consistent, in-house jewellery manufacturing.</p>
+      <p>OrenkaFine is a brand built for retailers who value reliability as much as design, documentation as much as beauty, and partnership as much as product. The story began in 1996. It continues today with every piece we make, every order we deliver, and every relationship we build.</p>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter reveal">
+  <div class="container newsletter-inner">
+    <div>
+      <p class="eyebrow">Join the house</p>
+      <h2>Be part of the OrenkaFine world</h2>
+      <p>Sign up for early access to new arrivals, styling edits and members-only offers.</p>
+    </div>
+    <form class="newsletter-form">
+      <div class="field-row">
+        <input type="email" required placeholder="Email address" aria-label="Email address" />
+        <button type="submit" class="btn btn-gold">Subscribe</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+
+<button class="to-top" aria-label="Back to top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<script src="js/supabaseClient.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+<script src="js/footer.js"></script>
+<script>
+  const revealEls = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    const steps = Array.from({ length: 21 }, (_, i) => i / 20);
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const rootHeight = entry.rootBounds ? entry.rootBounds.height : window.innerHeight;
+          const ratio = rootHeight > 0 ? Math.min(1, entry.intersectionRect.height / rootHeight) : entry.intersectionRatio;
+          entry.target.style.setProperty("--reveal", ratio.toFixed(3));
+        });
+      },
+      { threshold: steps }
+    );
+    revealEls.forEach((el) => revealObserver.observe(el));
+  } else {
+    revealEls.forEach((el) => el.style.setProperty("--reveal", 1));
+  }
+</script>
+</body>
+</html>
