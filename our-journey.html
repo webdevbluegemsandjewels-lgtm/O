@@ -13,20 +13,11 @@
   .founder-prose{ max-width: none; }
   .founder-prose p{ font-size: 1.02rem; color: var(--ink-soft); line-height:1.8; margin-bottom: 1.2rem; }
 
-  .founder-profile{
-    display:grid; grid-template-columns: 1.15fr .85fr; gap: 2.4rem; align-items:center;
-  }
-  .founder-profile-reverse{ grid-template-columns: .85fr 1.15fr; }
-  .founder-profile-reverse .founder-profile-img{ order: 2; }
-  .founder-profile-text .eyebrow{ color: var(--gold); }
-  .founder-profile-text h2{ font-size: clamp(1.85rem, 2.8vw, 2.4rem); margin: .4rem 0 1rem; }
-  .founder-profile-text p{ font-size: .98rem; color: var(--ink-soft); line-height:1.8; max-width: 52ch; }
-  .founder-profile-img{ width:100%; aspect-ratio: 4/5; object-fit:cover; max-width:380px; justify-self:center; }
-  @media (max-width: 760px){
-    .founder-profile, .founder-profile-reverse{ grid-template-columns: 1fr; }
-    .founder-profile-reverse .founder-profile-img{ order: 0; }
-    .founder-profile-img{ max-width: 100%; }
-  }
+  /* Founder profile portraits — smaller and vertically centered so the
+     photo's height never forces extra space between the heading and the
+     bio paragraph next to it. */
+  .founder-page .about-split img{ max-width: 240px; align-self: center; }
+  .founder-page .about-split{ align-items: center; }
   .founder-list{
     display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; margin-top: 2rem;
   }
@@ -36,19 +27,6 @@
   }
   .founder-list li::before{ content:"—"; color: var(--gold); margin-right:.6rem; }
   @media (max-width: 640px){ .founder-list{ grid-template-columns: 1fr; } }
-
-  .founder-page section:not(.hero){ padding: 0; }
-
-  .reveal{
-    --reveal: 0;
-    opacity: var(--reveal);
-    transform: translateY(calc((1 - var(--reveal)) * 40px)) scale(calc(0.98 + var(--reveal) * 0.02));
-    transition: opacity .35s linear, transform .35s linear;
-    will-change: opacity, transform;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .reveal{ opacity: 1; transform: none; transition: none; }
-  }
 </style>
 </head>
 <body class="about-page founder-page">
@@ -66,7 +44,7 @@
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html">Collections</a>
       <a href="about.html">The House</a>
-      <a href="founder.html" class="active">Our Story</a>
+      <a href="our-journey.html" class="active">Our Story</a>
       <a href="contact.html">Contact</a>
     </nav>
     <div class="header-icons">
@@ -81,7 +59,7 @@
 
 <section class="hero page-hero">
   <div class="hero-media">
-    <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1614606139527-3afb46eebcd7?auto=format&fit=crop&w=1600&q=80">
+    <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1762505464397-6abf1a645981?auto=format&fit=crop&w=1600&q=80">
       <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Assets/Hero/hero5.mp4" type="video/mp4" />
     </video>
   </div>
@@ -89,11 +67,10 @@
     <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Our Story</p>
     <p class="eyebrow">Business Begins With Trust</p>
     <h1>Our Story</h1>
-    <p style="max-width:56ch; color:var(--bone-dim); margin-top:1rem; font-size:1.05rem;">A brand built to manufacture confidence for jewellery retailers across India.</p>
   </div>
 </section>
 
-<section class="reveal">
+<section>
   <div class="container">
     <div class="section-head">
       <div>
@@ -109,7 +86,7 @@
   </div>
 </section>
 
-<section class="section-dim reveal">
+<section class="section-dim">
   <div class="container">
     <div class="section-head">
       <div>
@@ -125,7 +102,7 @@
   </div>
 </section>
 
-<section class="reveal">
+<section>
   <div class="container">
     <div class="section-head">
       <div>
@@ -142,7 +119,7 @@
   </div>
 </section>
 
-<section class="section-dim reveal">
+<section class="section-dim">
   <div class="container">
     <div class="section-head">
       <div>
@@ -159,7 +136,7 @@
   </div>
 </section>
 
-<section class="reveal">
+<section>
   <div class="container">
     <div class="section-head">
       <div>
@@ -174,29 +151,33 @@
   </div>
 </section>
 
-<section class="reveal">
-  <div class="container founder-profile">
-    <div class="founder-profile-text">
+<section class="editorial-reverse">
+  <div class="container editorial about-split">
+    <div class="about-split-head">
       <p class="eyebrow">Factory &amp; quality</p>
-      <h2>Mr. Shalabh Goyal</h2>
+      <h2 class="about-split-title">Mr. Shalabh Goyal</h2>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Sir.png" alt="Mr. Shalabh Goyal" />
+    <div class="about-split-body">
       <p>Mr. Shalabh Goyal remains closely involved in factory standards, quality decisions, client relationships, and business direction. His experience gives the company practical insight into both manufacturing and the retail jewellery market.</p>
     </div>
-    <img class="founder-profile-img" src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Sir.png" alt="Mr. Shalabh Goyal" />
   </div>
 </section>
 
-<section class="section-dim reveal">
-  <div class="container founder-profile founder-profile-reverse">
-    <div class="founder-profile-text">
+<section class="section-dim">
+  <div class="container editorial about-split">
+    <div class="about-split-head">
       <p class="eyebrow">Operations &amp; client relationships</p>
-      <h2>Mrs. Shweta Goyal</h2>
+      <h2 class="about-split-title">Mrs. Shweta Goyal</h2>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Maam.jpeg" alt="Mrs. Shweta Goyal" />
+    <div class="about-split-body">
       <p>Mrs. Shweta Goyal brings operational precision, business judgement, and client relationship depth. Her oversight across quality management, client commitments, and business operations helps ensure that promises are followed through with discipline.</p>
     </div>
-    <img class="founder-profile-img" src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Maam.jpeg" alt="Mrs. Shweta Goyal" />
   </div>
 </section>
 
-<section class="reveal">
+<section>
   <div class="container">
     <div class="section-head">
       <div>
@@ -215,7 +196,7 @@
   </div>
 </section>
 
-<section class="section-dim reveal">
+<section class="section-dim">
   <div class="container">
     <div class="section-head">
       <div>
@@ -230,7 +211,7 @@
   </div>
 </section>
 
-<section class="newsletter reveal">
+<section class="newsletter">
   <div class="container newsletter-inner">
     <div>
       <p class="eyebrow">Join the house</p>
@@ -257,24 +238,5 @@
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script src="js/footer.js"></script>
-<script>
-  const revealEls = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window) {
-    const steps = Array.from({ length: 21 }, (_, i) => i / 20);
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const rootHeight = entry.rootBounds ? entry.rootBounds.height : window.innerHeight;
-          const ratio = rootHeight > 0 ? Math.min(1, entry.intersectionRect.height / rootHeight) : entry.intersectionRatio;
-          entry.target.style.setProperty("--reveal", ratio.toFixed(3));
-        });
-      },
-      { threshold: steps }
-    );
-    revealEls.forEach((el) => revealObserver.observe(el));
-  } else {
-    revealEls.forEach((el) => el.style.setProperty("--reveal", 1));
-  }
-</script>
 </body>
 </html>

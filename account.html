@@ -10,38 +10,44 @@
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .account-section{ padding: 3.6rem 0 5rem; }
-  .account-header{ display:flex; align-items:center; gap:1.2rem; margin-bottom: 2.6rem; }
-  #acctAvatarBig .account-avatar{ width:84px; height:84px; font-size:2rem; }
-  .account-header h1{ font-size:1.7rem; margin:0 0 .3rem; }
-  .account-header p{ color: var(--ink-soft); font-size:.92rem; margin:0; }
+  .account-section{ padding: 2.4rem 0 3.4rem; }
+  .account-header{
+    display:flex; align-items:center; gap:1.2rem;
+    margin-bottom: 1.8rem; padding: 1.6rem 1.8rem;
+    background: linear-gradient(135deg, var(--ink) 0%, #2a271f 100%);
+    border-radius: 16px; color:#fff;
+  }
+  #acctAvatarBig .account-avatar{ width:72px; height:72px; font-size:1.7rem; border: 2px solid rgba(255,255,255,.25); }
+  .account-header h1{ font-size:1.5rem; margin:0 0 .25rem; color:#fff; }
+  .account-header p{ color: var(--bone-dim); font-size:.9rem; margin:0; }
+  .account-header .member-since{ color: var(--gold-light); font-size:.76rem; letter-spacing:.06em; text-transform:uppercase; margin-top:.35rem; }
   .account-card{
     max-width: 640px;
     background: #fff; border: 1px solid var(--line);
-    border-radius: 14px; padding: 2.2rem 2rem;
-    box-shadow: 0 12px 28px rgba(22,20,15,.08);
+    border-radius: 16px; padding: 1.9rem 1.8rem;
+    box-shadow: 0 16px 36px rgba(22,20,15,.1);
   }
-  .account-card h2{ font-size:1.1rem; margin: 0 0 1.4rem; }
-  .account-field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .account-field{ margin-bottom: 1.1rem; }
-  .account-field label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.5rem; }
+  .account-card h2{ font-size:1.05rem; margin: 0 0 1.1rem; }
+  .account-field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+  .account-field{ margin-bottom: .85rem; }
+  .account-field label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.4rem; }
   .account-field label .hint-inline{ text-transform:none; letter-spacing:normal; font-size:.72rem; color: var(--ink-soft); opacity:.75; }
   .account-field input{
     width:100%; background:#fff; border: 1.5px solid #cfc7b6; border-radius: 8px;
-    padding: .72rem .85rem; font-family: inherit; font-size: .95rem; color: var(--ink);
+    padding: .68rem .85rem; font-family: inherit; font-size: .95rem; color: var(--ink);
   }
   .account-field input:focus{ border-color: var(--gold); outline:none; box-shadow: 0 0 0 3px rgba(169,130,76,.15); }
   .account-field input[disabled]{ color: var(--ink-soft); background: var(--paper-dim, #f4f1ec); }
-  .account-actions{ display:flex; align-items:center; gap:1rem; margin-top: .6rem; flex-wrap:wrap; }
+  .account-actions{ display:flex; align-items:center; gap:1rem; margin-top: .4rem; flex-wrap:wrap; }
   .account-status{ font-size:.85rem; margin: 0; }
   .account-status.auth-error{ color:#a9432f; }
   .account-status.auth-success{ color: var(--emerald); }
-  .account-logout{ margin-top: 2rem; }
+  .account-logout{ margin-top: 1.6rem; }
   @media (max-width: 480px){
     .account-field-row{ grid-template-columns: 1fr; }
-    .account-card{ padding: 1.8rem 1.4rem; }
-    .account-header{ gap: .9rem; }
-    #acctAvatarBig .account-avatar{ width:64px; height:64px; font-size:1.6rem; }
+    .account-card{ padding: 1.6rem 1.3rem; }
+    .account-header{ gap: .8rem; padding: 1.2rem 1.3rem; }
+    #acctAvatarBig .account-avatar{ width:56px; height:56px; font-size:1.4rem; }
   }
 </style>
 </head>
@@ -60,7 +66,7 @@
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html">Collections</a>
       <a href="about.html">The House</a>
-      <a href="founder.html">Our Story</a>
+      <a href="our-journey.html">Our Story</a>
       <a href="contact.html">Contact</a>
     </nav>
     <div class="header-icons">
@@ -82,6 +88,7 @@
       <div>
         <h1 id="acctName">Your account</h1>
         <p id="acctEmail"></p>
+        <p class="member-since" id="acctSince" style="display:none;"></p>
       </div>
     </div>
 
@@ -155,6 +162,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     .single();
 
   if (profile) {
+    if (profile.created_at) {
+      const sinceEl = document.getElementById("acctSince");
+      const since = new Date(profile.created_at).toLocaleDateString(undefined, { year: "numeric", month: "long" });
+      sinceEl.textContent = "Member since " + since;
+      sinceEl.style.display = "block";
+    }
     document.getElementById("phone").value = profile.phone || "";
     document.getElementById("address1").value = profile.address_line1 || "";
     document.getElementById("address2").value = profile.address_line2 || "";

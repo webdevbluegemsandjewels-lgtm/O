@@ -37,10 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="footer-col">
           <h5>OrenkaFine</h5>
           <ul>
-            <li><a href="founder.html">Our Story</a></li>
+            <li><a href="our-journey.html">Our Story</a></li>
             <li><a href="about.html">The House</a></li>
             <li><a href="about.html">Journey of a Jewel</a></li>
-            <li><a href="contact.html">Careers</a></li>
             <li><a href="contact.html">Contact</a></li>
           </ul>
         </div>

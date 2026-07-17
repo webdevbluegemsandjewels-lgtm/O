@@ -24,9 +24,12 @@
 }
 
 *,*::before,*::after{ box-sizing: border-box; }
-html{ scroll-behavior: smooth; }
+html{ scroll-behavior: smooth; width: 100%; overflow-x: hidden; }
+img, video, canvas, svg{ max-width: 100%; height: auto; }
 body{
   margin:0;
+  width: 100%;
+  overflow-x: hidden;
   background: var(--bone);
   color: var(--ink);
   font-family: var(--font-body);
@@ -267,21 +270,23 @@ button{ font-family: inherit; cursor:pointer; }
 .hero::after{
   content:"";
   position:absolute; inset:0;
-  background: linear-gradient(180deg, rgba(22,20,15,.15) 0%, rgba(22,20,15,.15) 40%, rgba(22,20,15,.86) 100%);
+  background: linear-gradient(180deg, rgba(22,20,15,.55) 0%, rgba(22,20,15,.5) 40%, rgba(22,20,15,.88) 100%);
   z-index:1;
 }
 .hero-content{
-  position:relative; z-index:2;
-  color: var(--bone);
-  padding: 1rem 0 1.2rem;
-  width:100%;
+    position: relative;
+    z-index: 2;
+    color: var(--bone);
+    width: 100%;
+    padding: 1rem 0 1.2rem 60px; /* Top Right Bottom Left */
 }
-.hero-content .eyebrow{ color: var(--gold-light); }
+.hero-content .eyebrow{ color: var(--gold-light); text-shadow: 0 2px 14px rgba(0,0,0,.45); }
 .hero-title{
   font-size: clamp(2.6rem, 6.4vw, 5.6rem);
   line-height: .98;
   margin-top: .6rem;
   max-width: 15ch;
+  text-shadow: 0 4px 24px rgba(0,0,0,.5);
 }
 .hero-title em{ color: var(--gold-light); font-style: italic; }
 .hero-sub{
@@ -290,6 +295,7 @@ button{ font-family: inherit; cursor:pointer; }
   font-size: 1.05rem;
   font-weight: 300;
   color: var(--bone-dim);
+  text-shadow: 0 2px 14px rgba(0,0,0,.45);
 }
 .hero-actions{ margin-top: 2.2rem; display:flex; gap: 1rem; flex-wrap:wrap; }
 
@@ -1231,8 +1237,8 @@ section{ padding: 3rem 0; }
 /* Footer extras */
 .footer-brand{ display:flex; flex-direction:column; gap:.8rem; }
 .footer-tag{ color: var(--bone-dim); margin:0 0 .6rem; }
-.footer-newsletter{ display:flex; gap:.6rem; margin-top:.6rem; }
-.footer-newsletter input{ padding:.6rem .8rem; border:1px solid rgba(255,255,255,.08); background:transparent; color:var(--bone); border-radius:6px; min-width:200px; }
+.footer-newsletter{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.6rem; }
+.footer-newsletter input{ flex:1 1 160px; min-width:0; padding:.6rem .8rem; border:1px solid rgba(255,255,255,.08); background:transparent; color:var(--bone); border-radius:6px; }
 .footer-newsletter .btn{ padding:.55rem .9rem; font-size:.82rem; }
 .footer-links{ display:flex; gap:2.2rem; }
 .footer-col ul{ list-style:none; padding:0; margin:0; }
@@ -1266,11 +1272,20 @@ section{ padding: 3rem 0; }
 .page-hero .hero-content .breadcrumb{
   width: 100%;
 }
+.page-hero .hero-content h1{
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+  margin-top: .6rem;
+}
+.page-hero .hero-content .eyebrow{
+  margin-top: .6rem;
+}
 .page-hero{
   min-height: 62vh;
 }
 @media (max-width: 760px){
   .page-hero{ min-height: 56vh; }
+  .page-hero .hero-content h1{ font-size: clamp(2rem, 8vw, 2.8rem); }
 }
 .about-page section:not(.hero){
   padding: 1.7rem 0;
@@ -1445,7 +1460,7 @@ section{ padding: 3rem 0; }
   .main-nav{ gap: 1.2rem; }
   .brand{ font-size: 1.65rem; }
   .brand small{ font-size: .5rem; }
-  .hero{ min-height: 60vh; }
+  .hero:not(.page-hero){ min-height: 60vh; }
   .hero-content{ padding-bottom: 3.2rem; }
   .hero-sub{ max-width: 100%; }
   .section-head{ margin-bottom: 2.2rem; }
@@ -1473,7 +1488,8 @@ section{ padding: 3rem 0; }
   .site-footer{ padding-top: 3.2rem; }
   .footer-bottom{ gap: .75rem; }
   .stats-row{ grid-template-columns: 1fr; }
-  .hero{ min-height: 70vh; }
+  .hero:not(.page-hero){ min-height: 70vh; }
+  .unique-set-content{ grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px){
@@ -1507,7 +1523,7 @@ section{ padding: 3rem 0; }
   .main-nav.open-mobile{ display: flex; }
   .nav-toggle{ display: flex; }
   .main-nav a{ padding: .55rem 0; }
-  .hero{ min-height: 55vh; }
+  .hero:not(.page-hero){ min-height: 55vh; }
   .hero-content{ padding-bottom: 2.2rem; }
   .hero-title{ font-size: clamp(1.9rem, 8vw, 3rem); }
   .hero-sub{ font-size: .98rem; }
@@ -1576,7 +1592,7 @@ section{ padding: 3rem 0; }
 
 @media (max-width: 560px){
   .section{ padding: 2.4rem 0; }
-  .hero{ min-height: 50vh; }
+  .hero:not(.page-hero){ min-height: 50vh; }
   .brand{ font-size: 1.35rem; }
   .brand small{ font-size: .42rem; }
   .hero-title{ font-size: clamp(1.7rem, 9vw, 2.6rem); }
@@ -1604,7 +1620,7 @@ section{ padding: 3rem 0; }
 
 @media (max-width: 420px){
   .container{ padding-inline: 1rem; }
-  .hero{ min-height: 50vh; }
+  .hero:not(.page-hero){ min-height: 50vh; }
   .hero-actions{ gap: .6rem; }
   .eyebrow{ font-size: .65rem; letter-spacing: .2em; }
   .section-title{ font-size: clamp(1.6rem, 8vw, 1.9rem); }
@@ -1639,7 +1655,9 @@ body.auth-modal-open{ overflow: hidden; }
   padding: 2.7rem 2.2rem 2.2rem;
   box-shadow: 0 -20px 60px rgba(22,20,15,.3);
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
+  overflow-x: hidden;
   animation: authSlideUp .38s cubic-bezier(.22,.9,.32,1);
 }
 .auth-modal.closing{ animation: authSlideDown .28s cubic-bezier(.4,0,1,1) forwards; }
@@ -1668,7 +1686,7 @@ body.auth-modal-open{ overflow: hidden; }
 
 .auth-modal-tabs{
   display: flex; gap: 1.6rem;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.3rem;
   border-bottom: 1px solid var(--line);
 }
 .auth-modal-tab{
@@ -1683,7 +1701,7 @@ body.auth-modal-open{ overflow: hidden; }
 }
 .auth-modal-tab.active{ color: var(--ink); border-bottom-color: var(--gold); }
 
-.auth-modal .auth-field{ margin-bottom: 1.1rem; }
+.auth-modal .auth-field{ margin-bottom: .9rem; }
 .auth-modal .auth-field label{
   display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
   color: var(--ink-soft); margin-bottom:.5rem;
@@ -1701,5 +1719,9 @@ body.auth-modal-open{ overflow: hidden; }
 .auth-modal .auth-success{ color: var(--emerald); font-size:.88rem; margin-bottom:1rem; line-height:1.6; }
 
 @media (max-width: 480px){
-  .auth-modal{ border-radius: 38px 38px 0 0; padding: 2.4rem 1.4rem 1.6rem; }
+  .auth-modal{ border-radius: 32px 32px 0 0; padding: 2.2rem 1.2rem 1.4rem; max-height: 92dvh; }
+  .auth-modal .auth-field{ margin-bottom: .75rem; }
+  .auth-modal .auth-field-row{ gap: .6rem; }
+  .auth-modal .auth-field input{ padding: .62rem .75rem; font-size: .9rem; }
+  .auth-modal-tabs{ gap: 1.2rem; margin-bottom: 1rem; }
 }

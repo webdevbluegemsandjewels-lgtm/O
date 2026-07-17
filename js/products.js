@@ -164,11 +164,14 @@ PRODUCTS.forEach((p, i) => {
 	 ========================================================= */
 
 const IMG = {
-	ringModel:     "https://images.unsplash.com/photo-1614606139527-3afb46eebcd7",
-	necklaceSet:   "https://images.unsplash.com/photo-1758995115682-1452a1a9e35b",
-	earringsHoop:  "https://images.unsplash.com/photo-1680968921717-4abbbe793bb3",
-	braceletWrist: "https://images.unsplash.com/photo-1741071520895-47d81779c11e",
-	heartNecklace: "https://images.unsplash.com/photo-1761211115639-54394f139142",
+	ringModel:      "https://images.unsplash.com/photo-1762505464397-6abf1a645981",
+	necklaceSet:    "https://images.unsplash.com/photo-1747933509433-c58152c10ee7",
+	earringsHoop:   "https://images.unsplash.com/photo-1616121341778-0dd435d03d23",
+	braceletWrist:  "https://images.unsplash.com/photo-1705575518997-82a71bcc75a2",
+	heartNecklace:  "https://images.unsplash.com/photo-1620135104013-1abdff4b1ca7",
+	dolceRing:      "https://images.unsplash.com/photo-1615146037533-0a9877176eb2",
+	eternaBridal:   "https://images.unsplash.com/photo-1768932080519-3ebd5a81d090",
+	everydayGold:   "https://images.unsplash.com/photo-1593193611972-437ce4d601c6",
 };
 
 function img(key, w = 900, extra = "") {
@@ -176,9 +179,9 @@ function img(key, w = 900, extra = "") {
 }
 
 const COLLECTIONS = [
-	{ id: "Dolce", title: "Dolce Collection", tagline: "Inspired by Italian Summer", description: "Luminous diamonds and warm gold create pieces for wedding days, evenings, and everyday celebration.", image: img("ringModel", 1200), href: "collections.html?collection=Dolce" },
-	{ id: "Eterna", title: "Eterna Collection", tagline: "Wedding & Bridal", description: "Elegant engagement and bridal jewelry designed with diamonds that shine from every angle.", image: img("necklaceSet", 1200), href: "collections.html?collection=Eterna" },
-	{ id: "Everyday Gold", title: "Everyday Gold", tagline: "Everyday elegance", description: "Lightweight diamond details designed to stack, layer, and carry you from day to night.", image: img("braceletWrist", 1200), href: "collections.html?collection=Everyday+Gold" },
+	{ id: "Dolce", title: "Dolce Collection", tagline: "Inspired by Italian Summer", description: "Luminous diamonds and warm gold create pieces for wedding days, evenings, and everyday celebration.", image: img("dolceRing", 1200), href: "collections.html?collection=Dolce" },
+	{ id: "Eterna", title: "Eterna Collection", tagline: "Wedding & Bridal", description: "Elegant engagement and bridal jewelry designed with diamonds that shine from every angle.", image: img("eternaBridal", 1200), href: "collections.html?collection=Eterna" },
+	{ id: "Everyday Gold", title: "Everyday Gold", tagline: "Everyday elegance", description: "Lightweight diamond details designed to stack, layer, and carry you from day to night.", image: img("everydayGold", 1200), href: "collections.html?collection=Everyday+Gold" },
 ];
 
 const CATEGORIES = [
