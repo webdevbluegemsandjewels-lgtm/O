@@ -69,16 +69,16 @@ button{ font-family: inherit; cursor:pointer; }
 .utility-bar{
   background: var(--ink);
   color: var(--bone-dim);
-  font-size: .72rem;
+  font-size: .70rem;
   letter-spacing: .12em;
   text-transform: uppercase;
 }
 .utility-bar .container{
   display:flex; justify-content:space-between; align-items:center;
-  height: 34px;
+  height: 39px;
 }
 .utility-bar .marquee-track{
-  display:flex; gap: 3.5rem;
+  display:flex; gap: 3.0rem;
 }
 
 .site-header{
