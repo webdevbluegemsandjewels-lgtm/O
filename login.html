@@ -10,45 +10,118 @@
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .auth-section{ padding: 2.6rem 0 3.4rem; }
-  .auth-card{
-    display:grid; grid-template-columns: 1fr 1fr;
-    max-width: 900px; margin: 0 auto;
-    background: #fff; border: 1px solid var(--line);
-    border-radius: 20px; padding: 0;
-    box-shadow: 0 20px 50px rgba(22,20,15,.12);
+  .auth-section{
+    padding: 3.4rem 0 4.4rem;
+    min-height: calc(100vh - 180px);
+    display: flex;
+    align-items: center;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% 10%, rgba(169,130,76,.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 100%, rgba(169,130,76,.08), transparent 55%),
+      var(--bone);
+    position: relative;
     overflow: hidden;
   }
+  .auth-section::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M60 20 L80 60 L60 100 L40 60 Z' fill='none' stroke='%23a9824c' stroke-width='0.6' opacity='0.35'/%3E%3C/svg%3E");
+    background-size: 120px 120px;
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  .auth-card{
+    position: relative;
+    display:grid; grid-template-columns: 1.05fr 1fr;
+    max-width: 940px; margin: 0 auto;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 22px; padding: 0;
+    box-shadow: 0 30px 70px rgba(22,20,15,.16), 0 2px 0 rgba(169,130,76,.5) inset;
+    overflow: hidden;
+    animation: authCardIn .5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes authCardIn{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
   .auth-visual{
     position: relative;
     min-height: 100%;
-    background: linear-gradient(180deg, rgba(22,20,15,.1), rgba(22,20,15,.8)),
-      url('https://images.unsplash.com/photo-1687253946687-a3713aa25b2f?auto=format&fit=crop&w=900&q=80') center/cover no-repeat;
-    padding: 2.2rem;
-    display:flex; flex-direction:column; justify-content:flex-end;
+    background:
+      linear-gradient(180deg, rgba(22,20,15,.15) 0%, rgba(22,20,15,.35) 55%, rgba(22,20,15,.88) 100%),
+      url('https://images.unsplash.com/photo-1687253946687-a3713aa25b2f?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+    padding: 2.4rem;
+    display:flex; flex-direction:column; justify-content:space-between;
     color:#fff;
   }
-  .auth-visual .eyebrow{ color: var(--gold-light); }
-  .auth-visual h2{ font-size: 1.5rem; line-height:1.2; margin: .5rem 0 0; font-weight:500; }
-  .auth-form-panel{ padding: 2.4rem 2.2rem; }
-  .auth-card h1{ font-size: 1.6rem; margin-bottom: .3rem; }
-  .auth-card .sub{ color: var(--ink-soft); font-size: .9rem; margin-bottom: 1.4rem; }
-  .auth-field{ margin-bottom: .9rem; }
-  .auth-field label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.4rem; }
-  .auth-field input{
-    width:100%; background:#fff; border: 1.5px solid #cfc7b6; border-radius: 8px;
-    padding: .72rem .85rem; font-family: inherit; font-size: .95rem; color: var(--ink);
+  .auth-visual-top{
+    display:flex; align-items:center; gap:.6rem;
+    font-family: var(--font-display); font-size: 1.1rem; letter-spacing:.08em;
   }
-  .auth-field input:focus{ border-color: var(--gold); outline:none; box-shadow: 0 0 0 3px rgba(169,130,76,.15); }
-  .auth-submit{ width:100%; justify-content:center; margin-top:.3rem; }
-  .auth-error{ color:#a9432f; font-size:.85rem; margin-bottom:.9rem; display:none; }
-  .auth-switch{ text-align:center; margin-top:1.3rem; font-size:.88rem; color: var(--ink-soft); }
-  .auth-switch a{ color: var(--gold); text-decoration:underline; }
-  @media (max-width: 760px){
-    .auth-card{ grid-template-columns: 1fr; max-width: 440px; border-radius:16px; }
-    .auth-visual{ min-height: 140px; padding: 1.4rem; }
-    .auth-visual h2{ font-size: 1.15rem; }
-    .auth-form-panel{ padding: 1.8rem 1.4rem; }
+  .auth-visual-top svg{ flex-shrink:0; }
+  .auth-visual-bottom .eyebrow{ color: var(--gold-light); }
+  .auth-visual-bottom h2{ font-size: 1.65rem; line-height:1.22; margin: .6rem 0 1.1rem; font-weight:500; max-width: 22ch; }
+  .auth-quote{
+    border-top: 1px solid rgba(255,255,255,.22);
+    padding-top: 1rem;
+    font-size: .85rem;
+    color: rgba(243,238,228,.82);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .auth-form-panel{ padding: 2.8rem 2.6rem; display:flex; flex-direction:column; justify-content:center; }
+  .auth-facet{
+    display:flex; align-items:center; gap:.7rem;
+    margin-bottom: 1.1rem;
+  }
+  .auth-facet::before, .auth-facet::after{
+    content:""; flex:1; height:1px; background: linear-gradient(90deg, transparent, var(--line));
+  }
+  .auth-facet::after{ background: linear-gradient(90deg, var(--line), transparent); }
+
+  .auth-card h1{ font-size: 1.9rem; margin-bottom: .35rem; }
+  .auth-card .sub{ color: var(--ink-soft); font-size: .92rem; margin-bottom: 1.8rem; }
+
+  .auth-field{ margin-bottom: 1.05rem; position: relative; }
+  .auth-field label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.5rem; }
+  .auth-field .field-icon{
+    position:absolute; left: .85rem; top: calc(50% + .35rem);
+    transform: translateY(-50%);
+    color: var(--gold); opacity:.75; pointer-events:none;
+  }
+  .auth-field input{
+    width:100%; background:#fbf9f5; border: 1.5px solid #e2d9c6; border-radius: 9px;
+    padding: .82rem .9rem .82rem 2.5rem; font-family: inherit; font-size: .95rem; color: var(--ink);
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .auth-field input:focus{
+    border-color: var(--gold); outline:none; background:#fff;
+    box-shadow: 0 0 0 4px rgba(169,130,76,.14);
+  }
+
+  .auth-submit{
+    width:100%; justify-content:center; margin-top:.5rem;
+    box-shadow: 0 10px 24px rgba(169,130,76,.28);
+  }
+  .auth-secure-note{
+    display:flex; align-items:center; justify-content:center; gap:.4rem;
+    margin-top: 1rem; font-size: .76rem; color: var(--ink-soft);
+  }
+  .auth-secure-note svg{ color: var(--gold); }
+
+  .auth-error{ color:#a9432f; background:#fbeae6; border:1px solid #f0d0c8; border-radius:8px; padding:.7rem .9rem; font-size:.85rem; margin-bottom:1rem; display:none; }
+  .auth-switch{ text-align:center; margin-top:1.6rem; font-size:.9rem; color: var(--ink-soft); }
+  .auth-switch a{ color: var(--gold); text-decoration:underline; font-weight:500; }
+
+  @media (max-width: 860px){
+    .auth-card{ grid-template-columns: 1fr; max-width: 460px; border-radius:18px; }
+    .auth-visual{ min-height: 190px; padding: 1.6rem; }
+    .auth-visual-bottom h2{ font-size: 1.25rem; }
+    .auth-quote{ display:none; }
+    .auth-form-panel{ padding: 2rem 1.5rem; }
   }
 </style>
 </head>
@@ -77,11 +150,21 @@
   <div class="container">
     <div class="auth-card">
       <div class="auth-visual">
-        <p class="eyebrow">OrenkaFine</p>
-        <h2>Jewelry for every chapter of you</h2>
+        <div class="auth-visual-top">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2 L20 9 L12 22 L4 9 Z"/><path d="M4 9 L20 9"/><path d="M9 9 L12 2 L15 9 L12 22 Z"/></svg>
+          OrenkaFine
+        </div>
+        <div class="auth-visual-bottom">
+          <p class="eyebrow">Welcome back</p>
+          <h2>Jewelry for every chapter of you</h2>
+          <p class="auth-quote">"Every piece I own from them has a story — the craftsmanship never goes unnoticed."</p>
+        </div>
       </div>
+
       <div class="auth-form-panel">
-        <p class="eyebrow">Welcome back</p>
+        <div class="auth-facet" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2 L20 9 L12 22 L4 9 Z"/></svg>
+        </div>
         <h1>Log in</h1>
         <p class="sub">Log in to write reviews and place orders.</p>
 
@@ -90,13 +173,19 @@
         <form id="loginForm">
           <div class="auth-field">
             <label for="email">Email</label>
+            <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
             <input id="email" type="email" required autocomplete="email" />
           </div>
           <div class="auth-field">
             <label for="password">Password</label>
+            <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
             <input id="password" type="password" required autocomplete="current-password" />
           </div>
           <button type="submit" class="btn btn-gold auth-submit" id="submitBtn">Log In</button>
+          <p class="auth-secure-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            Secured with encrypted sign-in
+          </p>
         </form>
 
         <p class="auth-switch">Don't have an account? <a href="signup.html">Sign up</a></p>
