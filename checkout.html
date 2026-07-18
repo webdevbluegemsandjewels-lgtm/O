@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await requireAuth();
   if (!user) { window.location.href = "cart.html"; return; }
 
-  const items = window.OrenkaFineCart.getItems();
+  const items = await window.OrenkaFineCart.getItems();
   if (!items.length) {
     window.location.href = "cart.html";
     return;
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   coItems.innerHTML = items.map(i => `
     <div class="co-item"><span>${i.name} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>
   `).join("");
-  document.getElementById("coTotal").textContent = money(window.OrenkaFineCart.getSubtotal());
+  document.getElementById("coTotal").textContent = money(await window.OrenkaFineCart.getSubtotal());
 
   const errorEl = document.getElementById("checkoutError");
   const payBtn = document.getElementById("payBtn");
@@ -225,8 +225,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           const verifyData = await verifyRes.json();
 
           if (verifyData.verified) {
-            window.OrenkaFineCart.clearCart();
-            window.location.href = `order-success.html?order_id=${orderData.order_id}`;
+            await window.OrenkaFineCart.clearCart();
+            window.location.href = `order.html?order_id=${orderData.order_id}`;
           } else {
             errorEl.textContent = "Payment could not be verified. Please contact support.";
             errorEl.style.display = "block";

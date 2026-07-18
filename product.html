@@ -341,9 +341,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     qtyInput.value = v;
   });
 
-  document.getElementById("addToCartBtn").addEventListener("click", () => {
+  document.getElementById("addToCartBtn").addEventListener("click", async () => {
     const qty = parseInt(qtyInput.value, 10) || 1;
-    window.OrenkaFineCart.addItem({
+    const btn = document.getElementById("addToCartBtn");
+    const original = btn.textContent;
+    btn.disabled = true;
+
+    await window.OrenkaFineCart.addItem({
       id: product.id,
       slug: product.slug,
       name: product.name,
@@ -352,11 +356,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       color: selectedColor,
     }, qty);
 
-    const btn = document.getElementById("addToCartBtn");
-    const original = btn.textContent;
+    btn.disabled = false;
     btn.textContent = "Added ✓";
     setTimeout(() => { btn.textContent = original; }, 1600);
-  });
+  });  
 
   productContent.style.display = "grid";
 
