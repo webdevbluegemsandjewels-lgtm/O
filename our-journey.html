@@ -13,11 +13,157 @@
   .founder-prose{ max-width: none; }
   .founder-prose p{ font-size: 1.02rem; color: var(--ink-soft); line-height:1.8; margin-bottom: 1.2rem; }
 
-  /* Founder profile portraits — smaller and vertically centered so the
-     photo's height never forces extra space between the heading and the
-     bio paragraph next to it. */
-  .founder-page .about-split img{ max-width: 240px; align-self: center; }
-  .founder-page .about-split{ align-items: center; }
+  .founders-team-section{
+    padding: 68px 0;
+  }
+  .team-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:1.1rem;
+    margin-top:.9rem;
+  }
+  .team-card{
+    background: linear-gradient(180deg, #fff 0%, #f6f1ea 100%);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    display:flex;
+    flex-direction:column;
+  }
+  .team-card img{
+    width:190px;
+    height:190px;
+    object-fit:cover;
+    object-position:center top;
+    border-radius:50%;
+    border:5px solid #fff;
+    margin:1rem auto 0;
+    box-shadow: 0 10px 26px rgba(0,0,0,.14);
+  }
+  .team-card-body{
+    padding:.9rem 1rem 1.05rem;
+    display:flex;
+    flex-direction:column;
+    gap:.4rem;
+  }
+  .team-card-name{
+    font-family:"Cormorant Garamond", serif;
+    font-size:1.7rem;
+    color:var(--ink);
+    line-height:1;
+    margin:0;
+  }
+  .team-card-role{
+    margin:0;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    font-size:.68rem;
+    color:var(--ink-soft);
+  }
+  .team-card-bio{
+    margin:.2rem 0 .4rem;
+    color:var(--ink-soft);
+    line-height:1.6;
+    font-size:.88rem;
+  }
+  .team-card .btn{ align-self:flex-start; }
+
+  .profile-modal{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:1rem;
+    z-index:130;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .25s ease, visibility .25s ease;
+  }
+  .profile-modal.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .profile-modal-overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(22,18,14,.56);
+    backdrop-filter:blur(3px);
+  }
+  .profile-modal-dialog{
+    position:relative;
+    z-index:1;
+    width:min(700px, 100%);
+    max-height:calc(100vh - 2rem);
+    overflow:auto;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.25);
+    padding:.95rem;
+  }
+  .profile-modal-close{
+    position:absolute;
+    top:.7rem;
+    right:.7rem;
+    width:34px;
+    height:34px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    color:var(--ink);
+    font-size:1.2rem;
+    line-height:1;
+    cursor:pointer;
+  }
+  .profile-modal-main{
+    display:grid;
+    grid-template-columns:190px 1fr;
+    gap:.85rem;
+  }
+  .profile-modal-main img{
+    width:190px;
+    height:190px;
+    border-radius:50%;
+    border:5px solid #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    object-fit:cover;
+    aspect-ratio: 1/1;
+    justify-self:center;
+  }
+  .profile-modal-eyebrow{
+    margin:.2rem 0 .3rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-size:.7rem;
+    color:var(--ink-soft);
+  }
+  .profile-modal-name{
+    margin:0;
+    font-family:"Cormorant Garamond", serif;
+    font-size:1.85rem;
+    line-height:1;
+    color:var(--ink);
+  }
+  .profile-modal-role{
+    margin:.45rem 0 .8rem;
+    color:var(--gold);
+    font-weight:600;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    font-size:.7rem;
+  }
+  .profile-modal-bio{
+    margin:0;
+    color:var(--ink-soft);
+    line-height:1.65;
+    font-size:.9rem;
+    white-space:pre-line;
+  }
+
   .founder-list{
     display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; margin-top: 2rem;
   }
@@ -26,6 +172,11 @@
     color: var(--ink-soft); font-size:.92rem; line-height:1.6;
   }
   .founder-list li::before{ content:"—"; color: var(--gold); margin-right:.6rem; }
+  @media (max-width: 900px){
+    .team-grid{ grid-template-columns:1fr; }
+    .profile-modal-main{ grid-template-columns:1fr; }
+    .profile-modal-dialog{ padding:.9rem; }
+  }
   @media (max-width: 640px){ .founder-list{ grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -86,7 +237,7 @@
   </div>
 </section>
 
-<section class="section-dim">
+<section class="section-dim founders-team-section">
   <div class="container">
     <div class="section-head">
       <div>
@@ -151,31 +302,64 @@
   </div>
 </section>
 
-<section class="editorial-reverse">
-  <div class="container editorial about-split">
-    <div class="about-split-head">
-      <p class="eyebrow">Factory &amp; quality</p>
-      <h2 class="about-split-title">Mr. Shalabh Goyal</h2>
+<section class="section-dim">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Leadership</p>
+        <h2 class="section-title">Meet Our Founders</h2>
+      </div>
     </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Sir.png" alt="Mr. Shalabh Goyal" />
-    <div class="about-split-body">
-      <p>Mr. Shalabh Goyal remains closely involved in factory standards, quality decisions, client relationships, and business direction. His experience gives the company practical insight into both manufacturing and the retail jewellery market.</p>
+
+    <div class="team-grid" aria-label="Founding team members">
+      <article class="team-card">
+        <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Sir.png" alt="Mr. Shalabh Goyal" />
+        <div class="team-card-body">
+          <h3 class="team-card-name">Mr. Shalabh Goyal</h3>
+          <p class="team-card-role">Factory &amp; Quality</p>
+          <p class="team-card-bio">Leads quality standards, factory discipline, and core business direction with deep trade insight.</p>
+          <button class="btn btn-gold" type="button" data-profile-btn
+            data-name="Mr. Shalabh Goyal"
+            data-role="Factory &amp; Quality"
+            data-image="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Sir.png"
+            data-bio="Mr. Shalabh Goyal remains closely involved in factory standards, quality decisions, client relationships, and business direction. His experience gives the company practical insight into both manufacturing and the retail jewellery market."
+          >View Profile</button>
+        </div>
+      </article>
+
+      <article class="team-card">
+        <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Maam.jpeg" alt="Mrs. Shweta Goyal" />
+        <div class="team-card-body">
+          <h3 class="team-card-name">Mrs. Shweta Goyal</h3>
+          <p class="team-card-role">Operations &amp; Client Relationships</p>
+          <p class="team-card-bio">Drives operational precision and client commitments with consistent execution discipline.</p>
+          <button class="btn btn-gold" type="button" data-profile-btn
+            data-name="Mrs. Shweta Goyal"
+            data-role="Operations &amp; Client Relationships"
+            data-image="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Maam.jpeg"
+            data-bio="Mrs. Shweta Goyal brings operational precision, business judgement, and client relationship depth. Her oversight across quality management, client commitments, and business operations helps ensure that promises are followed through with discipline."
+          >View Profile</button>
+        </div>
+      </article>
     </div>
   </div>
 </section>
 
-<section class="section-dim">
-  <div class="container editorial about-split">
-    <div class="about-split-head">
-      <p class="eyebrow">Operations &amp; client relationships</p>
-      <h2 class="about-split-title">Mrs. Shweta Goyal</h2>
-    </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Founder/Maam.jpeg" alt="Mrs. Shweta Goyal" />
-    <div class="about-split-body">
-      <p>Mrs. Shweta Goyal brings operational precision, business judgement, and client relationship depth. Her oversight across quality management, client commitments, and business operations helps ensure that promises are followed through with discipline.</p>
+<div class="profile-modal" id="profile-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="profile-modal-name">
+  <div class="profile-modal-overlay" data-profile-close></div>
+  <div class="profile-modal-dialog">
+    <button class="profile-modal-close" type="button" aria-label="Close profile" data-profile-close>&times;</button>
+    <div class="profile-modal-main">
+      <img id="profile-modal-image" src="" alt="Team member profile" />
+      <div>
+        <p class="profile-modal-eyebrow">Leadership Profile</p>
+        <h3 class="profile-modal-name" id="profile-modal-name"></h3>
+        <p class="profile-modal-role" id="profile-modal-role"></p>
+        <p class="profile-modal-bio" id="profile-modal-bio"></p>
+      </div>
     </div>
   </div>
-</section>
+</div>
 
 <section>
   <div class="container">
@@ -238,5 +422,52 @@
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script src="js/footer.js"></script>
+<script>
+  const profileModal = document.getElementById("profile-modal");
+  const profileName = document.getElementById("profile-modal-name");
+  const profileRole = document.getElementById("profile-modal-role");
+  const profileBio = document.getElementById("profile-modal-bio");
+  const profileImage = document.getElementById("profile-modal-image");
+  const profileButtons = document.querySelectorAll("[data-profile-btn]");
+  const profileCloseEls = document.querySelectorAll("[data-profile-close]");
+
+  function openProfileModal(data) {
+    if (!profileModal) return;
+    profileName.textContent = data.name || "";
+    profileRole.textContent = data.role || "";
+    profileBio.textContent = data.bio || "";
+    profileImage.src = data.image || "";
+    profileImage.alt = `${data.name || "Team member"} profile`;
+    profileModal.classList.add("is-open");
+    profileModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeProfileModal() {
+    if (!profileModal) return;
+    profileModal.classList.remove("is-open");
+    profileModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  profileButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      openProfileModal({
+        name: btn.dataset.name,
+        role: btn.dataset.role,
+        image: btn.dataset.image,
+        bio: btn.dataset.bio,
+      });
+    });
+  });
+
+  profileCloseEls.forEach(el => {
+    el.addEventListener("click", closeProfileModal);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeProfileModal();
+  });
+</script>
 </body>
 </html>

@@ -187,8 +187,8 @@ const COLLECTIONS = [
 const CATEGORIES = [
 	{ name: "Rings", image: img("ringModel", 500) },
 	{ name: "Necklaces", image: img("necklaceSet", 500) },
-	{ name: "Earrings", image: img("earringsHoop", 500) },
-	{ name: "Bracelets", image: img("braceletWrist", 500) },
-	{ name: "Pendants", image: img("heartNecklace", 500) },
+	{ name: "Earrings", image: "https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Cats/earring.jpg" },
+	{ name: "Bracelets", image: "https://i.pinimg.com/736x/28/9f/3b/289f3bbd73161ccf4143a70215f0765f.jpg" },
+	{ name: "Pendants", image: "https://i.pinimg.com/736x/f0/17/c5/f017c573623f2fea65aec1588f4f4461.jpg" },
 ];
 
