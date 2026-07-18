@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           });
           const verifyData = await verifyRes.json();
 
-          if (verifyData.verified) {
+          if (verifyData.verified) { 
             await window.OrenkaFineCart.clearCart();
             window.location.href = `order.html?order_id=${orderData.order_id}`;
           } else {
