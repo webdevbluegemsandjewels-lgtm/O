@@ -96,10 +96,17 @@ const ACCOUNT_ICON_SVG =
  * Gravatar photo if their email has one set up, otherwise a circle
  * with their initial letter.
  */
+/**
+ * Renders an avatar into the header account icon, in priority order:
+ * 1. The photo from an OAuth provider (e.g. Google), if they signed in that way
+ * 2. Gravatar, if their email has one set up
+ * 3. A circle with their initial letter
+ */
 function renderAccountAvatar(el, user) {
   const fullName = user.user_metadata && user.user_metadata.full_name;
   const email = user.email || "";
   const letter = (fullName || email || "?").trim().charAt(0).toUpperCase() || "?";
+  const oauthPhoto = user.user_metadata && (user.user_metadata.avatar_url || user.user_metadata.picture);
 
   const fallback = document.createElement("div");
   fallback.className = "account-avatar account-avatar-initial";
@@ -107,16 +114,35 @@ function renderAccountAvatar(el, user) {
 
   el.innerHTML = "";
 
-  if (email && typeof md5Hex === "function") {
-    const hash = md5Hex(email.trim().toLowerCase());
+  function tryGravatar() {
+    if (email && typeof md5Hex === "function") {
+      const hash = md5Hex(email.trim().toLowerCase());
+      const img = document.createElement("img");
+      img.className = "account-avatar account-avatar-img";
+      img.alt = "";
+      img.src = `https://www.gravatar.com/avatar/${hash}?d=404&s=64`;
+      img.onerror = () => { if (img.isConnected) img.replaceWith(fallback); };
+      el.appendChild(img);
+    } else {
+      el.appendChild(fallback);
+    }
+  }
+
+  if (oauthPhoto) {
     const img = document.createElement("img");
     img.className = "account-avatar account-avatar-img";
     img.alt = "";
-    img.src = `https://www.gravatar.com/avatar/${hash}?d=404&s=64`;
-    img.onerror = () => { if (img.isConnected) img.replaceWith(fallback); };
+    img.referrerPolicy = "no-referrer"; // Google's photo URLs can block hotlinking without this
+    img.src = oauthPhoto;
+    img.onerror = () => {
+      if (img.isConnected) {
+        img.remove();
+        tryGravatar();
+      }
+    };
     el.appendChild(img);
   } else {
-    el.appendChild(fallback);
+    tryGravatar();
   }
 }
 
