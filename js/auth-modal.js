@@ -29,6 +29,12 @@
         <p class="auth-error" data-role="error" style="display:none;"></p>
         <p class="auth-success" data-role="success" style="display:none;"></p>
 
+        <button type="button" class="auth-oauth-btn" data-role="google-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.63h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.8z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.9l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.09C3.25 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.27A11.96 11.96 0 0 0 0 12c0 1.94.46 3.77 1.27 5.38l4-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.62l4 3.09C6.22 6.86 8.87 4.75 12 4.75z"/></svg>
+          Continue with Google
+        </button>
+        <div class="auth-divider">or continue with email</div>
+
         <form data-role="login-form">
           <div class="auth-field">
             <label>Email</label>
@@ -227,6 +233,13 @@
         successEl.textContent = "Account created! Check your email to confirm, then log in.";
         successEl.style.display = "block";
       }
+    });
+
+    wrap.querySelector('[data-role="google-btn"]').addEventListener("click", async () => {
+      await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.href },
+      });
     });
 
     return new Promise((resolve) => {
