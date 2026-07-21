@@ -9,6 +9,41 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .gift-promo-banner{
+      background: var(--gold-pale);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .gift-promo-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:1.2rem; flex-wrap:wrap; padding: 1rem 0;
+    }
+    .gift-promo-inner p{ margin:0; font-size:.95rem; color: var(--ink); }
+    @media (max-width:640px){
+      .gift-promo-inner{ flex-direction:column; align-items:flex-start; }
+    }
+
+    .gift-slide-popup{
+      position: fixed; top: 50%; right: -340px; transform: translateY(-50%);
+      width: 300px; background:#fff; border:1px solid var(--line); border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(22,20,15,.18); padding: 1.4rem;
+      z-index: 999; transition: right .5s ease;
+    }
+    .gift-slide-popup.open{ right: 20px; }
+    .gift-slide-popup img{ width:100%; height:auto; object-fit:contain; border-radius:8px; margin-bottom:.9rem; display:block; background: var(--bone-dim); }
+    .gift-slide-popup h4{ font-size:1.05rem; margin-bottom:.5rem; }
+    .gift-slide-popup p{ font-size:.85rem; color:var(--ink-soft); margin-bottom:1rem; line-height:1.6; }
+    .gift-slide-popup .btn{ width:100%; justify-content:center; }
+    .gift-slide-popup-close{
+      position:absolute; top:.6rem; right:.7rem; background:none; border:none;
+      font-size:1.2rem; line-height:1; cursor:pointer; color: var(--ink-soft);
+    }
+    @media (max-width:480px){
+      .gift-slide-popup{ width: calc(100% - 32px); right: -100%; }
+      .gift-slide-popup.open{ right:16px; }
+    }
+  </style>
   </head>
   <body>
 
@@ -53,6 +88,13 @@
       <h1>Discover Our Collections</h1>
       <p>Every piece tells a story of craftsmanship, elegance, and individuality. From everyday essentials to extraordinary statements.</p>
       <a href="#new-arrivals" class="btn btn-gold">Explore Collection</a>
+    </div>
+  </section>
+
+  <section class="gift-promo-banner">
+    <div class="container gift-promo-inner">
+      <p>Not sure what to pick? Give the gift of fine jewelry and let her choose.</p>
+      <a href="gift-card.html" class="btn btn-outline-dark">Explore Digital Gift Cards</a>
     </div>
   </section>
 
@@ -137,6 +179,14 @@
   </section>
 
   <footer class="site-footer" id="footer"></footer>
+
+  <div class="gift-slide-popup" id="giftSlidePopup">
+    <button type="button" class="gift-slide-popup-close" id="giftSlideClose" aria-label="Close">&times;</button>
+    <img src="Dgc/card1.png" alt="OrenkaFine Digital Gift Card" />
+    <h4>Give the Gift of Fine Jewelry</h4>
+    <p>Can't decide what to pick? Send a Digital Gift Card and let her choose her own piece.</p>
+    <a href="gift-card.html" class="btn btn-gold">Explore Digital Gift Cards</a>
+  </div>
 
   <button class="to-top" aria-label="Back to top">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
@@ -381,6 +431,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   syncPriceBounds();
   renderFilterLists();
   render();
+});
+
+// Auto slide-in gift card prompt — shows once per browser session,
+// same "don't nag every page load" pattern as the signup popup in
+// js/auth.js.
+const GIFT_SLIDE_PROMPT_KEY = "orenka_giftcard_prompt_shown";
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("giftSlidePopup");
+  const closeBtn = document.getElementById("giftSlideClose");
+  if (!popup || !closeBtn) return;
+
+  if (!sessionStorage.getItem(GIFT_SLIDE_PROMPT_KEY)) {
+    setTimeout(() => {
+      popup.classList.add("open");
+      sessionStorage.setItem(GIFT_SLIDE_PROMPT_KEY, "1");
+    }, 2500);
+  }
+
+  closeBtn.addEventListener("click", () => popup.classList.remove("open"));
 });
   </script>
   </body>

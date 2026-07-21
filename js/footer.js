@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="collections.html?cat=Earrings">Earrings</a></li>
             <li><a href="collections.html?cat=Bracelets">Bracelets</a></li>
             <li><a href="collections.html?cat=Pendants">Pendants</a></li>
+            <li><a href="gift-card.html">Gift Cards</a></li>
           </ul>
         </div>
         <div class="footer-col">

@@ -16,13 +16,14 @@ function normalizeBucketKey(path) {
   const tail = cleanPath.slice(slash + 1);
   if (head === "products") return `Products/${tail}`;
   if (head === "assets") return `Assets/${tail}`;
+  if (head === "dgc") return `Dgc/${tail}`;
   return cleanPath;
 }
 
 function toBucketUrl(path) {
   if (!path || /^https?:\/\//i.test(path) || path.startsWith("data:")) return path;
   const cleanPath = normalizeBucketKey(path);
-  if (!/^(products|assets)\//i.test(cleanPath)) return path;
+  if (!/^(products|assets|dgc)\//i.test(cleanPath)) return path;
   return `${SUPABASE_PUBLIC_BASE}/${cleanPath}`;
 }
 

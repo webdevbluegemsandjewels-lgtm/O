@@ -261,3 +261,30 @@ create policy "Order items are viewable by owner"
         and o.user_id = auth.uid()
     )
   );
+
+-- =========================================================
+-- Digital Gift Card catalog seed
+--
+-- gift-card.html reads its five amount tiers straight from
+-- public.products (category = 'Gift Card'), the same table and
+-- RLS policy every other product uses — so the cart_items foreign
+-- key + the "products are viewable by everyone" policy above just
+-- work, no schema changes needed. Guarded with NOT EXISTS instead
+-- of ON CONFLICT since slug has no known unique constraint; safe
+-- to re-run.
+--
+-- Images point at the "Dgc" folder in the Images storage bucket
+-- (see js/main.js toBucketUrl, which now maps "Dgc/..." the same
+-- way it already maps "Products/..." and "Assets/...").
+-- =========================================================
+
+insert into public.products (slug, name, brand, category, price, image, description, is_active, stock)
+select v.slug, v.name, v.brand, v.category, v.price, v.image, v.description, v.is_active, v.stock
+from (values
+  ('digital-gift-card-5000',  'Digital Gift Card - ₹5,000',  'OrenkaFine', 'Gift Card', 5000::numeric,  'Dgc/card1.png', 'A ₹5,000 OrenkaFine digital gift card, delivered straight to their inbox.',  true, 9999),
+  ('digital-gift-card-10000', 'Digital Gift Card - ₹10,000', 'OrenkaFine', 'Gift Card', 10000::numeric, 'Dgc/card1.png', 'A ₹10,000 OrenkaFine digital gift card, delivered straight to their inbox.', true, 9999),
+  ('digital-gift-card-15000', 'Digital Gift Card - ₹15,000', 'OrenkaFine', 'Gift Card', 15000::numeric, 'Dgc/card1.png', 'A ₹15,000 OrenkaFine digital gift card, delivered straight to their inbox.', true, 9999),
+  ('digital-gift-card-20000', 'Digital Gift Card - ₹20,000', 'OrenkaFine', 'Gift Card', 20000::numeric, 'Dgc/card1.png', 'A ₹20,000 OrenkaFine digital gift card, delivered straight to their inbox.', true, 9999),
+  ('digital-gift-card-25000', 'Digital Gift Card - ₹25,000', 'OrenkaFine', 'Gift Card', 25000::numeric, 'Dgc/card1.png', 'A ₹25,000 OrenkaFine digital gift card, delivered straight to their inbox.', true, 9999)
+) as v(slug, name, brand, category, price, image, description, is_active, stock)
+where not exists (select 1 from public.products p where p.slug = v.slug);

@@ -57,6 +57,24 @@
   }
   .product-color-swatch.active{ outline: 2px solid var(--gold); outline-offset: 2px; }
 
+  .product-options{ margin-bottom: 1.6rem; }
+  .product-options h4{ font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color: var(--gold); margin-bottom:.7rem; }
+  .option-pill-row, .option-chip-row{ display:flex; gap:.6rem; flex-wrap:wrap; }
+  .option-pill{
+    display:inline-flex; align-items:center; gap:.4rem;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: .5rem 1rem; font-size:.85rem; cursor:pointer;
+    background:#fff; transition: border-color .2s, background .2s;
+  }
+  .option-pill input{ margin:0; accent-color: var(--gold); }
+  .option-pill.active-pill{ border-color: var(--gold); background: var(--gold-pale); }
+  .option-chip{
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: .5rem 1rem; font-size:.85rem; cursor:pointer;
+    background:#fff; transition: border-color .2s, background .2s;
+  }
+  .option-chip.active{ border-color: var(--gold); background: var(--gold-pale); }
+
   .qty-add-row{ display:flex; gap: 1rem; align-items:center; margin-bottom: 1.4rem; flex-wrap:wrap; }
   .qty-stepper{ display:flex; align-items:center; border: 1px solid var(--line); }
   .qty-stepper button{ width: 40px; height: 46px; background: transparent; border:none; font-size:1.1rem; }
@@ -149,6 +167,25 @@
           <h4>Color</h4>
           <div class="product-color-row" id="colorRow"></div>
         </div>
+
+        <div class="product-options" id="metalSection" style="display:none;">
+          <h4>Metal Type</h4>
+          <div class="option-pill-row" id="metalRow"></div>
+        </div>
+
+        <div class="product-options" id="sizeSection" style="display:none;">
+          <h4>Size</h4>
+          <div class="option-chip-row" id="sizeRow"></div>
+        </div>
+
+        <div class="product-options" id="diamondSection" style="display:none;">
+          <h4>Diamond Quality</h4>
+          <div class="option-pill-row" id="diamondRow"></div>
+        </div>
+
+        <p id="variantUnavailable" style="display:none; color:#a9432f; font-size:.85rem; margin-bottom:1rem;">
+          This exact combination isn't available. Try a different option.
+        </p>
 
         <div class="qty-add-row">
           <div class="qty-stepper">
@@ -296,6 +333,110 @@ document.addEventListener("DOMContentLoaded", async () => {
     saveEl.style.display = "inline";
   }
 
+  // ---------- Real sibling variants (Metal Type / Size / Diamond Quality) ----------
+  let siblings = [product];
+  if (product.woo_parent_id) {
+    const { data: siblingRows } = await supabaseClient
+      .from("products")
+      .select("*")
+      .eq("woo_parent_id", product.woo_parent_id)
+      .eq("is_active", true);
+    if (siblingRows && siblingRows.length) siblings = siblingRows;
+  }
+
+  const selectedAttrs = {
+    size: product.variant_size || null,
+    metal: product.variant_metal_type || null,
+    diamond: product.variant_diamond_quality || null,
+  };
+  let activeVariant = product;
+
+  function uniqueVals(key) {
+    return [...new Set(siblings.map((s) => s[key]).filter(Boolean))];
+  }
+
+  function renderOptionSection(sectionId, rowId, options, selectedValue, kind) {
+    const section = document.getElementById(sectionId);
+    const row = document.getElementById(rowId);
+    if (options.length <= 1) { section.style.display = "none"; return; }
+    section.style.display = "block";
+    row.innerHTML = options.map((opt) => {
+      const active = opt === selectedValue;
+      if (kind === "chip") {
+        return `<button type="button" class="option-chip ${active ? "active" : ""}" data-value="${opt}">${opt}</button>`;
+      }
+      return `<label class="option-pill ${active ? "active-pill" : ""}"><input type="radio" name="${kind}" value="${opt}" ${active ? "checked" : ""}> ${opt}</label>`;
+    }).join("");
+  }
+
+  renderOptionSection("metalSection", "metalRow", uniqueVals("variant_metal_type"), selectedAttrs.metal, "metal");
+  renderOptionSection("sizeSection", "sizeRow", uniqueVals("variant_size"), selectedAttrs.size, "chip");
+  renderOptionSection("diamondSection", "diamondRow", uniqueVals("variant_diamond_quality"), selectedAttrs.diamond, "diamond");
+
+  function findMatchingVariant() {
+    return siblings.find((s) =>
+      (!selectedAttrs.size || s.variant_size === selectedAttrs.size) &&
+      (!selectedAttrs.metal || s.variant_metal_type === selectedAttrs.metal) &&
+      (!selectedAttrs.diamond || s.variant_diamond_quality === selectedAttrs.diamond)
+    );
+  }
+
+  function applyVariant(variant) {
+    const unavailEl = document.getElementById("variantUnavailable");
+    const addBtn = document.getElementById("addToCartBtn");
+    if (!variant) {
+      unavailEl.style.display = "block";
+      addBtn.disabled = true;
+      addBtn.style.opacity = ".5";
+      return;
+    }
+    unavailEl.style.display = "none";
+    addBtn.disabled = false;
+    addBtn.style.opacity = "1";
+    activeVariant = variant;
+
+    const vPrice = Number(variant.price) || 0;
+    const vOldPrice = variant.old_price ? Number(variant.old_price) : null;
+    document.getElementById("priceNow").textContent = `₹${vPrice.toLocaleString("en-IN")}`;
+    const oldEl = document.getElementById("priceOld");
+    const saveEl = document.getElementById("priceSave");
+    if (vOldPrice && vOldPrice > vPrice) {
+      oldEl.textContent = `₹${vOldPrice.toLocaleString("en-IN")}`;
+      oldEl.style.display = "inline";
+      saveEl.textContent = `SAVE ${Math.round(((vOldPrice - vPrice) / vOldPrice) * 100)}%`;
+      saveEl.style.display = "inline";
+    } else {
+      oldEl.style.display = "none";
+      saveEl.style.display = "none";
+    }
+
+    const pointsEl = document.getElementById("pointsNote");
+    if (pointsEl) pointsEl.textContent = `🎁 Purchase this item and get ${Math.round(vPrice / 10).toLocaleString("en-IN")} Points`;
+
+    if (variant.image) document.getElementById("mainImage").src = variant.image;
+
+    history.replaceState(null, "", `product.html?slug=${encodeURIComponent(variant.slug)}`);
+  }
+
+  document.getElementById("metalRow").addEventListener("change", (e) => {
+    if (e.target.name !== "metal") return;
+    selectedAttrs.metal = e.target.value;
+    applyVariant(findMatchingVariant());
+  });
+  document.getElementById("diamondRow").addEventListener("change", (e) => {
+    if (e.target.name !== "diamond") return;
+    selectedAttrs.diamond = e.target.value;
+    applyVariant(findMatchingVariant());
+  });
+  document.getElementById("sizeRow").addEventListener("click", (e) => {
+    const chip = e.target.closest(".option-chip");
+    if (!chip) return;
+    selectedAttrs.size = chip.dataset.value;
+    document.querySelectorAll("#sizeRow .option-chip").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    applyVariant(findMatchingVariant());
+  });
+
   let selectedColor = null;
   if (product.colors && product.colors.length) {
     selectedColor = product.colors[0];
@@ -348,11 +489,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     btn.disabled = true;
 
     await window.OrenkaFineCart.addItem({
-      id: product.id,
-      slug: product.slug,
-      name: product.name,
-      image: images[0] || "",
-      price,
+      id: activeVariant.id,
+      slug: activeVariant.slug,
+      name: activeVariant.name,
+      image: activeVariant.image || images[0] || "",
+      price: activeVariant.price,
       color: selectedColor,
     }, qty);
 
