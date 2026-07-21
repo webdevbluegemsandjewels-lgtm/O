@@ -1,4 +1,4 @@
-# MIRWA / OrenkaFine Storefront
+# OrenkaFine Storefront
 
 This repository is a multi-page jewelry storefront built with plain HTML, CSS, and browser-side JavaScript.
 
@@ -11,7 +11,7 @@ The checked-in app is no longer just a static marketing site. It now includes:
 - A Supabase S3-compatible storage helper for server-side asset work
 - A welcome-email Supabase Edge Function
 
-The workspace folder is named `Mirwa`, but most of the app code and UI copy still use the brand name `OrenkaFine`.
+
 
 ## Current stack
 

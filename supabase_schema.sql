@@ -145,3 +145,119 @@ drop trigger if exists on_profile_created_welcome_email on public.profiles;
 create trigger on_profile_created_welcome_email
   after insert on public.profiles
   for each row execute function public.notify_welcome_email();
+
+-- =========================================================
+-- Row Level Security — cart_items and products
+--
+-- Both tables already exist in the dashboard (cart_items:
+-- id, user_id, product_id, color, quantity, created_at,
+-- updated_at / products: id, slug, name, price, is_active, ...)
+-- but RLS was never turned on for them. Since the browser talks
+-- to Supabase with the public anon key, the "eq(user_id, ...)"
+-- filters in js/cart.js are only a UI convenience — anyone can
+-- call the REST API directly with a different user_id and read
+-- or write someone else's cart. Run this block once to close
+-- that off.
+-- =========================================================
+
+alter table public.cart_items enable row level security;
+
+drop policy if exists "Cart items are viewable by owner" on public.cart_items;
+create policy "Cart items are viewable by owner"
+  on public.cart_items for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Cart items are insertable by owner" on public.cart_items;
+create policy "Cart items are insertable by owner"
+  on public.cart_items for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Cart items are updatable by owner" on public.cart_items;
+create policy "Cart items are updatable by owner"
+  on public.cart_items for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Cart items are deletable by owner" on public.cart_items;
+create policy "Cart items are deletable by owner"
+  on public.cart_items for delete
+  using (auth.uid() = user_id);
+
+-- Products: readable by everyone (signed in or not) but only the
+-- active ones — no insert/update/delete policy is added, so once
+-- RLS is on, the anon/authenticated roles can't write to this
+-- table at all. Manage the catalog from the Supabase dashboard
+-- (or a service_role script), which bypasses RLS by design.
+alter table public.products enable row level security;
+
+drop policy if exists "Active products are viewable by everyone" on public.products;
+create policy "Active products are viewable by everyone"
+  on public.products for select
+  using (is_active = true);
+
+-- =========================================================
+-- Orders and order_items — schema + RLS scaffolding
+--
+-- checkout.html already calls two Edge Functions that don't exist
+-- yet in this repo (create-razorpay-order / verify-razorpay-payment).
+-- This block only creates the tables those functions will need and
+-- locks them down; it does NOT build the functions themselves.
+--
+-- Deliberate design: authenticated/anon clients get SELECT only.
+-- There is no insert/update policy for those roles, on purpose —
+-- a browser with just the anon key must never be able to create an
+-- order or set its own price. Once you build create-razorpay-order,
+-- it has to run with the service_role key (which bypasses RLS) and
+-- price every line item itself by reading public.products server
+-- side — never by trusting the amount the client sends. That's
+-- what keeps checkout tamper-proof; these policies just enforce
+-- that there's no other way in.
+-- =========================================================
+
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending', -- pending | paid | failed | cancelled
+  subtotal numeric not null,
+  currency text not null default 'INR',
+  razorpay_order_id text,
+  razorpay_payment_id text,
+  shipping_name text,
+  shipping_phone text,
+  shipping_address text,
+  shipping_city text,
+  shipping_state text,
+  shipping_pincode text,
+  created_at timestamptz not null default now(),
+  paid_at timestamptz
+);
+
+create table if not exists public.order_items (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references public.orders(id) on delete cascade,
+  product_id uuid not null references public.products(id),
+  color text,
+  quantity integer not null check (quantity > 0),
+  unit_price numeric not null, -- price captured at order time by the server, never the client
+  created_at timestamptz not null default now()
+);
+
+alter table public.orders enable row level security;
+
+drop policy if exists "Orders are viewable by owner" on public.orders;
+create policy "Orders are viewable by owner"
+  on public.orders for select
+  using (auth.uid() = user_id);
+
+alter table public.order_items enable row level security;
+
+drop policy if exists "Order items are viewable by owner" on public.order_items;
+create policy "Order items are viewable by owner"
+  on public.order_items for select
+  using (
+    exists (
+      select 1 from public.orders o
+      where o.id = order_items.order_id
+        and o.user_id = auth.uid()
+    )
+  );
