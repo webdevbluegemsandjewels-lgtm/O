@@ -225,6 +225,22 @@ window.OrenkaFineCart = {
 document.addEventListener("DOMContentLoaded", async () => {
   await updateCartBadge();
 
+  // Safety net for OAuth (Google) sign-in: that flow does a full
+  // page redirect to the provider and back, so this script re-runs
+  // fresh on return and can miss (or race) the SIGNED_IN event while
+  // supabase-js is still parsing the session out of the redirect
+  // URL. Email/password login doesn't navigate away, so its
+  // SIGNED_IN event is always caught by the listener below — but
+  // here, if we land on the page already signed in with leftover
+  // guest-cart items in localStorage, merge them right away instead
+  // of waiting on an event that may not fire in time.
+  const initialUserId = await getCurrentUserId();
+  if (initialUserId && readLocalCart().length) {
+    await mergeLocalCartIntoAccount(initialUserId);
+    await updateCartBadge();
+    notifyCartUpdated(await getItems());
+  }
+
   supabaseClient.auth.onAuthStateChange(async (event) => {
     if (event === "SIGNED_IN") {
       const userId = await getCurrentUserId();
