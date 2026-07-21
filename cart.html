@@ -181,6 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "checkout.html";
   });
 
+  // Guest cart merges into the account cart on login (see js/cart.js) —
+  // re-render here so this page picks up the merged items right away
+  // instead of still showing the pre-login list.
+  window.addEventListener("OrenkaFine:cart-updated", render);
+
   render();
 });
 </script>

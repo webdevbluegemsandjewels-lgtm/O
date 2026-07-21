@@ -231,9 +231,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (userId) {
         await mergeLocalCartIntoAccount(userId);
         await updateCartBadge();
+        notifyCartUpdated(await getItems());
       }
     } else if (event === "SIGNED_OUT") {
       await updateCartBadge();
+      notifyCartUpdated(await getItems());
     }
   });
 });
