@@ -25,7 +25,7 @@ The checked-in app is no longer just a static marketing site. It now includes:
 ## Root structure
 
 ```text
-Mirwa/
+OrenkaFine/
 ├── about.html
 ├── account.html
 ├── cart.html
@@ -181,7 +181,7 @@ These are worth knowing before you try to run everything end to end:
 - `checkout.html` calls Supabase Edge Functions named `create-razorpay-order` and `verify-razorpay-payment`, but those function files are not present in this repository.
 - `index.html` references `js/hero-db.js`, but that file is not present in the `js/` folder.
 - `collections.html` and `product.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.
-- Product and brand naming are mixed between `MIRWA` and `OrenkaFine`.
+- Product and brand naming are mixed between `OrenkaFine` and `OrenkaFine`.
 - The README that was previously in this repo described an older, smaller structure and did not match the current files.
 
 ## Suggested next cleanup steps
@@ -191,4 +191,4 @@ If you continue working on this repo, the highest-value follow-ups are:
 1. Add the missing checkout Edge Functions or remove the broken checkout calls.
 2. Add or remove the missing `js/hero-db.js` reference in `index.html`.
 3. Move hardcoded Supabase credentials out of committed frontend code if you want cleaner environment separation.
-4. Standardize branding between `Mirwa`, `MIRWA`, and `OrenkaFine`.
+4. Standardize branding between `OrenkaFine`, `OrenkaFine`, and `OrenkaFine`.
