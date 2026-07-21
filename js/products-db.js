@@ -9,7 +9,7 @@ function mapDbProductToCard(row) {
     id: row.id,
     slug: row.slug,
     name: row.name,
-    brand: row.brand || "OrenkaFine Jewelry",
+    brand: row.brand || "OrenkaFine jewellery",
     cat: row.category,
     price: `₹${Number(row.price).toLocaleString("en-IN")}`,
     oldPrice: row.old_price ? `₹${Number(row.old_price).toLocaleString("en-IN")}` : null,

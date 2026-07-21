@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="footer-top">
         <div class="footer-brand">
           <a href="index.html" class="brand">OrenkaFine</a>
-          <p>The world is my catwalk. Fine and fashion jewelry designed for everyday elegance, since 1996.</p>
+          <p>The world is my catwalk. Fine and fashion jewellery designed for everyday elegance, since 1996.</p>
           <div class="footer-social">
             <a href="#" class="icon-btn" aria-label="Instagram">IG</a>
             <a href="#" class="icon-btn" aria-label="Facebook">FB</a>
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 OrenkaFine Jewelry B.V. All rights reserved.</span>
+        <span>&copy; 2026 OrenkaFine jewellery B.V. All rights reserved.</span>
         <div class="legal-links">
           <a href="#">Disclaimer</a>
           <a href="#">Terms of Sale</a>

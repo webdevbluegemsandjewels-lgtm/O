@@ -15,7 +15,7 @@ const PRODUCTS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Ring ${ringNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
+		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
 		cat: "Rings",
 		price: `₹${amount}`,
 		image: `products/rings/${imageIndex}.png`,
@@ -41,7 +41,7 @@ const BRACELETS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Bracelet ${braceletNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
+		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
 		cat: "Bracelets",
 		price: `₹${amount}`,
 		image: `products/braclet/${imageIndex}.png`,
@@ -67,7 +67,7 @@ const NECKLACES = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Necklace ${necklaceNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
+		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
 		cat: "Necklaces",
 		price: `₹${amount}`,
 		image: `products/necklacs/${imageIndex}.png`,
@@ -93,7 +93,7 @@ const EARRINGS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Earring ${earringNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
+		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
 		cat: "Earrings",
 		price: `₹${amount}`,
 		image: `products/earring/${imageIndex}.png`,
@@ -119,7 +119,7 @@ const EAR_CUFFS = Array.from({ length: 50 }, (_, i) => {
 
 	return {
 		name: `Ear Cuff ${cuffNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine Jewelry" : "OrenkaFine Moda",
+		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
 		cat: "Ear Cuffs",
 		price: `₹${amount}`,
 		image: `products/ear-cuffs/${imageIndex}.png`,
@@ -180,7 +180,7 @@ function img(key, w = 900, extra = "") {
 
 const COLLECTIONS = [
 	{ id: "Dolce", title: "Dolce Collection", tagline: "Inspired by Italian Summer", description: "Luminous diamonds and warm gold create pieces for wedding days, evenings, and everyday celebration.", image: img("dolceRing", 1200), href: "collections.html?collection=Dolce" },
-	{ id: "Eterna", title: "Eterna Collection", tagline: "Wedding & Bridal", description: "Elegant engagement and bridal jewelry designed with diamonds that shine from every angle.", image: img("eternaBridal", 1200), href: "collections.html?collection=Eterna" },
+	{ id: "Eterna", title: "Eterna Collection", tagline: "Wedding & Bridal", description: "Elegant engagement and bridal jewellery designed with diamonds that shine from every angle.", image: img("eternaBridal", 1200), href: "collections.html?collection=Eterna" },
 	{ id: "Everyday Gold", title: "Everyday Gold", tagline: "Everyday elegance", description: "Lightweight diamond details designed to stack, layer, and carry you from day to night.", image: img("everydayGold", 1200), href: "collections.html?collection=Everyday+Gold" },
 ];
 
