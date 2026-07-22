@@ -98,13 +98,15 @@ set email = u.email
 from auth.users u
 where u.id = p.id and p.email is null;
 
--- One-time fix: accounts created while "Confirm email" was still on
--- are stuck as unconfirmed forever — turning that setting off only
--- affects signups going forward, it does NOT retroactively confirm
--- existing accounts. Run this once to unblock them:
-update auth.users
-set email_confirmed_at = now()
-where email_confirmed_at is null;
+-- The one-time "confirm every stuck account" fix that used to be
+-- here has been removed. Now that OTP verification is live and the
+-- welcome email fires on the email_confirmed_at transition (below),
+-- re-running that update on every schema run would auto-confirm —
+-- and welcome-email — every account still sitting unverified,
+-- including brand new signups who just haven't entered their code
+-- yet. That defeated the entire point of requiring OTP. If you ever
+-- have genuinely stuck old accounts to unblock again, do it by hand,
+-- one-off, in the SQL Editor — don't put it back in this file.
 
 -- =========================================================
 -- Welcome email trigger
@@ -117,9 +119,16 @@ where email_confirmed_at is null;
 -- directly in SQL via pg_net, which every Supabase project already
 -- has enabled — no hunting through dashboard menus required.
 --
--- BEFORE RUNNING: replace REPLACE_WITH_YOUR_WEBHOOK_SECRET below
--- with the exact same random string you set as WEBHOOK_SECRET on
--- the Edge Function.
+-- Fires on auth.users UPDATE, specifically the moment
+-- email_confirmed_at flips from null to a real timestamp — i.e.
+-- right after someone verifies their OTP code (or clicks a
+-- confirmation link), not at raw signup. It used to fire on INSERT
+-- into public.profiles, which happens immediately at signUp() time,
+-- before verification — so the welcome email was going out before
+-- the account was even usable. This is why welcome-email/index.ts
+-- reads payload.record.email / .full_name: those are built
+-- explicitly below to match, since auth.users itself only has email
+-- directly (full_name lives in raw_user_meta_data).
 -- =========================================================
 
 create or replace function public.notify_welcome_email()
@@ -135,16 +144,26 @@ begin
       'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqZXBpZWNqc29tcmFsbGxpaWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwODgyMDEsImV4cCI6MjA5OTY2NDIwMX0.cSYAd2dJcYOUvnGc66wjWtjVcww12p2rhHetZwzRoms',
       'x-webhook-secret', '34004203a12010dbcbd455ec00b87c9f846e3651527b79cf'
     ),
-    body := jsonb_build_object('record', to_jsonb(new))
+    body := jsonb_build_object(
+      'record', jsonb_build_object(
+        'email', new.email,
+        'full_name', new.raw_user_meta_data ->> 'full_name'
+      )
+    )
   );
   return new;
 end;
 $$;
 
+-- Old (fired too early — at profile creation, before verification):
 drop trigger if exists on_profile_created_welcome_email on public.profiles;
-create trigger on_profile_created_welcome_email
-  after insert on public.profiles
-  for each row execute function public.notify_welcome_email();
+
+drop trigger if exists on_auth_user_confirmed_welcome_email on auth.users;
+create trigger on_auth_user_confirmed_welcome_email
+  after update on auth.users
+  for each row
+  when (old.email_confirmed_at is null and new.email_confirmed_at is not null)
+  execute function public.notify_welcome_email();
 
 -- =========================================================
 -- Row Level Security — cart_items and products

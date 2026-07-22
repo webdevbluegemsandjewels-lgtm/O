@@ -94,7 +94,7 @@
           <p data-role="otp-message" style="margin-bottom:1rem; font-size:.9rem; color:var(--ink-soft); line-height:1.6;"></p>
           <div class="auth-field">
             <label>Verification code</label>
-            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" data-role="otp-code" />
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="one-time-code" data-role="otp-code" />
           </div>
           <button type="button" class="btn btn-gold auth-submit" data-role="otp-verify">Verify</button>
           <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
@@ -201,7 +201,7 @@
       if (error) {
         if (error.message.toLowerCase().includes("not confirmed")) {
           await supabaseClient.auth.resend({ type: "signup", email }); // stale codes expire, send a fresh one
-          showOtpStep(modal, email, `Your email isn't verified yet. We just sent a fresh 6-digit code to ${email}.`);
+          showOtpStep(modal, email, `Your email isn't verified yet. We just sent a fresh verification code to ${email}.`);
         } else {
           showError(modal, error.message);
         }
@@ -258,7 +258,7 @@
         if (typeof syncAccountUI === "function") syncAccountUI();
         close(data.user);
       } else {
-        showOtpStep(modal, email, `We sent a 6-digit code to ${email}. Enter it below to activate your account — without this, you won't be able to log in.`);
+        showOtpStep(modal, email, `We sent a verification code to ${email}. Enter it below to activate your account — without this, you won't be able to log in.`);
       }
     });
 

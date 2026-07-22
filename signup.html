@@ -252,10 +252,10 @@
         </form>
 
         <div id="otpSection" style="display:none;">
-          <p class="sub">We sent a 6-digit code to <strong id="otpEmailDisplay"></strong>. Enter it below to activate your account — without this, you won't be able to log in.</p>
+          <p class="sub">We sent a verification code to <strong id="otpEmailDisplay"></strong>. Enter it below to activate your account — without this, you won't be able to log in.</p>
           <div class="auth-field no-icon">
             <label for="otpCode">Verification code</label>
-            <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" />
+            <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="one-time-code" />
           </div>
           <button type="button" class="btn btn-gold auth-submit" id="otpVerifyBtn">Verify &amp; Continue</button>
           <p class="auth-switch">Didn't get a code? <a href="#" id="otpResendLink">Resend code</a></p>

@@ -212,10 +212,10 @@
         </form>
 
         <div id="otpSection" style="display:none;">
-          <p class="sub">Your email isn't verified yet, so we can't log you in. We just sent a fresh 6-digit code to <strong id="otpEmailDisplay"></strong>.</p>
+          <p class="sub">Your email isn't verified yet, so we can't log you in. We just sent a fresh verification code to <strong id="otpEmailDisplay"></strong>.</p>
           <div class="auth-field">
             <label for="otpCode">Verification code</label>
-            <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" />
+            <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="one-time-code" />
           </div>
           <button type="button" class="btn btn-gold auth-submit" id="otpVerifyBtn">Verify &amp; Log In</button>
           <p class="auth-switch">Didn't get it? <a href="#" id="otpResendLink">Resend code</a></p>
