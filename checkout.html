@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function money(n) {
-    return `₹${Number(n).toLocaleString("en-IN")}`;
+    return `₹${Math.round(Number(n)).toLocaleString("en-IN")}`;
   }
 
   const coItems = document.getElementById("coItems");

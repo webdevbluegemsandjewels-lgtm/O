@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkoutBtn = document.getElementById("checkoutBtn");
 
   function money(n) {
-    return `₹${Number(n).toLocaleString("en-IN")}`;
+    return `₹${Math.round(Number(n)).toLocaleString("en-IN")}`;
   }
 
   async function render() {

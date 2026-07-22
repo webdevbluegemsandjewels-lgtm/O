@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const itemLayout = document.getElementById("itemLayout");
 
   function money(n) {
-    return `₹${Number(n).toLocaleString("en-IN")}`;
+    return `₹${Math.round(Number(n)).toLocaleString("en-IN")}`;
   }
 
   function matches(i) {
