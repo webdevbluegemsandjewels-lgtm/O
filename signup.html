@@ -251,7 +251,17 @@
           </p>
         </form>
 
-        <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+        <div id="otpSection" style="display:none;">
+          <p class="sub">We sent a 6-digit code to <strong id="otpEmailDisplay"></strong>. Enter it below to activate your account — without this, you won't be able to log in.</p>
+          <div class="auth-field no-icon">
+            <label for="otpCode">Verification code</label>
+            <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" />
+          </div>
+          <button type="button" class="btn btn-gold auth-submit" id="otpVerifyBtn">Verify &amp; Continue</button>
+          <p class="auth-switch">Didn't get a code? <a href="#" id="otpResendLink">Resend code</a></p>
+        </div>
+
+        <p class="auth-switch" id="loginSwitch">Already have an account? <a href="login.html">Log in</a></p>
       </div>
     </div>
   </div>
@@ -267,6 +277,61 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorEl = document.getElementById("authError");
   const successEl = document.getElementById("authSuccess");
   const submitBtn = document.getElementById("submitBtn");
+  const otpSection = document.getElementById("otpSection");
+  const otpEmailDisplay = document.getElementById("otpEmailDisplay");
+  const otpCodeInput = document.getElementById("otpCode");
+  const otpVerifyBtn = document.getElementById("otpVerifyBtn");
+  const otpResendLink = document.getElementById("otpResendLink");
+  const loginSwitch = document.getElementById("loginSwitch");
+  let pendingEmail = "";
+
+  function goToRedirectTarget() {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    window.location.href = redirect ? decodeURIComponent(redirect) : "index.html";
+  }
+
+  function showOtpStep(email) {
+    pendingEmail = email;
+    form.style.display = "none";
+    document.getElementById("googleBtn").style.display = "none";
+    document.querySelector(".auth-divider").style.display = "none";
+    loginSwitch.style.display = "none";
+    otpEmailDisplay.textContent = email;
+    otpSection.style.display = "block";
+  }
+
+  otpVerifyBtn.addEventListener("click", async () => {
+    errorEl.style.display = "none";
+    const token = otpCodeInput.value.trim();
+    if (!token) return;
+    otpVerifyBtn.disabled = true;
+    otpVerifyBtn.textContent = "Verifying…";
+
+    const { error } = await supabaseClient.auth.verifyOtp({ email: pendingEmail, token, type: "signup" });
+
+    otpVerifyBtn.disabled = false;
+    otpVerifyBtn.textContent = "Verify & Continue";
+
+    if (error) {
+      errorEl.textContent = error.message;
+      errorEl.style.display = "block";
+      return;
+    }
+
+    goToRedirectTarget();
+  });
+
+  otpResendLink.addEventListener("click", async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+    successEl.style.display = "none";
+    otpResendLink.textContent = "Sending…";
+    const { error } = await supabaseClient.auth.resend({ type: "signup", email: pendingEmail });
+    otpResendLink.textContent = "Resend code";
+    successEl.textContent = error ? error.message : "A new code has been sent.";
+    successEl.style.display = "block";
+  });
 
   document.getElementById("googleBtn").addEventListener("click", async () => {
     const params = new URLSearchParams(window.location.search);
@@ -322,13 +387,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (data.session) {
-      const params = new URLSearchParams(window.location.search);
-      const redirect = params.get("redirect");
-      window.location.href = redirect ? decodeURIComponent(redirect) : "index.html";
+      goToRedirectTarget();
     } else {
-      form.reset();
-      successEl.textContent = "Account created! Check your email to confirm, then log in.";
+      successEl.textContent = "Account created! Enter the verification code below to activate it.";
       successEl.style.display = "block";
+      showOtpStep(email);
     }
   });
 });

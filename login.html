@@ -211,7 +211,17 @@
           </p>
         </form>
 
-        <p class="auth-switch">Don't have an account? <a href="signup.html">Sign up</a></p>
+        <div id="otpSection" style="display:none;">
+          <p class="sub">Your email isn't verified yet, so we can't log you in. We just sent a fresh 6-digit code to <strong id="otpEmailDisplay"></strong>.</p>
+          <div class="auth-field">
+            <label for="otpCode">Verification code</label>
+            <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" />
+          </div>
+          <button type="button" class="btn btn-gold auth-submit" id="otpVerifyBtn">Verify &amp; Log In</button>
+          <p class="auth-switch">Didn't get it? <a href="#" id="otpResendLink">Resend code</a></p>
+        </div>
+
+        <p class="auth-switch" id="signupSwitch">Don't have an account? <a href="signup.html">Sign up</a></p>
       </div>
     </div>
   </div>
@@ -226,6 +236,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
   const errorEl = document.getElementById("authError");
   const submitBtn = document.getElementById("submitBtn");
+  const otpSection = document.getElementById("otpSection");
+  const otpEmailDisplay = document.getElementById("otpEmailDisplay");
+  const otpCodeInput = document.getElementById("otpCode");
+  const otpVerifyBtn = document.getElementById("otpVerifyBtn");
+  const otpResendLink = document.getElementById("otpResendLink");
+  const signupSwitch = document.getElementById("signupSwitch");
+  let pendingEmail = "";
+
+  function goToRedirectTarget() {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    window.location.href = redirect ? decodeURIComponent(redirect) : "index.html";
+  }
+
+  async function showOtpStep(email) {
+    pendingEmail = email;
+    form.style.display = "none";
+    document.getElementById("googleBtn").style.display = "none";
+    document.querySelector(".auth-divider").style.display = "none";
+    signupSwitch.style.display = "none";
+    otpEmailDisplay.textContent = email;
+    otpSection.style.display = "block";
+    await supabaseClient.auth.resend({ type: "signup", email }); // stale codes expire, so send a fresh one
+  }
+
+  otpVerifyBtn.addEventListener("click", async () => {
+    errorEl.style.display = "none";
+    const token = otpCodeInput.value.trim();
+    if (!token) return;
+    otpVerifyBtn.disabled = true;
+    otpVerifyBtn.textContent = "Verifying…";
+
+    const { error } = await supabaseClient.auth.verifyOtp({ email: pendingEmail, token, type: "signup" });
+
+    otpVerifyBtn.disabled = false;
+    otpVerifyBtn.textContent = "Verify & Log In";
+
+    if (error) {
+      errorEl.textContent = error.message;
+      errorEl.style.display = "block";
+      return;
+    }
+
+    goToRedirectTarget();
+  });
+
+  otpResendLink.addEventListener("click", async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+    otpResendLink.textContent = "Sending…";
+    await supabaseClient.auth.resend({ type: "signup", email: pendingEmail });
+    otpResendLink.textContent = "Resend code";
+  });
 
   document.getElementById("googleBtn").addEventListener("click", async () => {
     const params = new URLSearchParams(window.location.search);
@@ -250,17 +313,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Log In";
+
     if (error) {
-      errorEl.textContent = error.message;
-      errorEl.style.display = "block";
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Log In";
+      if (error.message.toLowerCase().includes("not confirmed")) {
+        await showOtpStep(email);
+      } else {
+        errorEl.textContent = error.message;
+        errorEl.style.display = "block";
+      }
       return;
     }
 
-    const params = new URLSearchParams(window.location.search);
-    const redirect = params.get("redirect");
-    window.location.href = redirect ? decodeURIComponent(redirect) : "index.html";
+    goToRedirectTarget();
   });
 });
 </script>

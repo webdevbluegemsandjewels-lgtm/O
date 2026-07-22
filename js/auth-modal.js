@@ -89,6 +89,18 @@
           </div>
           <button type="submit" class="btn btn-gold auth-submit" data-role="signup-submit">Sign Up</button>
         </form>
+
+        <div data-role="otp-section" style="display:none;">
+          <p data-role="otp-message" style="margin-bottom:1rem; font-size:.9rem; color:var(--ink-soft); line-height:1.6;"></p>
+          <div class="auth-field">
+            <label>Verification code</label>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" data-role="otp-code" />
+          </div>
+          <button type="button" class="btn btn-gold auth-submit" data-role="otp-verify">Verify</button>
+          <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
+            Didn't get it? <a href="#" data-role="otp-resend" style="color:var(--gold); text-decoration:underline;">Resend code</a>
+          </p>
+        </div>
       </div>
     `;
     document.body.appendChild(wrap);
@@ -113,6 +125,19 @@
     const el = modal.querySelector('[data-role="error"]');
     el.textContent = msg;
     el.style.display = "block";
+  }
+
+  function showOtpStep(modal, email, message) {
+    modal.querySelector('[data-role="login-form"]').style.display = "none";
+    modal.querySelector('[data-role="signup-form"]').style.display = "none";
+    modal.querySelector(".auth-modal-tabs").style.display = "none";
+    modal.querySelector('[data-role="google-btn"]').style.display = "none";
+    modal.querySelector(".auth-divider").style.display = "none";
+    const otpSection = modal.querySelector('[data-role="otp-section"]');
+    otpSection.style.display = "block";
+    otpSection.dataset.email = email;
+    modal.querySelector('[data-role="otp-message"]').textContent = message;
+    modal.querySelector('[data-role="otp-code"]').value = "";
   }
 
   function close(result) {
@@ -174,7 +199,12 @@
       btn.textContent = "Log In";
 
       if (error) {
-        showError(modal, error.message);
+        if (error.message.toLowerCase().includes("not confirmed")) {
+          await supabaseClient.auth.resend({ type: "signup", email }); // stale codes expire, send a fresh one
+          showOtpStep(modal, email, `Your email isn't verified yet. We just sent a fresh 6-digit code to ${email}.`);
+        } else {
+          showError(modal, error.message);
+        }
         return;
       }
 
@@ -228,11 +258,44 @@
         if (typeof syncAccountUI === "function") syncAccountUI();
         close(data.user);
       } else {
-        modal.querySelector('[data-role="signup-form"]').reset();
-        const successEl = modal.querySelector('[data-role="success"]');
-        successEl.textContent = "Account created! Check your email to confirm, then log in.";
-        successEl.style.display = "block";
+        showOtpStep(modal, email, `We sent a 6-digit code to ${email}. Enter it below to activate your account — without this, you won't be able to log in.`);
       }
+    });
+
+    // --- OTP verification (shared by the login "not confirmed" path and signup) ---
+    modal.querySelector('[data-role="otp-verify"]').addEventListener("click", async () => {
+      hideMessages(modal);
+      const otpSection = modal.querySelector('[data-role="otp-section"]');
+      const email = otpSection.dataset.email;
+      const token = modal.querySelector('[data-role="otp-code"]').value.trim();
+      if (!token) return;
+
+      const btn = modal.querySelector('[data-role="otp-verify"]');
+      btn.disabled = true;
+      btn.textContent = "Verifying…";
+
+      const { data, error } = await supabaseClient.auth.verifyOtp({ email, token, type: "signup" });
+
+      btn.disabled = false;
+      btn.textContent = "Verify";
+
+      if (error) {
+        showError(modal, error.message);
+        return;
+      }
+
+      if (typeof syncAccountUI === "function") syncAccountUI();
+      close(data.user);
+    });
+
+    modal.querySelector('[data-role="otp-resend"]').addEventListener("click", async (e) => {
+      e.preventDefault();
+      hideMessages(modal);
+      const email = modal.querySelector('[data-role="otp-section"]').dataset.email;
+      const link = modal.querySelector('[data-role="otp-resend"]');
+      link.textContent = "Sending…";
+      await supabaseClient.auth.resend({ type: "signup", email });
+      link.textContent = "Resend code";
     });
 
     wrap.querySelector('[data-role="google-btn"]').addEventListener("click", async () => {

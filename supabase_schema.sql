@@ -133,7 +133,7 @@ begin
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqZXBpZWNqc29tcmFsbGxpaWZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwODgyMDEsImV4cCI6MjA5OTY2NDIwMX0.cSYAd2dJcYOUvnGc66wjWtjVcww12p2rhHetZwzRoms',
-      'x-webhook-secret', 'REPLACE_WITH_YOUR_WEBHOOK_SECRET'
+      'x-webhook-secret', '34004203a12010dbcbd455ec00b87c9f846e3651527b79cf'
     ),
     body := jsonb_build_object('record', to_jsonb(new))
   );
