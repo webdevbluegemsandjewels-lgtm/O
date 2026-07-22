@@ -100,13 +100,16 @@ async function fetchDbCart(userId) {
   }));
 }
 
+// Returns true on success, false on failure (and logs why) — callers
+// need this so they don't wipe data (e.g. the guest cart) based on an
+// operation that silently didn't actually happen.
 async function upsertDbCartItem(userId, product, qtyDelta) {
   const colorKey = product.color || "";
   const sizeKey = product.size || "";
   const metalKey = product.metalType || "";
   const diamondKey = product.diamondQuality || "";
 
-  const { data: existing } = await supabaseClient
+  const { data: existing, error: selectErr } = await supabaseClient
     .from("cart_items")
     .select("id, quantity")
     .eq("user_id", userId)
@@ -117,12 +120,21 @@ async function upsertDbCartItem(userId, product, qtyDelta) {
     .eq("selected_diamond_quality", diamondKey)
     .maybeSingle();
 
+  if (selectErr) {
+    console.error("Cart: failed to look up existing cart_items row (has supabase_schema.sql been run against this database?):", selectErr.message);
+    return false;
+  }
+
   if (existing) {
     const update = { quantity: existing.quantity + qtyDelta, updated_at: new Date().toISOString() };
     if (product.price != null) update.unit_price = product.price;
-    await supabaseClient.from("cart_items").update(update).eq("id", existing.id);
+    const { error } = await supabaseClient.from("cart_items").update(update).eq("id", existing.id);
+    if (error) {
+      console.error("Cart: failed to update cart_items row:", error.message);
+      return false;
+    }
   } else if (qtyDelta > 0) {
-    await supabaseClient.from("cart_items").insert({
+    const { error } = await supabaseClient.from("cart_items").insert({
       user_id: userId,
       product_id: product.id,
       color: colorKey,
@@ -132,17 +144,26 @@ async function upsertDbCartItem(userId, product, qtyDelta) {
       unit_price: product.price != null ? product.price : null,
       quantity: qtyDelta,
     });
+    if (error) {
+      console.error("Cart: failed to insert cart_items row:", error.message);
+      return false;
+    }
   }
+
+  return true;
 }
 
 async function mergeLocalCartIntoAccount(userId) {
   const localItems = readLocalCart();
   if (!localItems.length) return;
 
-  for (const item of localItems) {
-    await upsertDbCartItem(userId, item, item.qty);
+  const results = await Promise.all(localItems.map((item) => upsertDbCartItem(userId, item, item.qty)));
+
+  if (results.every(Boolean)) {
+    writeLocalCart([]); // everything made it into the account cart — safe to clear the guest copy
+  } else {
+    console.error("Cart: guest cart was NOT fully merged into the account cart — leaving localStorage untouched so nothing is lost. Check the errors above (a common cause is supabase_schema.sql not having been run yet).");
   }
-  writeLocalCart([]); // guest cart is now merged in — clear it
 }
 
 // ---------- public API ----------
@@ -167,7 +188,8 @@ async function addItem(product, qty = 1) {
   };
 
   if (userId) {
-    await upsertDbCartItem(userId, normalized, qty);
+    const ok = await upsertDbCartItem(userId, normalized, qty);
+    if (!ok) console.error("Cart: addItem did not actually save (see error above) — the UI may still show 'Added' even though nothing was stored.");
   } else {
     const items = readLocalCart();
     const existing = items.find((i) => matchesVariant(i, normalized));
