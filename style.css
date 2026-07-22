@@ -1721,6 +1721,24 @@ body.auth-modal-open{ overflow: hidden; }
 .auth-modal .auth-error{ color:#a9432f; font-size:.85rem; margin-bottom:1rem; }
 .auth-modal .auth-success{ color: var(--emerald); font-size:.88rem; margin-bottom:1rem; line-height:1.6; }
 
+.auth-modal .auth-divider{
+  display:flex; align-items:center; gap:.9rem;
+  margin: 1.1rem 0;
+  font-size:.76rem; letter-spacing:.08em; text-transform:uppercase;
+  color: var(--ink-soft);
+}
+.auth-modal .auth-divider::before, .auth-modal .auth-divider::after{
+  content:""; flex:1; height:1px; background: var(--line);
+}
+.auth-modal .auth-oauth-btn{
+  width:100%; display:flex; align-items:center; justify-content:center; gap:.7rem;
+  padding: .78rem .9rem; border: 1.5px solid #e2d9c6; border-radius: 9px;
+  background:#fff; font-family: inherit; font-size:.92rem; font-weight:500; color: var(--ink);
+  cursor:pointer; transition: border-color .2s ease, background .2s ease;
+  margin-bottom: .3rem;
+}
+.auth-modal .auth-oauth-btn:hover{ border-color: var(--gold); background: var(--gold-pale); }
+
 @media (max-width: 480px){
   .auth-modal{ border-radius: 32px 32px 0 0; padding: 2.2rem 1.2rem 1.4rem; max-height: 92dvh; }
   .auth-modal .auth-field{ margin-bottom: .75rem; }
