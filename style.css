@@ -1094,10 +1094,13 @@ section{ padding: 3rem 0; }
 }
 
 .discount-ribbon{
-  position:absolute; top:0; left:0; z-index:2;
-  background:var(--emerald); color:var(--bone);
-  font-size:.68rem; line-height:1.15; text-align:center;
-  padding:.4rem .6rem; border-bottom-right-radius:6px;
+  position:absolute; top:16px; left:-42px; z-index:3;
+  width:160px;
+  background: #c0392b; color:#fff;
+  font-size:.68rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+  text-align:center; line-height:1.4; padding:.3rem 0;
+  transform: rotate(-45deg); transform-origin:center;
+  box-shadow: 0 2px 6px rgba(22,20,15,.18);
 }
 
 /* ---------- Shop toolbar (result count + sort) ---------- */

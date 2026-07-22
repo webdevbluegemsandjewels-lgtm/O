@@ -18,7 +18,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const FROM_EMAIL = Deno.env.get("WELCOME_FROM_EMAIL") || "onboarding@resend.dev";
+const FROM_EMAIL = Deno.env.get("WELCOME_FROM_EMAIL");
 const WEBHOOK_SECRET = Deno.env.get("WEBHOOK_SECRET");
 
 serve(async (req) => {

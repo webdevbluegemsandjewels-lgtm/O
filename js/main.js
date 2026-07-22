@@ -196,8 +196,8 @@ function productCardHTML(p) {
     <article class="product-card">
       ${openTag}
       <div class="product-media">
-        ${p.discount ? `<span class="discount-ribbon">${p.discount}<br>OFF</span>` : ""}
-        ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ""}
+        ${p.discount ? `<span class="discount-ribbon">${p.discount} OFF</span>` : ""}
+        ${(p.tag && !p.discount) ? `<span class="product-tag">${p.tag}</span>` : ""}
         <button class="product-wish" aria-label="Add ${p.name} to wishlist" onclick="event.preventDefault()">&hearts;</button>
         <img src="${primaryImage}" data-secondary="${secondaryImage}" alt="${p.name}" loading="lazy" />
       </div>
