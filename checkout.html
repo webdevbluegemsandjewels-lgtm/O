@@ -146,9 +146,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const coItems = document.getElementById("coItems");
-  coItems.innerHTML = items.map(i => `
-    <div class="co-item"><span>${i.name} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>
-  `).join("");
+  coItems.innerHTML = items.map(i => {
+    const details = [i.color, i.size ? `Size ${i.size}` : "", i.metalType, i.diamondQuality].filter(Boolean).join(" · ");
+    return `
+    <div class="co-item">
+      <span>${i.name} × ${i.qty}${details ? ` <small style="color:var(--ink-soft);">(${details})</small>` : ""}</span>
+      <span>${money(i.price * i.qty)}</span>
+    </div>
+  `;
+  }).join("");
   document.getElementById("coTotal").textContent = money(await window.OrenkaFineCart.getSubtotal());
 
   const errorEl = document.getElementById("checkoutError");

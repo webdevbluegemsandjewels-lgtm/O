@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title id="pageTitle">Product — OrenkaFine</title>
-<meta name="description" id="pageDesc" content="OrenkaFine fine and fashion Jewellery." />
+<meta name="description" id="pageDesc" content="OrenkaFine fine and fashion jewelry." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
@@ -38,7 +38,7 @@
   .product-detail h1{ font-size: clamp(1.9rem, 3vw, 2.6rem); margin-bottom: .6rem; line-height:1.1; }
   .product-detail-rating{ font-size:.85rem; color:var(--ink-soft); margin-bottom: 1rem; }
   .product-detail-rating .star{ color: var(--gold); }
-  .product-detail-price{ display:flex; align-items:baseline; gap:.8rem; margin-bottom: 1.4rem; }
+  .product-detail-price{ display:flex; align-items:baseline; gap:.8rem; margin-bottom: 1rem; }
   .product-detail-price .now{ font-size: 1.7rem; font-family: var(--font-display); color: var(--ink); }
   .product-detail-price .old{ font-size: 1.1rem; color: var(--ink-soft); text-decoration: line-through; }
   .product-detail-price .save{ font-size:.82rem; color: var(--emerald); font-weight:500; }
@@ -47,42 +47,83 @@
   .product-meta-row{ display:flex; gap: 1.6rem; flex-wrap:wrap; margin-bottom: 1.6rem; font-size:.85rem; color: var(--ink-soft); }
   .product-meta-row strong{ color: var(--ink); font-weight:500; }
 
-  .product-colors{ margin-bottom: 1.6rem; }
-  .product-colors h4{ font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color: var(--gold); margin-bottom:.7rem; }
-  .product-color-row{ display:flex; gap:.6rem; }
-  .product-color-swatch{
-    width: 30px; height: 30px; border-radius:50%;
-    border: 1px solid var(--line); cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
+  .points-note{
+    display:inline-flex; align-items:center; gap:.5rem;
+    background: var(--gold-pale); color: var(--ink);
+    border-radius: 999px; padding: .5rem 1rem; font-size: .82rem;
+    margin-bottom: 1.4rem;
   }
-  .product-color-swatch.active{ outline: 2px solid var(--gold); outline-offset: 2px; }
 
   .product-options{ margin-bottom: 1.6rem; }
-  .product-options h4{ font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color: var(--gold); margin-bottom:.7rem; }
-  .option-pill-row, .option-chip-row{ display:flex; gap:.6rem; flex-wrap:wrap; }
+  .product-options h4{
+    font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color: var(--gold);
+    margin-bottom:.7rem; display:flex; align-items:center; justify-content:space-between;
+  }
+  .option-pill-row{ display:flex; gap:.6rem; flex-wrap:wrap; }
   .option-pill{
-    display:inline-flex; align-items:center; gap:.4rem;
-    border: 1px solid var(--line); border-radius: 999px;
-    padding: .5rem 1rem; font-size:.85rem; cursor:pointer;
-    background:#fff; transition: border-color .2s, background .2s;
+    border: 1px solid var(--line); border-radius: 999px; padding: .55rem 1.1rem;
+    font-size: .85rem; cursor:pointer; transition: border-color .2s, background .2s;
+    display:flex; align-items:center; gap:.4rem;
   }
-  .option-pill input{ margin:0; accent-color: var(--gold); }
+  .option-pill input{ accent-color: var(--gold); margin:0; }
   .option-pill.active-pill{ border-color: var(--gold); background: var(--gold-pale); }
-  .option-chip{
-    border: 1px solid var(--line); border-radius: 8px;
-    padding: .5rem 1rem; font-size:.85rem; cursor:pointer;
-    background:#fff; transition: border-color .2s, background .2s;
-  }
-  .option-chip.active{ border-color: var(--gold); background: var(--gold-pale); }
 
-  .qty-add-row{ display:flex; gap: 1rem; align-items:center; margin-bottom: 1.4rem; flex-wrap:wrap; }
+  .option-chip-row{ display:flex; gap:.55rem; flex-wrap:wrap; }
+  .option-chip{
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid var(--line); background:#fff; font-size:.85rem; cursor:pointer;
+    transition: border-color .2s, background .2s, color .2s;
+  }
+  .option-chip.active{ border-color: var(--ink); background: var(--ink); color:#fff; }
+
+  .price-approx-note{ font-size:.76rem; color: var(--ink-soft); margin: -.8rem 0 1.2rem; display:none; }
+
+  .delivery-check{ margin: 0 0 1.6rem; }
+  .delivery-check h4{
+    font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color: var(--gold);
+    margin-bottom:.6rem;
+  }
+  .delivery-check-row{ display:flex; gap:.6rem; max-width: 320px; }
+  .delivery-check-row input{
+    flex:1; border: 1px solid var(--line); border-radius: 8px; padding:.6rem .8rem;
+    font-family: inherit; font-size:.9rem;
+  }
+  .delivery-check-row button{
+    border: 1px solid var(--ink); background:#fff; border-radius: 8px; padding: 0 1.1rem;
+    font-size:.85rem; cursor:pointer; white-space:nowrap;
+  }
+  .delivery-result{ font-size:.83rem; margin-top:.6rem; display:none; }
+
+  .qty-add-row{ display:flex; gap: 1rem; align-items:center; margin-bottom: 1rem; flex-wrap:wrap; }
   .qty-stepper{ display:flex; align-items:center; border: 1px solid var(--line); }
   .qty-stepper button{ width: 40px; height: 46px; background: transparent; border:none; font-size:1.1rem; }
   .qty-stepper input{
     width: 46px; text-align:center; border:none; border-left:1px solid var(--line); border-right:1px solid var(--line);
     height: 46px; font-family: inherit; font-size: 1rem;
   }
+
+  .cart-action-row{ display:flex; gap:.8rem; margin-bottom: 1.4rem; flex-wrap:wrap; }
   .add-to-cart-btn{ flex:1; min-width: 220px; justify-content:center; }
+  .trial-dropdown{ position:relative; }
+  .trial-trigger{
+    display:flex; align-items:center; gap:.5rem; height:100%; min-height: 48px;
+    border: 1px solid var(--ink); background:#fff; color: var(--ink);
+    padding: 0 1.1rem; border-radius:6px; font-size:.85rem; cursor:pointer;
+  }
+  .trial-menu{
+    position:absolute; bottom: calc(100% + .5rem); left:0; min-width:200px;
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    box-shadow: 0 14px 28px rgba(22,20,15,.14); display:none; flex-direction:column; z-index:10;
+    overflow:hidden;
+  }
+  .trial-menu.open{ display:flex; }
+  .trial-menu button, .trial-menu a{
+    display:flex; align-items:center; gap:.6rem; padding:.75rem .9rem;
+    font-size:.85rem; color: var(--ink); text-align:left; background:none; border:none; cursor:pointer;
+    text-decoration:none;
+  }
+  .trial-menu button:hover, .trial-menu a:hover{ background: var(--bone-dim); }
+
   .stock-note{ font-size:.82rem; color: var(--ink-soft); margin-bottom: 2rem; }
   .stock-note.low{ color:#a9432f; }
 
@@ -107,7 +148,7 @@
 
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewelry</small></a>
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html">Collections</a>
       <a href="about.html">The House</a>
@@ -155,6 +196,9 @@
           <span class="old" id="priceOld" style="display:none;"></span>
           <span class="save" id="priceSave" style="display:none;"></span>
         </div>
+        <p class="price-approx-note" id="priceApproxNote">Estimated price for this metal type — final price confirmed at checkout.</p>
+
+        <p class="points-note" id="pointsNote"></p>
 
         <p class="product-detail-desc" id="productDesc">Description loading…</p>
 
@@ -163,13 +207,13 @@
           <span>Brand: <strong id="productBrand">OrenkaFine</strong></span>
         </div>
 
-        <div class="product-colors" id="colorSection" style="display:none;">
+        <div class="product-options" id="colorSection">
           <h4>Color</h4>
-          <div class="product-color-row" id="colorRow"></div>
+          <div class="option-pill-row" id="colorRow"></div>
         </div>
 
-        <div class="product-options" id="metalSection" style="display:none;">
-          <h4>Metal Type</h4>
+        <div class="product-options" id="metalSection">
+          <h4>Metal Type <a href="#" class="option-guide-link" onclick="return false;" style="font-size:.72rem;text-transform:none;letter-spacing:normal;color:var(--ink-soft);text-decoration:underline;">Gold Purity Guide</a></h4>
           <div class="option-pill-row" id="metalRow"></div>
         </div>
 
@@ -179,7 +223,7 @@
         </div>
 
         <div class="product-options" id="diamondSection" style="display:none;">
-          <h4>Diamond Quality</h4>
+          <h4>Diamond Type &amp; Quality</h4>
           <div class="option-pill-row" id="diamondRow"></div>
         </div>
 
@@ -187,13 +231,32 @@
           This exact combination isn't available. Try a different option.
         </p>
 
+        <div class="delivery-check">
+          <h4>Check delivery date</h4>
+          <div class="delivery-check-row">
+            <input type="text" id="pincodeInput" placeholder="Enter Pincode" inputmode="numeric" maxlength="6" />
+            <button type="button" id="pincodeCheckBtn">Check</button>
+          </div>
+          <p class="delivery-result" id="deliveryResult"></p>
+        </div>
+
         <div class="qty-add-row">
           <div class="qty-stepper">
             <button type="button" id="qtyMinus" aria-label="Decrease quantity">&minus;</button>
             <input type="text" id="qtyInput" value="1" inputmode="numeric" aria-label="Quantity" />
             <button type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
           </div>
-          <button class="btn btn-gold add-to-cart-btn" id="addToCartBtn">Add to Bag</button>
+        </div>
+
+        <div class="cart-action-row">
+          <div class="trial-dropdown">
+            <button type="button" class="trial-trigger" id="trialTrigger">Trial Cart <span style="font-size:.7rem;">&#9662;</span></button>
+            <div class="trial-menu" id="trialMenu">
+              <button type="button" id="addToTrialBtn">&#127968; Add To Trial Cart</button>
+              <a href="tel:+912055550142" id="callEnquiryLink">&#128222; Call for Enquiry</a>
+            </div>
+          </div>
+          <button class="btn btn-gold add-to-cart-btn" id="addToCartBtn">Add to Cart</button>
         </div>
 
         <p class="stock-note" id="stockNote"></p>
@@ -257,7 +320,6 @@
 <script src="js/auth-modal.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
-<script src="js/search.js"></script>
 <script src="js/footer.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
@@ -312,7 +374,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("productCat").textContent = product.category;
   document.getElementById("productName").textContent = product.name;
-  document.getElementById("productMaterial").textContent = product.material || "18 karat gold";
+  document.getElementById("productMaterial").textContent = product.gold_type || "18 karat gold";
   document.getElementById("productBrand").textContent = product.brand || "OrenkaFine";
   document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the OrenkaFine collection.";
 
@@ -320,21 +382,73 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("productRating").innerHTML = `${product.rating} <span class="star">★</span>`;
   }
 
-  const price = Number(product.price) || 0;
-  const oldPrice = product.old_price ? Number(product.old_price) : null;
-  document.getElementById("priceNow").textContent = `₹${price.toLocaleString("en-IN")}`;
-  if (oldPrice && oldPrice > price) {
-    const saveAmt = oldPrice - price;
-    const savePct = Math.round((saveAmt / oldPrice) * 100);
-    const oldEl = document.getElementById("priceOld");
-    const saveEl = document.getElementById("priceSave");
-    oldEl.textContent = `₹${oldPrice.toLocaleString("en-IN")}`;
-    oldEl.style.display = "inline";
-    saveEl.textContent = `SAVE ${savePct}%`;
-    saveEl.style.display = "inline";
+  // ---------- Gold rate (for real market-based karat pricing) ----------
+  const { data: goldRateRow } = await supabaseClient.from("gold_rates").select("*").eq("id", 1).maybeSingle();
+  const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_gram) : null;
+
+  const KARAT_PURITY = { "24kt": 1, "18kt": 0.75, "14kt": 14 / 24, "9kt": 9 / 24 };
+  const KARAT_LABELS = { "24kt": "24 Kt Gold", "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
+
+  // Diamonds don't have a simple live "price per gram" feed the way
+  // gold does, so Diamond Quality uses a fixed approximate markup
+  // over the scraped base price instead of a market lookup. GH-VS-SI
+  // is the baseline (matches whatever the product was scraped at);
+  // F-G-VVS-VS (better color/clarity) carries a flat premium.
+  // Unrecognized or not-set values fall back to 1 (no change).
+  const DIAMOND_QUALITY_MULTIPLIER = { "GH-VS-SI": 1, "F-G-VVS-VS": 1.2 };
+  function diamondMultiplier() {
+    return DIAMOND_QUALITY_MULTIPLIER[selectedAttrs.diamond] || 1;
   }
 
-  // ---------- Real sibling variants (Metal Type / Size / Diamond Quality) ----------
+  // A bigger ring uses more metal. When Size has a real sibling row
+  // for the exact size (sizeIsReal), that row's own gold_weight_grams
+  // already reflects this and applySelection() has already swapped
+  // to it — so this multiplier stays a no-op then. It only kicks in
+  // for the fallback size range (no real per-size weight data),
+  // approximating ~2% more/less metal per size step from a size-10
+  // baseline, applied to weight before the karat formula runs.
+  const SIZE_BASELINE = 10;
+  const SIZE_WEIGHT_STEP_PCT = 0.02;
+  function sizeWeightMultiplier() {
+    if (sizeIsReal) return 1;
+    const sizeNum = parseInt(selectedAttrs.size, 10);
+    if (!sizeNum) return 1;
+    return 1 + (sizeNum - SIZE_BASELINE) * SIZE_WEIGHT_STEP_PCT;
+  }
+
+  function goldValueAt(karatKey, weightGrams) {
+    if (!weightGrams || !goldRate24kt) return null;
+    return weightGrams * KARAT_PURITY[karatKey] * goldRate24kt;
+  }
+
+  // Most real scraped products don't have gold_weight_grams set (the
+  // scraper was never built to capture it) — without a weight, the
+  // exact formula below has nothing to compute against, so Metal
+  // Type would silently never change the price. Rather than leave it
+  // broken for every product that lacks a weight, fall back to
+  // treating a fixed share of the scraped (18kt-baseline) price as
+  // "gold value" and scale just that share by the karat ratio. Less
+  // precise than the real weight-based math, but it means Metal Type
+  // (and Size, via sizeWeightMultiplier on that same gold share)
+  // actually works today instead of only for future scraper updates.
+  const ASSUMED_GOLD_SHARE_OF_PRICE = 0.65;
+
+  // Scraped price is treated as the 18kt baseline (matches Foro's default material).
+  function computeAdjustedPrice(basePrice, weightGrams, karatKey) {
+    const baseGoldValue = goldValueAt("18kt", weightGrams);
+    const selectedGoldValue = goldValueAt(karatKey, weightGrams);
+    if (baseGoldValue !== null && selectedGoldValue !== null) {
+      const nonGoldPortion = basePrice - baseGoldValue;
+      return { price: Math.max(0, nonGoldPortion + selectedGoldValue), isExact: true };
+    }
+
+    const karatRatio = KARAT_PURITY[karatKey] / KARAT_PURITY["18kt"];
+    const goldShare = basePrice * ASSUMED_GOLD_SHARE_OF_PRICE * sizeWeightMultiplier();
+    const nonGoldShare = basePrice * (1 - ASSUMED_GOLD_SHARE_OF_PRICE);
+    return { price: Math.max(0, nonGoldShare + goldShare * karatRatio), isExact: false };
+  }
+
+  // ---------- Real sibling variants (for Size — the one dimension we have real scraped data for) ----------
   let siblings = [product];
   if (product.woo_parent_id) {
     const { data: siblingRows } = await supabaseClient
@@ -345,116 +459,206 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (siblingRows && siblingRows.length) siblings = siblingRows;
   }
 
-  const selectedAttrs = {
-    size: product.variant_size || null,
-    metal: product.variant_metal_type || null,
-    diamond: product.variant_diamond_quality || null,
-  };
   let activeVariant = product;
+  const selectedAttrs = { size: product.variant_size || null, diamond: product.variant_diamond_quality || null };
 
   function uniqueVals(key) {
     return [...new Set(siblings.map((s) => s[key]).filter(Boolean))];
   }
 
-  function renderOptionSection(sectionId, rowId, options, selectedValue, kind) {
-    const section = document.getElementById(sectionId);
-    const row = document.getElementById(rowId);
-    if (options.length <= 1) { section.style.display = "none"; return; }
-    section.style.display = "block";
-    row.innerHTML = options.map((opt) => {
-      const active = opt === selectedValue;
-      if (kind === "chip") {
-        return `<button type="button" class="option-chip ${active ? "active" : ""}" data-value="${opt}">${opt}</button>`;
-      }
-      return `<label class="option-pill ${active ? "active-pill" : ""}"><input type="radio" name="${kind}" value="${opt}" ${active ? "checked" : ""}> ${opt}</label>`;
-    }).join("");
-  }
-
-  renderOptionSection("metalSection", "metalRow", uniqueVals("variant_metal_type"), selectedAttrs.metal, "metal");
-  renderOptionSection("sizeSection", "sizeRow", uniqueVals("variant_size"), selectedAttrs.size, "chip");
-  renderOptionSection("diamondSection", "diamondRow", uniqueVals("variant_diamond_quality"), selectedAttrs.diamond, "diamond");
+  // Size is the one dimension backed by real sibling rows (scraped
+  // data), so it's the one that swaps to a different real product
+  // row. Diamond Quality doesn't switch rows — it uses a fixed
+  // multiplier applied in refreshDisplayedPrice() instead, since
+  // there's no real per-diamond-quality product row for most items
+  // to switch to. Metal Type also doesn't switch rows; it's a live
+  // formula on top of whichever row is currently active.
+  const sizeOptions = uniqueVals("variant_size");
+  const diamondOptionsReal = uniqueVals("variant_diamond_quality");
+  const sizeIsReal = sizeOptions.length > 0;
 
   function findMatchingVariant() {
-    return siblings.find((s) =>
-      (!selectedAttrs.size || s.variant_size === selectedAttrs.size) &&
-      (!selectedAttrs.metal || s.variant_metal_type === selectedAttrs.metal) &&
-      (!selectedAttrs.diamond || s.variant_diamond_quality === selectedAttrs.diamond)
-    );
+    return siblings.find((s) => !sizeIsReal || !selectedAttrs.size || s.variant_size === selectedAttrs.size);
   }
 
-  function applyVariant(variant) {
+  function applySelection() {
+    const matched = findMatchingVariant();
     const unavailEl = document.getElementById("variantUnavailable");
-    const addBtn = document.getElementById("addToCartBtn");
-    if (!variant) {
+    if (!matched) {
       unavailEl.style.display = "block";
-      addBtn.disabled = true;
-      addBtn.style.opacity = ".5";
+      document.getElementById("addToCartBtn").disabled = true;
       return;
     }
     unavailEl.style.display = "none";
-    addBtn.disabled = false;
-    addBtn.style.opacity = "1";
-    activeVariant = variant;
+    document.getElementById("addToCartBtn").disabled = false;
+    activeVariant = matched;
+    if (matched.image) mainImage.src = matched.image;
+    history.replaceState(null, "", `product.html?slug=${encodeURIComponent(matched.slug)}`);
+    refreshDisplayedPrice();
+  }
 
-    const vPrice = Number(variant.price) || 0;
-    const vOldPrice = variant.old_price ? Number(variant.old_price) : null;
-    document.getElementById("priceNow").textContent = `₹${vPrice.toLocaleString("en-IN")}`;
+  // Rings should always offer a size picker — real sibling data
+  // (from the scraper) when it exists, otherwise a standard ring
+  // size range, same fallback pattern as Diamond Quality below.
+  const RING_SIZE_FALLBACK = ["06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16"];
+  const isRing = (product.category || "").toLowerCase() === "rings";
+  const sizeOptionsToShow = sizeOptions.length ? sizeOptions : (isRing ? RING_SIZE_FALLBACK : []);
+  const sizeSection = document.getElementById("sizeSection");
+  const sizeRow = document.getElementById("sizeRow");
+  if (!selectedAttrs.size && sizeOptionsToShow.length) selectedAttrs.size = sizeOptionsToShow[0];
+  if (sizeOptionsToShow.length > 1) {
+    sizeSection.style.display = "block";
+    sizeRow.innerHTML = sizeOptionsToShow.map((opt) => `
+      <button type="button" class="option-chip ${opt === selectedAttrs.size ? "active" : ""}" data-value="${opt}">${opt}</button>
+    `).join("");
+  }
+
+  sizeRow.addEventListener("click", (e) => {
+    const chip = e.target.closest(".option-chip");
+    if (!chip) return;
+    selectedAttrs.size = chip.dataset.value;
+    sizeRow.querySelectorAll(".option-chip").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    applySelection();
+  });
+
+  // ---------- Color (fixed 2 options — cosmetic, not tied to price) ----------
+  let selectedColor = "Rose Gold";
+  const colorRow = document.getElementById("colorRow");
+  colorRow.innerHTML = ["Rose Gold", "Yellow Gold"].map((c, i) => `
+    <label class="option-pill ${i === 0 ? "active-pill" : ""}"><input type="radio" name="color" value="${c}" ${i === 0 ? "checked" : ""}> ${c}</label>
+  `).join("");
+  colorRow.addEventListener("change", (e) => {
+    if (e.target.name !== "color") return;
+    selectedColor = e.target.value;
+    colorRow.querySelectorAll(".option-pill").forEach((p) => p.classList.toggle("active-pill", p.querySelector("input").checked));
+  });
+
+  // ---------- Diamond Type & Quality ----------
+  // Only shown for products that actually have a diamond
+  // (product.has_diamond). Option labels come from real sibling
+  // data (variant_diamond_quality) when available, falling back to
+  // a default pair otherwise — but either way, picking one applies
+  // DIAMOND_QUALITY_MULTIPLIER in refreshDisplayedPrice() rather
+  // than switching to a different product row, since there's no
+  // real per-quality price/row to switch to for most items.
+  if (product.has_diamond) {
+    document.getElementById("diamondSection").style.display = "block";
+    const diamondRow = document.getElementById("diamondRow");
+    const diamondOptionsToShow = diamondOptionsReal.length ? diamondOptionsReal : ["GH-VS-SI", "F-G-VVS-VS"];
+    if (!selectedAttrs.diamond || !diamondOptionsToShow.includes(selectedAttrs.diamond)) {
+      selectedAttrs.diamond = diamondOptionsToShow[0];
+    }
+
+    diamondRow.innerHTML = diamondOptionsToShow.map((d) => `
+      <label class="option-pill ${d === selectedAttrs.diamond ? "active-pill" : ""}"><input type="radio" name="diamondQuality" value="${d}" ${d === selectedAttrs.diamond ? "checked" : ""}> ${d}</label>
+    `).join("");
+    diamondRow.addEventListener("change", (e) => {
+      if (e.target.name !== "diamondQuality") return;
+      selectedAttrs.diamond = e.target.value;
+      diamondRow.querySelectorAll(".option-pill").forEach((p) => p.classList.toggle("active-pill", p.querySelector("input").checked));
+      refreshDisplayedPrice();
+    });
+  }
+
+  // ---------- Metal Type (always 4 options — real market-price math when gold_weight_grams is known) ----------
+  let selectedKarat = "18kt";
+  if (product.variant_metal_type) {
+    const m = product.variant_metal_type.toLowerCase();
+    if (m.includes("24")) selectedKarat = "24kt";
+    else if (m.includes("14")) selectedKarat = "14kt";
+    else if (m.includes("9")) selectedKarat = "9kt";
+  }
+  const metalRow = document.getElementById("metalRow");
+  metalRow.innerHTML = Object.keys(KARAT_LABELS).map((key) => `
+    <label class="option-pill ${key === selectedKarat ? "active-pill" : ""}"><input type="radio" name="metal" value="${key}" ${key === selectedKarat ? "checked" : ""}> ${KARAT_LABELS[key]}</label>
+  `).join("");
+  metalRow.addEventListener("change", (e) => {
+    if (e.target.name !== "metal") return;
+    selectedKarat = e.target.value;
+    metalRow.querySelectorAll(".option-pill").forEach((p) => p.classList.toggle("active-pill", p.querySelector("input").checked));
+    refreshDisplayedPrice();
+  });
+
+  const CONTACT_PHONE = "+912055550142"; // same number used by "Call for Enquiry" in the Trial Cart menu
+
+  function refreshDisplayedPrice() {
+    const basePrice = Number(activeVariant.price) || 0;
+    const addBtn = document.getElementById("addToCartBtn");
+    const qtyRow = document.querySelector(".qty-add-row");
+    const trialDropdown = document.querySelector(".trial-dropdown");
+    const pointsEl = document.getElementById("pointsNote");
+
+    // No real price on this variant (yet) — show a contact prompt
+    // instead of "₹0", and swap Add to Cart for a call link since
+    // there's nothing sensible to add to the cart at that price.
+    if (basePrice <= 0) {
+      document.getElementById("priceNow").textContent = "Contact us for pricing";
+      document.getElementById("priceOld").style.display = "none";
+      document.getElementById("priceSave").style.display = "none";
+      document.getElementById("priceApproxNote").style.display = "none";
+      pointsEl.style.display = "none";
+      if (qtyRow) qtyRow.style.display = "none";
+      if (trialDropdown) trialDropdown.style.display = "none";
+      addBtn.textContent = "Call for Price";
+      addBtn.disabled = false;
+      addBtn.style.opacity = "1";
+      addBtn.dataset.contactMode = "true";
+      return;
+    }
+
+    addBtn.dataset.contactMode = "false";
+    if (addBtn.textContent === "Call for Price") addBtn.textContent = "Add to Cart";
+    if (qtyRow) qtyRow.style.display = "";
+    if (trialDropdown) trialDropdown.style.display = "";
+    pointsEl.style.display = "";
+
+    const baseOldPrice = activeVariant.old_price ? Number(activeVariant.old_price) : null;
+    const weight = activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null;
+
+    const result = computeAdjustedPrice(basePrice, weight, selectedKarat);
+    const displayPrice = result.price * diamondMultiplier();
+
+    document.getElementById("priceNow").textContent = `₹${Math.round(displayPrice).toLocaleString("en-IN")}`;
+
     const oldEl = document.getElementById("priceOld");
     const saveEl = document.getElementById("priceSave");
-    if (vOldPrice && vOldPrice > vPrice) {
-      oldEl.textContent = `₹${vOldPrice.toLocaleString("en-IN")}`;
+    if (baseOldPrice && baseOldPrice > basePrice && selectedKarat === "18kt" && diamondMultiplier() === 1 && sizeWeightMultiplier() === 1) {
+      oldEl.textContent = `₹${baseOldPrice.toLocaleString("en-IN")}`;
       oldEl.style.display = "inline";
-      saveEl.textContent = `SAVE ${Math.round(((vOldPrice - vPrice) / vOldPrice) * 100)}%`;
+      saveEl.textContent = `SAVE ${Math.round(((baseOldPrice - basePrice) / baseOldPrice) * 100)}%`;
       saveEl.style.display = "inline";
     } else {
       oldEl.style.display = "none";
       saveEl.style.display = "none";
     }
 
-    const pointsEl = document.getElementById("pointsNote");
-    if (pointsEl) pointsEl.textContent = `🎁 Purchase this item and get ${Math.round(vPrice / 10).toLocaleString("en-IN")} Points`;
+    document.getElementById("priceApproxNote").style.display =
+      (selectedKarat !== "18kt" || sizeWeightMultiplier() !== 1 || diamondMultiplier() !== 1) ? "block" : "none";
 
-    if (variant.image) document.getElementById("mainImage").src = variant.image;
-
-    history.replaceState(null, "", `product.html?slug=${encodeURIComponent(variant.slug)}`);
+    pointsEl.textContent =
+      `🎁 Purchase this item and get ${Math.round(displayPrice / 10).toLocaleString("en-IN")} Points`;
   }
 
-  document.getElementById("metalRow").addEventListener("change", (e) => {
-    if (e.target.name !== "metal") return;
-    selectedAttrs.metal = e.target.value;
-    applyVariant(findMatchingVariant());
-  });
-  document.getElementById("diamondRow").addEventListener("change", (e) => {
-    if (e.target.name !== "diamond") return;
-    selectedAttrs.diamond = e.target.value;
-    applyVariant(findMatchingVariant());
-  });
-  document.getElementById("sizeRow").addEventListener("click", (e) => {
-    const chip = e.target.closest(".option-chip");
-    if (!chip) return;
-    selectedAttrs.size = chip.dataset.value;
-    document.querySelectorAll("#sizeRow .option-chip").forEach((c) => c.classList.remove("active"));
-    chip.classList.add("active");
-    applyVariant(findMatchingVariant());
-  });
+  refreshDisplayedPrice();
 
-  let selectedColor = null;
-  if (product.colors && product.colors.length) {
-    selectedColor = product.colors[0];
-    document.getElementById("colorSection").style.display = "block";
-    const colorRow = document.getElementById("colorRow");
-    colorRow.innerHTML = product.colors.map((c, i) => `
-      <button type="button" class="product-color-swatch ${i === 0 ? "active" : ""}" data-color="${c}"
-        style="background:${(typeof COLOR_SWATCHES !== "undefined" && COLOR_SWATCHES[c]) || "#ccc"}" title="${c}"></button>
-    `).join("");
-    colorRow.addEventListener("click", (e) => {
-      const btn = e.target.closest(".product-color-swatch");
-      if (!btn) return;
-      selectedColor = btn.dataset.color;
-      colorRow.querySelectorAll(".product-color-swatch").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-    });
-  }
+  // ---------- Price (initial) ----------
+  const price = Number(product.price) || 0;
+
+  // ---------- Delivery pincode check (estimate only, not a real courier lookup) ----------
+  document.getElementById("pincodeCheckBtn").addEventListener("click", () => {
+    const pin = document.getElementById("pincodeInput").value.trim();
+    const resultEl = document.getElementById("deliveryResult");
+    if (!/^\d{6}$/.test(pin)) {
+      resultEl.textContent = "Enter a valid 6-digit pincode.";
+      resultEl.style.color = "#a9432f";
+      resultEl.style.display = "block";
+      return;
+    }
+    resultEl.textContent = "✓ Estimated delivery in 3–5 business days.";
+    resultEl.style.color = "var(--emerald)";
+    resultEl.style.display = "block";
+  });
 
   const stockNote = document.getElementById("stockNote");
   const stock = typeof product.stock === "number" ? product.stock : 100;
@@ -483,9 +687,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     qtyInput.value = v;
   });
 
+  function currentDisplayedPrice() {
+    const basePrice = Number(activeVariant.price) || 0;
+    const weight = activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null;
+    return computeAdjustedPrice(basePrice, weight, selectedKarat).price * diamondMultiplier();
+  }
+
+  // ---------- Trial Cart dropdown ----------
+  const trialTrigger = document.getElementById("trialTrigger");
+  const trialMenu = document.getElementById("trialMenu");
+  trialTrigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    trialMenu.classList.toggle("open");
+  });
+  document.addEventListener("click", () => trialMenu.classList.remove("open"));
+
+  document.getElementById("addToTrialBtn").addEventListener("click", async () => {
+    trialMenu.classList.remove("open");
+    await window.OrenkaFineCart.addItem({
+      id: activeVariant.id,
+      slug: activeVariant.slug,
+      name: `${activeVariant.name} (Trial)`,
+      image: activeVariant.image || images[0] || "",
+      price: currentDisplayedPrice(),
+      color: selectedColor,
+      size: selectedAttrs.size,
+      metalType: KARAT_LABELS[selectedKarat],
+      diamondQuality: product.has_diamond ? selectedAttrs.diamond : null,
+    }, 1);
+    const original = trialTrigger.innerHTML;
+    trialTrigger.innerHTML = "Added ✓";
+    setTimeout(() => { trialTrigger.innerHTML = original; }, 1600);
+  });
+
+  // ---------- Add to Cart ----------
   document.getElementById("addToCartBtn").addEventListener("click", async () => {
-    const qty = parseInt(qtyInput.value, 10) || 1;
     const btn = document.getElementById("addToCartBtn");
+
+    if (btn.dataset.contactMode === "true") {
+      window.location.href = `tel:${CONTACT_PHONE}`;
+      return;
+    }
+
+    const qty = parseInt(qtyInput.value, 10) || 1;
     const original = btn.textContent;
     btn.disabled = true;
 
@@ -494,14 +738,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       slug: activeVariant.slug,
       name: activeVariant.name,
       image: activeVariant.image || images[0] || "",
-      price: activeVariant.price,
+      price: currentDisplayedPrice(),
       color: selectedColor,
+      size: selectedAttrs.size,
+      metalType: KARAT_LABELS[selectedKarat],
+      diamondQuality: product.has_diamond ? selectedAttrs.diamond : null,
     }, qty);
 
     btn.disabled = false;
     btn.textContent = "Added ✓";
     setTimeout(() => { btn.textContent = original; }, 1600);
-  });  
+  });
 
   productContent.style.display = "grid";
 
@@ -582,8 +829,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   writeReviewBtn.addEventListener("click", async () => {
-    const user = await requireAuth(); // redirects to login.html?redirect=this-page if not signed in
-    if (!user) return; // requireAuth already redirected
+    const user = await requireAuth();
+    if (!user) return;
     reviewFormWrap.style.display = reviewFormWrap.style.display === "none" ? "block" : "none";
   });
 

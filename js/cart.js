@@ -9,14 +9,24 @@
      gets merged into their account cart (quantities added together),
      then the local copy is cleared.
 
-   Public API is unchanged in shape, but every method is now async —
-   callers need `await`:
+   Each line is keyed by product + every selected option (color, size,
+   metal type, diamond quality) — not just product + color — since
+   product.html lets those vary independently and each combination can
+   have its own price. unit_price is stored per line (not just looked
+   up from products.price) because product.html computes price live
+   from karat/diamond/size selections, not a single fixed value.
+
+   Public API is unchanged in shape except updateQty/removeItem, which
+   now take a variantKey object instead of positional (id, color) —
+   every method is async, callers need `await`:
      await window.OrenkaFineCart.getItems()
      await window.OrenkaFineCart.addItem(product, qty)
-     await window.OrenkaFineCart.updateQty(id, color, qty)
-     await window.OrenkaFineCart.removeItem(id, color)
+     await window.OrenkaFineCart.updateQty(variantKey, qty)
+     await window.OrenkaFineCart.removeItem(variantKey)
      await window.OrenkaFineCart.clearCart()
      await window.OrenkaFineCart.getSubtotal()
+
+   variantKey / product shape: { id, color, size, metalType, diamondQuality }
    ========================================================= */
 
 const OrenkaFine_CART_KEY = "OrenkaFine_cart_v1";
@@ -35,6 +45,14 @@ function readLocalCart() {
 
 function writeLocalCart(items) {
   localStorage.setItem(OrenkaFine_CART_KEY, JSON.stringify(items));
+}
+
+function matchesVariant(item, key) {
+  return item.id === key.id
+    && (item.color || null) === (key.color || null)
+    && (item.size || null) === (key.size || null)
+    && (item.metalType || null) === (key.metalType || null)
+    && (item.diamondQuality || null) === (key.diamondQuality || null);
 }
 
 // ---------- shared ----------
@@ -57,7 +75,7 @@ function notifyCartUpdated(items) {
 async function fetchDbCart(userId) {
   const { data, error } = await supabaseClient
     .from("cart_items")
-    .select("product_id, color, quantity, products(name, image, price, slug)")
+    .select("product_id, color, quantity, selected_size, selected_metal_type, selected_diamond_quality, unit_price, products(name, image, price, slug)")
     .eq("user_id", userId);
 
   if (error) {
@@ -70,32 +88,50 @@ async function fetchDbCart(userId) {
     slug: row.products?.slug,
     name: row.products?.name,
     image: row.products?.image,
-    price: row.products?.price,
+    // unit_price is the exact price selected on product.html (varies by
+    // karat/diamond/size); older rows without it fall back to the live
+    // product price.
+    price: row.unit_price != null ? Number(row.unit_price) : row.products?.price,
     color: row.color || null,
+    size: row.selected_size || null,
+    metalType: row.selected_metal_type || null,
+    diamondQuality: row.selected_diamond_quality || null,
     qty: row.quantity,
   }));
 }
 
-async function upsertDbCartItem(userId, productId, color, qtyDelta) {
-  const colorKey = color || "";
+async function upsertDbCartItem(userId, product, qtyDelta) {
+  const colorKey = product.color || "";
+  const sizeKey = product.size || "";
+  const metalKey = product.metalType || "";
+  const diamondKey = product.diamondQuality || "";
 
   const { data: existing } = await supabaseClient
     .from("cart_items")
     .select("id, quantity")
     .eq("user_id", userId)
-    .eq("product_id", productId)
+    .eq("product_id", product.id)
     .eq("color", colorKey)
+    .eq("selected_size", sizeKey)
+    .eq("selected_metal_type", metalKey)
+    .eq("selected_diamond_quality", diamondKey)
     .maybeSingle();
 
   if (existing) {
-    await supabaseClient
-      .from("cart_items")
-      .update({ quantity: existing.quantity + qtyDelta, updated_at: new Date().toISOString() })
-      .eq("id", existing.id);
+    const update = { quantity: existing.quantity + qtyDelta, updated_at: new Date().toISOString() };
+    if (product.price != null) update.unit_price = product.price;
+    await supabaseClient.from("cart_items").update(update).eq("id", existing.id);
   } else if (qtyDelta > 0) {
-    await supabaseClient
-      .from("cart_items")
-      .insert({ user_id: userId, product_id: productId, color: colorKey, quantity: qtyDelta });
+    await supabaseClient.from("cart_items").insert({
+      user_id: userId,
+      product_id: product.id,
+      color: colorKey,
+      selected_size: sizeKey,
+      selected_metal_type: metalKey,
+      selected_diamond_quality: diamondKey,
+      unit_price: product.price != null ? product.price : null,
+      quantity: qtyDelta,
+    });
   }
 }
 
@@ -104,7 +140,7 @@ async function mergeLocalCartIntoAccount(userId) {
   if (!localItems.length) return;
 
   for (const item of localItems) {
-    await upsertDbCartItem(userId, item.id, item.color, item.qty);
+    await upsertDbCartItem(userId, item, item.qty);
   }
   writeLocalCart([]); // guest cart is now merged in — clear it
 }
@@ -118,25 +154,28 @@ async function getItems() {
 
 async function addItem(product, qty = 1) {
   const userId = await getCurrentUserId();
-  const color = product.color || null;
+  const normalized = {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    image: product.image,
+    price: product.price,
+    color: product.color || null,
+    size: product.size || null,
+    metalType: product.metalType || null,
+    diamondQuality: product.diamondQuality || null,
+  };
 
   if (userId) {
-    await upsertDbCartItem(userId, product.id, color, qty);
+    await upsertDbCartItem(userId, normalized, qty);
   } else {
     const items = readLocalCart();
-    const existing = items.find((i) => i.id === product.id && (i.color || null) === color);
+    const existing = items.find((i) => matchesVariant(i, normalized));
     if (existing) {
       existing.qty += qty;
+      existing.price = normalized.price; // keep price current for this exact combination
     } else {
-      items.push({
-        id: product.id,
-        slug: product.slug,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-        color,
-        qty,
-      });
+      items.push({ ...normalized, qty });
     }
     writeLocalCart(items);
   }
@@ -146,32 +185,42 @@ async function addItem(product, qty = 1) {
   notifyCartUpdated(items);
 }
 
-async function updateQty(id, color, qty) {
+async function updateQty(variantKey, qty) {
   const userId = await getCurrentUserId();
 
   if (userId) {
-    const colorKey = color || "";
+    const colorKey = variantKey.color || "";
+    const sizeKey = variantKey.size || "";
+    const metalKey = variantKey.metalType || "";
+    const diamondKey = variantKey.diamondQuality || "";
+
     if (qty <= 0) {
       await supabaseClient
         .from("cart_items")
         .delete()
         .eq("user_id", userId)
-        .eq("product_id", id)
-        .eq("color", colorKey);
+        .eq("product_id", variantKey.id)
+        .eq("color", colorKey)
+        .eq("selected_size", sizeKey)
+        .eq("selected_metal_type", metalKey)
+        .eq("selected_diamond_quality", diamondKey);
     } else {
       await supabaseClient
         .from("cart_items")
         .update({ quantity: qty, updated_at: new Date().toISOString() })
         .eq("user_id", userId)
-        .eq("product_id", id)
-        .eq("color", colorKey);
+        .eq("product_id", variantKey.id)
+        .eq("color", colorKey)
+        .eq("selected_size", sizeKey)
+        .eq("selected_metal_type", metalKey)
+        .eq("selected_diamond_quality", diamondKey);
     }
   } else {
     let items = readLocalCart();
     if (qty <= 0) {
-      items = items.filter((i) => !(i.id === id && (i.color || null) === color));
+      items = items.filter((i) => !matchesVariant(i, variantKey));
     } else {
-      const item = items.find((i) => i.id === id && (i.color || null) === color);
+      const item = items.find((i) => matchesVariant(i, variantKey));
       if (item) item.qty = qty;
     }
     writeLocalCart(items);
@@ -182,8 +231,8 @@ async function updateQty(id, color, qty) {
   notifyCartUpdated(items);
 }
 
-async function removeItem(id, color) {
-  await updateQty(id, color, 0);
+async function removeItem(variantKey) {
+  await updateQty(variantKey, 0);
 }
 
 async function clearCart() {

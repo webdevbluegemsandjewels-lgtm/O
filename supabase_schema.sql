@@ -288,3 +288,147 @@ from (values
   ('digital-gift-card-25000', 'Digital Gift Card - ₹25,000', 'OrenkaFine', 'Gift Card', 25000::numeric, 'Dgc/card1.png', 'A ₹25,000 OrenkaFine digital gift card, delivered straight to their inbox.', true, 9999)
 ) as v(slug, name, brand, category, price, image, description, is_active, stock)
 where not exists (select 1 from public.products p where p.slug = v.slug);
+
+-- =========================================================
+-- Gold-rate metal pricing + diamond flag
+--
+-- product.html was replaced with a version (built elsewhere, not
+-- through this SQL file) that computes Metal Type pricing live from
+-- gold_weight_grams x a market rate in gold_rates, instead of
+-- needing a separate product row per karat. It also reads
+-- has_diamond to decide whether to show the Diamond Type & Quality
+-- picker at all. None of these three things existed in any SQL
+-- file in this repo — they were apparently added by hand straight
+-- in the Supabase dashboard in that other session and never saved
+-- anywhere. Adding them here now so they're actually tracked.
+--
+-- All guarded / idempotent, safe to re-run.
+-- =========================================================
+
+-- has_diamond is derived automatically from the product name — any
+-- product whose name contains "diamond" (case-insensitive) counts
+-- as a diamond product. No manual flagging or seed data needed; it
+-- stays correct for every existing and future row, including
+-- whatever scrape-foro.js imports.
+alter table public.products drop column if exists has_diamond;
+alter table public.products add column has_diamond boolean generated always as (name ilike '%diamond%') stored;
+
+alter table public.products add column if not exists gold_weight_grams numeric;
+
+create table if not exists public.gold_rates (
+  id int primary key,
+  rate_24kt_per_gram numeric not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.gold_rates enable row level security;
+
+drop policy if exists "Gold rates are viewable by everyone" on public.gold_rates;
+create policy "Gold rates are viewable by everyone"
+  on public.gold_rates for select
+  using (true);
+
+-- Real 24kt gold rate as of today (₹14,656/gram, Delhi retail,
+-- per public gold-rate sites — this is a manually looked-up
+-- snapshot, not a live feed). Update this by hand periodically for
+-- now; supabase/functions/update-gold-rate/index.ts has the code
+-- to fetch this live and update the row automatically, but it is
+-- NOT deployed or scheduled yet — see that file's header comment
+-- before activating it.
+-- Uses "do update" (not "do nothing") so re-running this file
+-- always refreshes the row to whatever value is here.
+insert into public.gold_rates (id, rate_24kt_per_gram)
+values (1, 14656)
+on conflict (id) do update set
+  rate_24kt_per_gram = excluded.rate_24kt_per_gram,
+  updated_at = now();
+
+-- =========================================================
+-- Material auto-categorization
+--
+-- public.products.material was already in use for gold karat/purity
+-- text (e.g. "18 karat gold" — read by product.html's Material meta
+-- row and js/main.js's card label). Renaming that existing column to
+-- gold_type so it keeps holding exactly what it always held, then
+-- creating a fresh material column for the new fixed-list category
+-- (Baguette, Diamond, Emerald, Emerald Gold, Evil Eye Gold, Gold,
+-- Marquise, Ruby Gemstones, Ruby Gold) collections.html's Material
+-- filter now uses. The rename is guarded so this file stays safe to
+-- re-run — it only fires once, the first time gold_type doesn't
+-- exist yet but material does.
+--
+-- product.html, js/products-db.js, js/main.js, and js/products.js
+-- were all updated to read gold_type where they used to read
+-- material for karat text, and to use the new material column only
+-- for the category filter.
+-- =========================================================
+
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'products' and column_name = 'material'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'products' and column_name = 'gold_type'
+  ) then
+    alter table public.products rename column material to gold_type;
+  end if;
+end $$;
+
+alter table public.products add column if not exists gold_type text;
+alter table public.products add column if not exists material text;
+
+-- This fills in the new material column by scanning each product's
+-- name + description for those words, case-insensitive.
+--
+-- Order matters: compound phrases (e.g. "Emerald Gold") are checked
+-- before the single words they contain ("Emerald", "Gold"), so a
+-- product named "Emerald Gold Ring" gets categorized as "Emerald
+-- Gold" and not just "Gold". Same reasoning for "Evil Eye Gold",
+-- "Ruby Gemstones", and "Ruby Gold" ahead of plain "Gold".
+--
+-- Only overwrites when a keyword actually matches (the "else
+-- material" branch leaves anything else untouched) — safe to
+-- re-run any time after the scraper updates names/descriptions.
+
+update public.products
+set material = case
+  when (name || ' ' || coalesce(description, '')) ilike '%emerald gold%'   then 'Emerald Gold'
+  when (name || ' ' || coalesce(description, '')) ilike '%evil eye gold%'  then 'Evil Eye Gold'
+  when (name || ' ' || coalesce(description, '')) ilike '%ruby gemstones%' then 'Ruby Gemstones'
+  when (name || ' ' || coalesce(description, '')) ilike '%ruby gold%'      then 'Ruby Gold'
+  when (name || ' ' || coalesce(description, '')) ilike '%baguette%'       then 'Baguette'
+  when (name || ' ' || coalesce(description, '')) ilike '%marquise%'       then 'Marquise'
+  when (name || ' ' || coalesce(description, '')) ilike '%diamond%'        then 'Diamond'
+  when (name || ' ' || coalesce(description, '')) ilike '%emerald%'        then 'Emerald'
+  when (name || ' ' || coalesce(description, '')) ilike '%gold%'           then 'Gold'
+  else material
+end;
+
+-- =========================================================
+-- cart_items — save the selected variant, not just color
+--
+-- product.html now lets someone pick Color, Size, Metal Type, and
+-- Diamond Quality independently, and computes a live price from
+-- that combination (karat formula x diamond multiplier x size
+-- adjustment). cart_items previously only stored color + quantity,
+-- reading price live from products.price — so for signed-in users,
+-- the size/metal/diamond choice and the actual computed price were
+-- silently lost the moment the item was saved to the account cart
+-- (guest/localStorage carts didn't have this problem, since they
+-- store the whole item object client-side).
+--
+-- selected_size / selected_metal_type / selected_diamond_quality
+-- join color as part of each line's identity (js/cart.js now
+-- matches on all of them together), so two different variant picks
+-- of the same product become two separate cart lines instead of
+-- merging into one. unit_price stores the exact price shown on
+-- product.html at add-to-cart time; js/cart.js prefers it over the
+-- live products.price when present.
+-- =========================================================
+
+alter table public.cart_items add column if not exists selected_size text;
+alter table public.cart_items add column if not exists selected_metal_type text;
+alter table public.cart_items add column if not exists selected_diamond_quality text;
+alter table public.cart_items add column if not exists unit_price numeric;

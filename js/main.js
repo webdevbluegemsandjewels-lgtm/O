@@ -204,7 +204,7 @@ function productCardHTML(p) {
       <div class="product-info">
         <div class="price-row">${priceHTML}</div>
         <h3 class="product-name">${p.name} ${ratingHTML}</h3>
-        <p class="product-cat">${p.material || p.cat}</p>
+        <p class="product-cat">${p.goldType || p.cat}</p>
         <div class="swatch-row">${swatches}</div>
       </div>
       ${closeTag}

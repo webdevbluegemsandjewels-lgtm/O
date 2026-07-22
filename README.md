@@ -1,6 +1,6 @@
 # OrenkaFine Storefront
 
-This repository is a multi-page jewelry storefront built with plain HTML, CSS, and browser-side JavaScript.
+This repository is a multi-page jewellery storefront built with plain HTML, CSS, and browser-side JavaScript.
 
 The checked-in app is no longer just a static marketing site. It now includes:
 
@@ -179,6 +179,7 @@ Frontend features that require external services already referenced in code:
 These are worth knowing before you try to run everything end to end:
 
 - `checkout.html` calls Supabase Edge Functions named `create-razorpay-order` and `verify-razorpay-payment`, but those function files are not present in this repository.
+- `supabase/functions/update-gold-rate/index.ts` exists but is **not deployed or scheduled**. Until it (or something like it) is wired up, `public.gold_rates.rate_24kt_per_gram` is a manually looked-up snapshot set by `supabase_schema.sql`, not a live feed — update it by hand periodically, or deploy the function per its header comment.
 - `index.html` references `js/hero-db.js`, but that file is not present in the `js/` folder.
 - `collections.html` and `product.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.
 - Product and brand naming are mixed between `OrenkaFine` and `OrenkaFine`.

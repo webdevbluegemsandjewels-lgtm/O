@@ -203,6 +203,10 @@
   <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const SHOP_CATS = ["Rings", "Bracelets", "Necklaces", "Earrings", "Ear Cuffs", "Charms & Pendants"];
+  const MATERIAL_FILTERS = [
+    "Baguette", "Diamond", "Emerald", "Emerald Gold", "Evil Eye Gold",
+    "Gold", "Marquise", "Ruby Gemstones", "Ruby Gold",
+  ];
 
   const loadStatus = document.getElementById("loadStatus");
   const DB_PRODUCTS = await loadProductsFromDB();
@@ -324,13 +328,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const materialCounts = {};
     base.forEach((p) => {
-      const m = p.material || "18 karat gold";
-      materialCounts[m] = (materialCounts[m] || 0) + 1;
+      if (p.material) materialCounts[p.material] = (materialCounts[p.material] || 0) + 1;
     });
-    document.getElementById("materialFilters").innerHTML = Object.keys(materialCounts).map((m) => `
+    document.getElementById("materialFilters").innerHTML = MATERIAL_FILTERS.map((m) => `
       <label class="filter-check-row">
         <span class="swatch-label">${m}</span>
-        <span class="count">${materialCounts[m]}</span>
+        <span class="count">${materialCounts[m] || 0}</span>
         <input type="checkbox" data-material="${m}" style="margin-left:.5rem;">
       </label>
     `).join("");

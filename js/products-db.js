@@ -5,22 +5,24 @@
    ========================================================= */
 
 function mapDbProductToCard(row) {
+  const hasPrice = Number(row.price) > 0;
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
     brand: row.brand || "OrenkaFine jewellery",
     cat: row.category,
-    price: `₹${Number(row.price).toLocaleString("en-IN")}`,
-    oldPrice: row.old_price ? `₹${Number(row.old_price).toLocaleString("en-IN")}` : null,
-    discount: row.old_price
+    price: hasPrice ? `₹${Number(row.price).toLocaleString("en-IN")}` : "Contact Us",
+    oldPrice: hasPrice && row.old_price ? `₹${Number(row.old_price).toLocaleString("en-IN")}` : null,
+    discount: hasPrice && row.old_price
       ? `${Math.round((1 - row.price / row.old_price) * 100)}%`
       : null,
     image: row.image,
     secondaryImage: row.secondary_image || row.image,
     tag: row.tag || "",
     rating: row.rating || null,
-    material: row.material || "18 karat gold",
+    goldType: row.gold_type || "18 karat gold",
+    material: row.material || null, // Baguette/Diamond/Emerald/etc. category, not gold karat — see supabase_schema.sql
     colors: row.colors || [],
     description: row.description || "",
   };
