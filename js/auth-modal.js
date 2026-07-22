@@ -46,8 +46,21 @@
             <label>Password</label>
             <input type="password" required autocomplete="current-password" data-role="login-password" />
           </div>
+          <p style="text-align:right; margin:-.6rem 0 1rem;"><a href="#" data-role="forgot-link" style="font-size:.82rem; color:var(--gold); text-decoration:underline;">Forgot password?</a></p>
           <button type="submit" class="btn btn-gold auth-submit" data-role="login-submit">Log In</button>
         </form>
+
+        <div data-role="forgot-section" style="display:none;">
+          <p style="margin-bottom:1rem; font-size:.9rem; color:var(--ink-soft); line-height:1.6;">Enter your account email and we'll send you a link to reset your password.</p>
+          <div class="auth-field">
+            <label>Email</label>
+            <input type="email" required autocomplete="email" data-role="forgot-email" />
+          </div>
+          <button type="button" class="btn btn-gold auth-submit" data-role="forgot-submit">Send Reset Link</button>
+          <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
+            <a href="#" data-role="forgot-back" style="color:var(--gold); text-decoration:underline;">Back to log in</a>
+          </p>
+        </div>
 
         <form data-role="signup-form" style="display:none;">
           <div class="auth-field">
@@ -110,11 +123,16 @@
   }
 
   function switchTab(modal, tab) {
+    modal.querySelector(".auth-modal-tabs").style.display = "flex";
+    modal.querySelector('[data-role="google-btn"]').style.display = "flex";
+    modal.querySelector(".auth-divider").style.display = "flex";
     modal.querySelectorAll(".auth-modal-tab").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.tab === tab);
     });
     modal.querySelector('[data-role="login-form"]').style.display = tab === "login" ? "block" : "none";
     modal.querySelector('[data-role="signup-form"]').style.display = tab === "signup" ? "block" : "none";
+    modal.querySelector('[data-role="forgot-section"]').style.display = "none";
+    modal.querySelector('[data-role="otp-section"]').style.display = "none";
     hideMessages(modal);
   }
 
@@ -132,6 +150,7 @@
   function showOtpStep(modal, email, message) {
     modal.querySelector('[data-role="login-form"]').style.display = "none";
     modal.querySelector('[data-role="signup-form"]').style.display = "none";
+    modal.querySelector('[data-role="forgot-section"]').style.display = "none";
     modal.querySelector(".auth-modal-tabs").style.display = "none";
     modal.querySelector('[data-role="google-btn"]').style.display = "none";
     modal.querySelector(".auth-divider").style.display = "none";
@@ -140,6 +159,18 @@
     otpSection.dataset.email = email;
     modal.querySelector('[data-role="otp-message"]').textContent = message;
     modal.querySelector('[data-role="otp-code"]').value = "";
+  }
+
+  function showForgotStep(modal, email) {
+    modal.querySelector('[data-role="login-form"]').style.display = "none";
+    modal.querySelector('[data-role="signup-form"]').style.display = "none";
+    modal.querySelector('[data-role="otp-section"]').style.display = "none";
+    modal.querySelector(".auth-modal-tabs").style.display = "none";
+    modal.querySelector('[data-role="google-btn"]').style.display = "none";
+    modal.querySelector(".auth-divider").style.display = "none";
+    modal.querySelector('[data-role="forgot-section"]').style.display = "block";
+    modal.querySelector('[data-role="forgot-email"]').value = email || "";
+    hideMessages(modal);
   }
 
   function close(result) {
@@ -182,6 +213,44 @@
 
     modal.querySelectorAll(".auth-modal-tab").forEach((btn) => {
       btn.addEventListener("click", () => switchTab(modal, btn.dataset.tab));
+    });
+
+    // --- Forgot password ---
+    modal.querySelector('[data-role="forgot-link"]').addEventListener("click", (e) => {
+      e.preventDefault();
+      const email = modal.querySelector('[data-role="login-email"]').value.trim();
+      showForgotStep(modal, email);
+    });
+
+    modal.querySelector('[data-role="forgot-back"]').addEventListener("click", (e) => {
+      e.preventDefault();
+      switchTab(modal, "login");
+    });
+
+    modal.querySelector('[data-role="forgot-submit"]').addEventListener("click", async () => {
+      hideMessages(modal);
+      const email = modal.querySelector('[data-role="forgot-email"]').value.trim();
+      if (!email) return;
+
+      const btn = modal.querySelector('[data-role="forgot-submit"]');
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password.html`,
+      });
+
+      btn.disabled = false;
+      btn.textContent = "Send Reset Link";
+
+      if (error) {
+        showError(modal, error.message);
+        return;
+      }
+
+      const successEl = modal.querySelector('[data-role="success"]');
+      successEl.textContent = "Check your email for a link to reset your password.";
+      successEl.style.display = "block";
     });
 
     // --- Login ---
