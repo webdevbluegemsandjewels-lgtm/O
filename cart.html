@@ -132,11 +132,19 @@ document.addEventListener("DOMContentLoaded", () => {
     cartEmpty.style.display = "none";
     cartLayout.style.display = "grid";
 
-    cartItemsEl.innerHTML = items.map((item) => `
+    cartItemsEl.innerHTML = items.map((item) => {
+      const detailHref = `cart-item.html?${new URLSearchParams({
+        id: item.id,
+        color: item.color || "",
+        size: item.size || "",
+        metal: item.metalType || "",
+        diamond: item.diamondQuality || "",
+      })}`;
+      return `
       <div class="cart-row" data-id="${item.id}" data-color="${item.color || ""}" data-size="${item.size || ""}" data-metal="${item.metalType || ""}" data-diamond="${item.diamondQuality || ""}">
-        <img src="${item.image}" alt="${item.name}" />
+        <a href="${detailHref}"><img src="${item.image}" alt="${item.name}" /></a>
         <div>
-          <h4>${item.name}</h4>
+          <h4><a href="${detailHref}" style="color:inherit; text-decoration:none;">${item.name}</a></h4>
           <p class="meta">${[
             item.color ? `Color: ${item.color}` : "",
             item.size ? `Size: ${item.size}` : "",
@@ -148,13 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>${item.qty}</span>
             <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
           </div>
+          <a href="${detailHref}" style="display:inline-block; margin-top:.5rem; font-size:.78rem; color:var(--ink-soft); text-decoration:underline;">View Details</a>
         </div>
         <div class="cart-row-right">
           <span class="cart-row-price">${money(item.price * item.qty)}</span>
           <button type="button" class="cart-remove" data-action="remove">Remove</button>
         </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
 
     const subtotal = await window.OrenkaFineCart.getSubtotal();
     summarySubtotal.textContent = money(subtotal);
