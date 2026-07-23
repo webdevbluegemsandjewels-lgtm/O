@@ -178,7 +178,7 @@ Frontend features that require external services already referenced in code:
 
 These are worth knowing before you try to run everything end to end:
 
-- `checkout.html` calls Supabase Edge Functions named `create-razorpay-order` and `verify-razorpay-payment`, but those function files are not present in this repository.
+- `checkout.html` calls Supabase Edge Functions named `create-razorpay-order` and `verify-razorpay-payment` — the code for both now exists at `supabase/functions/create-razorpay-order/` and `supabase/functions/verify-razorpay-payment/`, but neither is **deployed** yet, and both need `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` secrets set before they'll work (unlike `welcome-email`, leave "Enforce JWT Verification" **ON** for these two — checkout.html calls them with a real signed-in user's token).
 - `supabase/functions/update-gold-rate/index.ts` exists but is **not deployed or scheduled**. Until it (or something like it) is wired up, `public.gold_rates.rate_24kt_per_gram` is a manually looked-up snapshot set by `supabase_schema.sql`, not a live feed — update it by hand periodically, or deploy the function per its header comment.
 - `index.html` references `js/hero-db.js`, but that file is not present in the `js/` folder.
 - `collections.html` and `product.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.

@@ -231,35 +231,46 @@ create policy "Active products are viewable by everyone"
 -- side — never by trusting the amount the client sends. That's
 -- what keeps checkout tamper-proof; these policies just enforce
 -- that there's no other way in.
+--
+-- Note: these tables already existed live with simpler columns
+-- (total / price instead of subtotal / unit_price) before this
+-- "create table if not exists" ever ran, so it was a silent no-op —
+-- adjusted the column names here to match what's actually live, and
+-- added the missing Razorpay/shipping columns via alter table below.
 -- =========================================================
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   status text not null default 'pending', -- pending | paid | failed | cancelled
-  subtotal numeric not null,
-  currency text not null default 'INR',
-  razorpay_order_id text,
-  razorpay_payment_id text,
-  shipping_name text,
-  shipping_phone text,
-  shipping_address text,
-  shipping_city text,
-  shipping_state text,
-  shipping_pincode text,
-  created_at timestamptz not null default now(),
-  paid_at timestamptz
+  total numeric not null,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists public.order_items (
   id uuid primary key default gen_random_uuid(),
   order_id uuid not null references public.orders(id) on delete cascade,
   product_id uuid not null references public.products(id),
-  color text,
   quantity integer not null check (quantity > 0),
-  unit_price numeric not null, -- price captured at order time by the server, never the client
+  price numeric not null, -- price captured at order time by the server, never the client
   created_at timestamptz not null default now()
 );
+
+alter table public.orders add column if not exists currency text not null default 'INR';
+alter table public.orders add column if not exists razorpay_order_id text;
+alter table public.orders add column if not exists razorpay_payment_id text;
+alter table public.orders add column if not exists shipping_name text;
+alter table public.orders add column if not exists shipping_phone text;
+alter table public.orders add column if not exists shipping_address text;
+alter table public.orders add column if not exists shipping_city text;
+alter table public.orders add column if not exists shipping_state text;
+alter table public.orders add column if not exists shipping_pincode text;
+alter table public.orders add column if not exists paid_at timestamptz;
+
+alter table public.order_items add column if not exists color text;
+alter table public.order_items add column if not exists selected_size text;
+alter table public.order_items add column if not exists selected_metal_type text;
+alter table public.order_items add column if not exists selected_diamond_quality text;
 
 alter table public.orders enable row level security;
 
