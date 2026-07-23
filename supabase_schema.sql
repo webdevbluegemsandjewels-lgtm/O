@@ -1,4 +1,22 @@
 -- =========================================================
+-- CHANGE LOG — READ THIS FIRST
+--
+-- Every section below is tagged with the date it was added and a
+-- status:
+--   ✅ RUN            — you've confirmed this works in production
+--   ⚠ NOT YET RUN     — run this now, nothing depends on it working yet
+--   ❔ VERIFY          — probably run already, but not explicitly
+--                        confirmed — double check before assuming so
+--
+-- Re-running the whole file is always safe (everything here is
+-- idempotent — guarded with "if not exists", "if exists", or
+-- NOT EXISTS checks) — but this log tells you what's actually NEW
+-- since your last run, so you're not just guessing. Going forward,
+-- every new section added to this file gets its own real date +
+-- status the moment it's added.
+-- =========================================================
+
+-- =========================================================
 -- OrenkaFine — Supabase schema for user accounts
 -- Run this once in Supabase Dashboard → SQL Editor.
 --
@@ -108,6 +126,7 @@ where u.id = p.id and p.email is null;
 -- have genuinely stuck old accounts to unblock again, do it by hand,
 -- one-off, in the SQL Editor — don't put it back in this file.
 
+-- Added: 2026-07-23 — ✅ RUN (confirmed: OTP signup + welcome email tested end to end)
 -- =========================================================
 -- Welcome email trigger
 -- Only run this AFTER you've deployed the welcome-email Edge
@@ -165,6 +184,7 @@ create trigger on_auth_user_confirmed_welcome_email
   when (old.email_confirmed_at is null and new.email_confirmed_at is not null)
   execute function public.notify_welcome_email();
 
+-- Added: 2026-07-23 — ✅ RUN (confirmed: cart merge on login working)
 -- =========================================================
 -- Row Level Security — cart_items and products
 --
@@ -214,6 +234,10 @@ create policy "Active products are viewable by everyone"
   on public.products for select
   using (is_active = true);
 
+-- Added: 2026-07-23 — ⚠ NOT YET RUN — run this now (adds razorpay_order_id,
+-- razorpay_payment_id, shipping_*, paid_at, and the order_items variant
+-- columns the payment gateway needs; the table itself already exists
+-- but was missing all of these)
 -- =========================================================
 -- Orders and order_items — schema + RLS scaffolding
 --
@@ -292,6 +316,7 @@ create policy "Order items are viewable by owner"
     )
   );
 
+-- Added: 2026-07-23 — ✅ RUN (confirmed: gift-card.html tested working)
 -- =========================================================
 -- Digital Gift Card catalog seed
 --
@@ -319,6 +344,7 @@ from (values
 ) as v(slug, name, brand, category, price, image, description, is_active, stock)
 where not exists (select 1 from public.products p where p.slug = v.slug);
 
+-- Added: 2026-07-23 — ✅ RUN (confirmed: karat/diamond/size pricing tested working)
 -- =========================================================
 -- Gold-rate metal pricing + diamond flag
 --
@@ -373,6 +399,9 @@ on conflict (id) do update set
   rate_24kt_per_gram = excluded.rate_24kt_per_gram,
   updated_at = now();
 
+-- Added: 2026-07-23 — ❔ VERIFY (likely run alongside the sections above,
+-- but not explicitly confirmed — check collections.html's Material
+-- filter actually shows Baguette/Diamond/Emerald/etc. with real counts)
 -- =========================================================
 -- Material auto-categorization
 --
@@ -436,6 +465,8 @@ set material = case
   else material
 end;
 
+-- Added: 2026-07-23 — ✅ RUN (confirmed: cart shows size/metal/diamond
+-- details correctly, separate lines for different variants)
 -- =========================================================
 -- cart_items — save the selected variant, not just color
 --
