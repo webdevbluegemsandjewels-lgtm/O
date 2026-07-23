@@ -142,14 +142,14 @@ document.addEventListener("DOMContentLoaded", () => {
       })}`;
       return `
       <div class="cart-row" data-id="${item.id}" data-color="${item.color || ""}" data-size="${item.size || ""}" data-metal="${item.metalType || ""}" data-diamond="${item.diamondQuality || ""}">
-        <a href="${detailHref}"><img src="${item.image}" alt="${item.name}" /></a>
+        <a href="${detailHref}"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></a>
         <div>
-          <h4><a href="${detailHref}" style="color:inherit; text-decoration:none;">${item.name}</a></h4>
+          <h4><a href="${detailHref}" style="color:inherit; text-decoration:none;">${escapeHtml(item.name)}</a></h4>
           <p class="meta">${[
-            item.color ? `Color: ${item.color}` : "",
-            item.size ? `Size: ${item.size}` : "",
-            item.metalType ? item.metalType : "",
-            item.diamondQuality ? `Diamond: ${item.diamondQuality}` : "",
+            item.color ? `Color: ${escapeHtml(item.color)}` : "",
+            item.size ? `Size: ${escapeHtml(item.size)}` : "",
+            item.metalType ? escapeHtml(item.metalType) : "",
+            item.diamondQuality ? `Diamond: ${escapeHtml(item.diamondQuality)}` : "",
           ].filter(Boolean).join(" · ")}</p>
           <div class="cart-qty">
             <button type="button" data-action="dec" aria-label="Decrease quantity">&minus;</button>

@@ -817,11 +817,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     reviewsList.innerHTML = reviews.map((r) => {
       const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
       const date = new Date(r.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
-      const name = r.reviewer_name || "OrenkaFine customer";
+      const name = escapeHtml(r.reviewer_name || "OrenkaFine customer");
       return `
         <div style="border-bottom:1px solid var(--line); padding-bottom:1.2rem;">
           <div style="color:var(--gold); font-size:1rem; margin-bottom:.3rem;">${stars}</div>
-          <p style="color:var(--ink-soft); line-height:1.7; margin-bottom:.5rem;">${(r.comment || "").replace(/</g, "&lt;")}</p>
+          <p style="color:var(--ink-soft); line-height:1.7; margin-bottom:.5rem;">${escapeHtml(r.comment || "")}</p>
           <p style="font-size:.8rem; color:var(--ink-soft);"><strong style="color:var(--ink);">${name}</strong> &middot; ${date}</p>
         </div>
       `;

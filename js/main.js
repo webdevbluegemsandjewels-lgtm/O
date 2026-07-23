@@ -1,6 +1,18 @@
 /* =========================================================
    OrenkaFine — site behavior
    ========================================================= */
+
+// Escapes user-supplied text (review names/comments, cart line
+// details, anything not admin-controlled) before it's interpolated
+// into innerHTML — without this, e.g. a signup full_name of
+// "<img src=x onerror=...>" renders and executes for every visitor
+// who views that person's review.
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
 const DEFAULT_SUPABASE_S3_ENDPOINT = "https://xjepiecjsomrallliifj.storage.supabase.co/storage/v1/s3";
 const DEFAULT_SUPABASE_BUCKET = "Images";
 

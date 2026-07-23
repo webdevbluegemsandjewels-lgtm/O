@@ -67,8 +67,17 @@ serve(async (req) => {
     if (cartErr) return json({ error: cartErr.message }, 500);
     if (!cartRows || cartRows.length === 0) return json({ error: "Your cart is empty" }, 400);
 
+    // unit_price is legitimately variable (karat/diamond/size adjustments
+    // happen client-side in product.html), but cart_items is writable via
+    // the anon key — a request crafted directly against the REST API
+    // could set an arbitrary (even negative) unit_price on a real
+    // product_id. Floor it against the real product price so a tampered
+    // row can't check out for a fraction of, or less than, nothing.
+    const MIN_PRICE_RATIO = 0.5;
     const orderItems = cartRows.map((row: any) => {
-      const price = row.unit_price != null ? Number(row.unit_price) : Number(row.products?.price) || 0;
+      const basePrice = Number(row.products?.price) || 0;
+      const claimedPrice = row.unit_price != null ? Number(row.unit_price) : basePrice;
+      const price = claimedPrice > 0 && claimedPrice >= basePrice * MIN_PRICE_RATIO ? claimedPrice : basePrice;
       return {
         product_id: row.product_id,
         quantity: row.quantity,

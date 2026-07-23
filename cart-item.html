@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const specList = document.getElementById("specList");
     specList.innerHTML = specs.length
-      ? specs.map(([label, value]) => `<div class="spec-row"><span>${label}</span><span>${value}</span></div>`).join("")
+      ? specs.map(([label, value]) => `<div class="spec-row"><span>${label}</span><span>${escapeHtml(value)}</span></div>`).join("")
       : `<p class="no-specs">No specific options were selected for this item.</p>`;
 
     const viewProductLink = document.getElementById("viewProductLink");
