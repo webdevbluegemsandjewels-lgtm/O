@@ -9,12 +9,56 @@
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .success-section{ padding: 5rem 0; text-align:center; }
-  .success-icon{ width:64px; height:64px; margin:0 auto 1.4rem; }
-  .order-id{ font-family: var(--font-display); font-size:1.1rem; color: var(--gold); margin: 1rem 0 2rem; }
+  .success-section{ padding: 3.2rem 0 5rem; }
+  .success-banner{
+    text-align:center; padding: 2rem 1.5rem; margin-bottom: 2.4rem;
+    border: 1px dashed var(--emerald); border-radius: 12px; background: #eaf1ec;
+  }
+  .success-icon{ width:48px; height:48px; margin:0 auto 1rem; }
+  .success-banner p{ color: var(--ink); font-size:1rem; line-height:1.6; max-width: 46ch; margin: 0 auto; }
+
+  .order-meta-row{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding: 1.4rem 1.6rem; margin-bottom: 2.2rem; text-align:center;
+  }
+  .order-meta-row div span{ display:block; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color: var(--ink-soft); margin-bottom:.4rem; }
+  .order-meta-row div strong{ font-family: var(--font-display); font-size:1.05rem; color: var(--ink); font-weight:500; }
+
+  .order-details-card{ background:#fff; border:1px solid var(--line); border-radius:12px; padding: 1.8rem; margin-bottom: 2rem; }
+  .order-details-card h3{ font-size:1.05rem; margin-bottom:1.2rem; }
+  .order-line{ display:flex; justify-content:space-between; gap:1.2rem; padding: 1.1rem 0; border-top:1px solid var(--line); }
+  .order-line:first-of-type{ border-top:none; }
+  .order-line-name{ font-size:.95rem; color: var(--ink); margin-bottom:.4rem; }
+  .order-line-specs{ font-size:.8rem; color: var(--ink-soft); line-height:1.7; }
+  .order-line-price{ font-family: var(--font-display); font-size:1rem; color: var(--ink); white-space:nowrap; }
+
+  .order-summary-lines{ margin-top: .6rem; padding-top: 1rem; border-top:1px solid var(--line); }
+  .order-summary-line{ display:flex; justify-content:space-between; font-size:.9rem; color: var(--ink-soft); margin-bottom:.6rem; }
+  .order-summary-line.total{ color: var(--ink); font-weight:500; font-size:1.05rem; border-top:1px solid var(--line); padding-top:.8rem; margin-top:.4rem; }
+
+  .address-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+  .address-card{ background:#fff; border:1px solid var(--line); border-radius:12px; padding: 1.6rem; }
+  .address-card h4{ font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color: var(--gold); margin-bottom:.9rem; }
+  .address-card p{ font-size:.9rem; color: var(--ink-soft); line-height:1.7; }
+
+  .order-actions{ text-align:center; margin-top: 2.4rem; }
+  .order-notfound{ text-align:center; padding: 5rem 0; color: var(--ink-soft); }
+
+  @media (max-width: 760px){
+    .order-meta-row{ grid-template-columns: 1fr 1fr; }
+    .address-grid{ grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
 
 <header class="site-header">
   <div class="container">
@@ -25,30 +69,147 @@
       <a href="our-journey.html">Our Story</a>
       <a href="contact.html">Contact</a>
     </nav>
-    <div class="header-icons"></div>
+    <div class="header-icons">
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+    </div>
   </div>
 </header>
 
 <section class="success-section">
   <div class="container">
-    <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="#4a7c59" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
-    <h1 class="section-title">Thank you for your order!</h1>
-    <p class="order-id" id="orderIdDisplay"></p>
-    <p>We've received your payment and your order is being prepared.</p>
-    <a href="collections.html" class="btn btn-outline-dark" style="margin-top:2rem;">Continue Shopping</a>
+
+    <div id="notFoundState" class="order-notfound" style="display:none;">
+      <p>We couldn't find that order.</p>
+      <a href="index.html" class="btn btn-outline-dark" style="margin-top:1rem;">Back to Home</a>
+    </div>
+
+    <div id="orderLayout" style="display:none;">
+      <div class="success-banner">
+        <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="#4a7c59" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+        <h1 class="section-title" style="margin-bottom:.6rem;">Thank you for shopping with us</h1>
+        <p>Your payment has gone through and your order is confirmed. We'll email you once it ships.</p>
+      </div>
+
+      <div class="order-meta-row">
+        <div><span>Order Number</span><strong id="orderNumber"></strong></div>
+        <div><span>Date</span><strong id="orderDate"></strong></div>
+        <div><span>Total</span><strong id="orderTotal"></strong></div>
+        <div><span>Payment Method</span><strong id="orderPayment">Razorpay</strong></div>
+      </div>
+
+      <div class="order-details-card">
+        <h3>Order Details</h3>
+        <div id="orderLines"></div>
+        <div class="order-summary-lines">
+          <div class="order-summary-line"><span>Subtotal</span><span id="orderSubtotal"></span></div>
+          <div class="order-summary-line"><span>Shipping</span><span>Free</span></div>
+          <div class="order-summary-line total"><span>Total</span><span id="orderTotalLine"></span></div>
+        </div>
+      </div>
+
+      <div class="address-grid">
+        <div class="address-card">
+          <h4>Shipping Address</h4>
+          <p id="shippingAddress"></p>
+        </div>
+        <div class="address-card">
+          <h4>Order Status</h4>
+          <p id="orderStatus"></p>
+        </div>
+      </div>
+
+      <div class="order-actions">
+        <a href="collections.html" class="btn btn-gold">Continue Shopping</a>
+      </div>
+    </div>
+
   </div>
 </section>
 
 <footer class="site-footer" id="footer"></footer>
+
 <script src="js/supabaseClient.js"></script>
-<script src="js/footer.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/main.js"></script>
+<script src="js/footer.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const notFoundState = document.getElementById("notFoundState");
+  const orderLayout = document.getElementById("orderLayout");
+
+  function money(n) {
+    return `₹${Math.round(Number(n)).toLocaleString("en-IN")}`;
+  }
+
+  const user = await requireAuth();
+  if (!user) return; // requireAuth already redirected to login
+
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("order_id");
-  if (orderId) {
-    document.getElementById("orderIdDisplay").textContent = `Order #${orderId.slice(0, 8).toUpperCase()}`;
+  if (!orderId) {
+    notFoundState.style.display = "block";
+    return;
   }
+
+  const { data: order, error: orderErr } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (orderErr || !order) {
+    notFoundState.style.display = "block";
+    return;
+  }
+
+  const { data: items } = await supabaseClient
+    .from("order_items")
+    .select("quantity, price, color, selected_size, selected_metal_type, selected_diamond_quality, products(name, image)")
+    .eq("order_id", orderId);
+
+  orderLayout.style.display = "block";
+
+  document.getElementById("orderNumber").textContent = `#${order.id.slice(0, 8).toUpperCase()}`;
+  document.getElementById("orderDate").textContent = new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+  document.getElementById("orderTotal").textContent = money(order.total);
+  document.getElementById("orderSubtotal").textContent = money(order.total);
+  document.getElementById("orderTotalLine").textContent = money(order.total);
+
+  const statusLabel = { pending: "Payment pending", paid: "Paid — being prepared", failed: "Payment failed", cancelled: "Cancelled" };
+  document.getElementById("orderStatus").textContent = statusLabel[order.status] || order.status;
+
+  const addressLines = [
+    order.shipping_name,
+    order.shipping_address,
+    [order.shipping_city, order.shipping_state, order.shipping_pincode].filter(Boolean).join(", "),
+    order.shipping_phone,
+  ].filter(Boolean);
+  document.getElementById("shippingAddress").innerHTML = addressLines.map(escapeHtml).join("<br>");
+
+  const orderLines = document.getElementById("orderLines");
+  orderLines.innerHTML = (items || []).map((item) => {
+    const specs = [
+      item.color ? `Colour: ${item.color}` : "",
+      item.selected_metal_type ? `Metal Type: ${item.selected_metal_type}` : "",
+      item.selected_size ? `Size: ${item.selected_size}` : "",
+      item.selected_diamond_quality ? `Diamond Quality: ${item.selected_diamond_quality}` : "",
+    ].filter(Boolean).map(escapeHtml).join("<br>");
+
+    return `
+      <div class="order-line">
+        <div>
+          <div class="order-line-name">${escapeHtml(item.products?.name || "Product")} &times; ${item.quantity}</div>
+          ${specs ? `<div class="order-line-specs">${specs}</div>` : ""}
+        </div>
+        <div class="order-line-price">${money(item.price * item.quantity)}</div>
+      </div>
+    `;
+  }).join("");
+});
 </script>
 </body>
 </html>
