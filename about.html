@@ -9,16 +9,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .about-page section:not(.hero){ padding: 1.2rem 0; }
+  .about-page .section-head{ justify-content:center; text-align:center; }
+  .about-page .about-split-head{ text-align:center; }
+  .about-page .about-split-head .eyebrow{ justify-content:center; }
+  .about-page .about-split{
+    grid-template-areas:
+      "title title"
+      "body image";
+  }
+  @media (max-width: 760px){
+    .about-page .about-split{
+      grid-template-areas:
+        "title"
+        "image"
+        "body";
+    }
+  }
+  .catwalk-video{
+    grid-area: image;
+    width: 100%;
+    max-width: 100%;
+    justify-self: stretch;
+    background:#fff;
+    border-radius:10px;
+    border:1px solid var(--line);
+  }
+  .marquee-wrap{
+    overflow:hidden; margin-top:.6rem;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .marquee-track{ display:flex; gap:1.3rem; width:max-content; animation: marqueeScroll linear infinite; }
+  .marquee-track:hover{ animation-play-state:paused; }
+  @keyframes marqueeScroll{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+  .testimonial-marquee .marquee-track{ animation-duration:34s; }
+  .testimonial-item.testimonial-card{ flex:0 0 320px; padding:1.3rem 1.5rem; }
+  .testimonial-item .stars{ color:var(--gold); font-size:.9rem; margin-bottom:.4rem; letter-spacing:.15em; }
+  .testimonial-item p{ margin-bottom:.7rem; }
+  .recommend-marquee .marquee-track{ animation-duration:38s; }
+  .recommend-item{ flex:0 0 220px; }
+  @media (max-width: 760px){
+    .testimonial-item{ flex-basis:280px; }
+    .recommend-item{ flex-basis:180px; }
+  }
+</style>
 </head>
 <body class="about-page">
-
 <div class="utility-bar">
   <div class="container">
     <span>Complimentary gift wrapping on every order</span>
     <span>Fast delivery &middot; Secure checkout</span>
   </div>
 </div>
-
 <header class="site-header">
   <div class="container">
     <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
@@ -37,7 +81,6 @@
     </div>
   </div>
 </header>
-
 <section class="hero page-hero">
   <div class="hero-media">
     <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1764512680324-048f158cab2b?auto=format&fit=crop&w=1600&q=80">
@@ -50,14 +93,15 @@
     <h1>The OrenkaFine House</h1>
   </div>
 </section>
-
 <section>
   <div class="container editorial about-split">
     <div class="about-split-head">
       <p class="eyebrow">Our philosophy</p>
       <h2 class="about-split-title">The world is my catwalk</h2>
     </div>
-    <img src="https://images.unsplash.com/photo-1633934542430-0905ccb5f050?w=1000&auto=format&fit=crop&q=80" alt="Gold necklace and earrings on display" />
+    <video class="catwalk-video" autoplay muted loop playsinline preload="metadata">
+      <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/TheHouse/wimc.mp4" type="video/mp4" />
+    </video>
     <div class="about-split-body">
       <p>OrenkaFine was founded on a simple idea: fine Jewellery should be worn, not saved for occasions. Our founder began sketching pieces at café tables across Europe, gathering color and form from wherever life took her.</p>
       <p>Today the house designs two distinct lines from the same studio — OrenkaFine Jewellery, our fine 18kt gold collection, and OrenkaFine Moda, our fashion-forward everyday pieces — united by the same hand-finished craftsmanship.</p>
@@ -65,14 +109,15 @@
     </div>
   </div>
 </section>
-
 <section class="editorial-reverse section-dim">
   <div class="container editorial about-split">
     <div class="about-split-head">
       <p class="eyebrow">Craftsmanship</p>
       <h2 class="about-split-title">Made to be layered, mixed, and lived in</h2>
     </div>
-    <img src="https://images.unsplash.com/photo-1638734205377-f21045bf6ebe?auto=format&fit=crop&w=1000&q=80" alt="Gold hoop earrings closeup on white background" />
+    <video class="catwalk-video" autoplay muted loop playsinline preload="metadata">
+      <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/TheHouse/cms.mp4" type="video/mp4" />
+    </video>
     <div class="about-split-body">
       <p>Every setting is finished by hand in small batches. We work in 18kt gold, sterling silver, and considered gemstones — amethyst, emerald, London blue topaz — chosen for how they catch the light against skin.</p>
       <p>We design in families, not single pieces, so a ring, a stack of bangles and a pair of earrings from the same collection always feel like they belong together.</p>
@@ -80,7 +125,6 @@
     </div>
   </div>
 </section>
-
 <section>
   <div class="container">
     <div class="section-head">
@@ -109,7 +153,6 @@
     </div>
   </div>
 </section>
-
 <section>
   <div class="container">
     <div class="section-head">
@@ -126,7 +169,32 @@
     </div>
   </div>
 </section>
-
+<section class="section-dim">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Reviews</p>
+        <h2 class="section-title">What Our Customers Say</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap testimonial-marquee">
+      <div class="marquee-track" id="testimonialTrack"></div>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Just for you</p>
+        <h2 class="section-title">Recommended For You</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap recommend-marquee">
+      <div class="marquee-track" id="recommendTrack"></div>
+    </div>
+  </div>
+</section>
 <section class="newsletter">
   <div class="container newsletter-inner">
     <div>
@@ -142,19 +210,49 @@
     </form>
   </div>
 </section>
-
 <footer class="site-footer" id="footer"></footer>
-
 <button class="to-top" aria-label="Back to top">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
 </button>
-
 <script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
 <script src="js/auth-modal.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/products.js"></script>
 <script src="js/main.js"></script>
 <script src="js/search.js"></script>
 <script src="js/footer.js"></script>
+<script>
+  const TESTIMONIALS = [
+    { name: "Priya Sharma", text: "The quality exceeded my expectations. The finish, sparkle, and craftsmanship are absolutely beautiful." },
+    { name: "Rahul Mehta", text: "I love knowing that I'm buying directly from the brand. The quality is outstanding and the pricing feels honest." },
+    { name: "Neha Kapoor", text: "Elegant packaging, quick delivery, and a necklace that looks even more stunning in person." },
+    { name: "Aditi Verma", text: "My favourite jewellery purchase. Beautifully crafted and perfect for everyday luxury." },
+  ];
+  function testimonialCardHTML(t) {
+    return `
+      <div class="testimonial-card testimonial-item">
+        <p class="stars">★★★★★</p>
+        <p>&ldquo;${t.text}&rdquo;</p>
+        <span>${t.name}</span>
+      </div>
+    `;
+  }
+  const testimonialTrack = document.getElementById("testimonialTrack");
+  if (testimonialTrack) {
+    testimonialTrack.innerHTML = [...TESTIMONIALS, ...TESTIMONIALS].map(testimonialCardHTML).join("");
+  }
+  const recommendTrack = document.getElementById("recommendTrack");
+  if (recommendTrack && typeof loadProductsFromDB === "function") {
+    loadProductsFromDB().then((products) => {
+      const picks = products.slice(0, 10);
+      if (!picks.length) return;
+      recommendTrack.innerHTML = [...picks, ...picks]
+        .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)
+        .join("");
+      attachProductHoverSwap();
+    });
+  }
+</script>
 </body>
 </html>
