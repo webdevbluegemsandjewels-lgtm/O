@@ -1343,7 +1343,14 @@ section{ padding: 3rem 0; }
     gap: 1rem;
   }
 }
-.breadcrumb{ font-size:.78rem; color: var(--ink-soft); margin-top: 1rem; letter-spacing:.05em; text-transform:uppercase;}
+.breadcrumb{
+  font-size: .88rem;
+  color: var(--ink-soft);
+  margin-top: -1.5rem;   /* Increase to -2rem if needed */
+  margin-bottom: .5rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
 .breadcrumb a{ color: var(--ink-soft); }
 .breadcrumb a:hover{ color: var(--gold); }
 .page-hero .hero-content .breadcrumb,
