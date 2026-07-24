@@ -10,11 +10,70 @@
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  /* Tighter rhythm for this page specifically — the default 3rem
+     section padding plus 1.2rem paragraph gaps stacked into a lot of
+     dead air between blocks of fairly short copy. */
+  body.founder-page section{ padding: 1.3rem 0; background: #fff; }
+  body.founder-page .section-head{ margin-bottom: .9rem; justify-content: center; text-align: center; }
+  body.founder-page .section-title{ margin-top: .2rem; }
+
   .founder-prose{ max-width: none; }
-  .founder-prose p{ font-size: 1.02rem; color: var(--ink-soft); line-height:1.8; margin-bottom: 1.2rem; }
+  .founder-prose p{ font-size: 1.02rem; color: var(--ink-soft); line-height:1.6; margin-bottom: .5rem; }
+  .founder-prose p:last-child{ margin-bottom: 0; }
 
   .founders-team-section{
-    padding: 68px 0;
+    padding: 34px 0;
+  }
+
+  .slogan-banner{ padding: .6rem 0 .9rem; text-align:center; }
+  .slogan-text{
+    margin:0; font-family: var(--font-display); font-weight:700;
+    font-size: clamp(1.2rem, 2.4vw, 1.6rem); color: var(--ink);
+    letter-spacing:.02em;
+  }
+
+  /* Mobile default: stacked in DOM order — image, then paragraph. */
+  .why-choose-grid{ margin-top: .4rem; display:flex; flex-direction:column; gap: 1.1rem; }
+  .why-choose-grid img{
+    display:block; width:100%; max-height:340px; object-fit:contain;
+    border-radius:10px; border:1px solid var(--line);
+  }
+
+  /* Desktop: image beside the paragraph, side by side. */
+  @media (min-width: 761px){
+    .why-choose-grid{
+      display:grid; grid-template-columns: 1fr 1fr;
+      gap: 1.4rem; align-items:center;
+    }
+  }
+
+  .our-promise-image{ margin-top: .6rem; }
+  .our-promise-image img{
+    display:block; width:100%; height:auto; margin:0 auto;
+    border-radius:10px; border:1px solid var(--line);
+  }
+
+  .marquee-wrap{
+    overflow:hidden; margin-top: .6rem;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .marquee-track{ display:flex; gap: 1.3rem; width: max-content; animation: marqueeScroll linear infinite; }
+  .marquee-track:hover{ animation-play-state: paused; }
+  @keyframes marqueeScroll{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+
+  .testimonial-marquee .marquee-track{ animation-duration: 34s; }
+  .testimonial-item.testimonial-card{ flex: 0 0 320px; padding: 1.3rem 1.5rem; }
+  .testimonial-item .stars{ color: var(--gold); font-size:.9rem; margin-bottom:.4rem; letter-spacing:.15em; }
+  .testimonial-item p{ margin-bottom: .7rem; }
+
+  .recommend-marquee .marquee-track{ animation-duration: 38s; }
+  .recommend-item{ flex: 0 0 220px; }
+
+  @media (max-width: 760px){
+    .why-choose-grid img{ max-height:220px; }
+    .testimonial-item{ flex-basis: 280px; }
+    .recommend-item{ flex-basis: 180px; }
   }
   .team-grid{
     display:grid;
@@ -164,20 +223,11 @@
     white-space:pre-line;
   }
 
-  .founder-list{
-    display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; margin-top: 2rem;
-  }
-  .founder-list li{
-    list-style:none; padding: 1.1rem 1.3rem; background: var(--bone-dim); border:1px solid var(--line);
-    color: var(--ink-soft); font-size:.92rem; line-height:1.6;
-  }
-  .founder-list li::before{ content:"—"; color: var(--gold); margin-right:.6rem; }
   @media (max-width: 900px){
     .team-grid{ grid-template-columns:1fr; }
     .profile-modal-main{ grid-template-columns:1fr; }
     .profile-modal-dialog{ padding:.9rem; }
   }
-  @media (max-width: 640px){ .founder-list{ grid-template-columns: 1fr; } }
 </style>
 </head>
 <body class="about-page founder-page">
@@ -216,7 +266,7 @@
   </div>
   <div class="container hero-content">
     <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Our Story</p>
-    <p class="eyebrow">Business Begins With Trust</p>
+    <p class="eyebrow">Since 1996</p>
     <h1>Our Story</h1>
   </div>
 </section>
@@ -226,47 +276,21 @@
     <div class="section-head">
       <div>
         <p class="eyebrow">Since 1996</p>
-        <h2 class="section-title">Business Begins With Trust</h2>
+        <h2 class="section-title">Our Story</h2>
       </div>
     </div>
     <div class="founder-prose">
-      <p>Before a design is selected, before a diamond is set, and before a piece reaches the display counter, there is one question that matters most: can the retailer trust the people behind the jewellery?</p>
-      <p>OrenkaFine was built to answer that question with confidence. Founded in Mumbai in 1996, the brand began with a deep respect for the discipline of the gems and jewellery trade and a clear purpose: to manufacture fine jewellery that retailers could sell with pride and certainty.</p>
-      <p>Every piece had to carry more than design. It had to carry accuracy, finish, durability, documentation, and the assurance that the work behind it was honest and dependable.</p>
+      <p>For over 30 years, OrenkaFine has been creating fine jewellery that celebrates craftsmanship, timeless design, and everyday elegance.</p>
+      <p>What began as a trusted jewellery business in Mumbai has evolved into a modern direct-to-consumer brand, bringing beautifully crafted fine jewellery directly from our workshop to customers across India.</p>
+      <p>By designing, manufacturing, and selling our collections ourselves, we eliminate unnecessary middlemen and expensive showroom costs. This allows us to offer exceptional craftsmanship, certified quality, and honest pricing without compromise.</p>
+      <p>Every OrenkaFine creation reflects three decades of experience, combining traditional jewellery-making techniques with contemporary design to create pieces that are made to be worn, loved, and passed on for generations.</p>
     </div>
   </div>
 </section>
 
-<section class="section-dim founders-team-section">
+<section class="slogan-banner">
   <div class="container">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">Our craft</p>
-        <h2 class="section-title">A Story Built on Craftsmanship</h2>
-      </div>
-    </div>
-    <div class="founder-prose">
-      <p>The journey of OrenkaFine has always been connected to craftsmanship. Jewellery is a refined art, but it is also a serious responsibility. A small difference in stone selection, setting, polish, proportion, or finish can change the value and beauty of a piece.</p>
-      <p>For nearly three decades, the company has grown by respecting detail, learning from the trade, listening to retailers, and treating every order as a commitment.</p>
-      <p>The company continues to bring together skilled craftsmanship, careful processes, and a deep understanding of jewellery excellence. Trust remains central. Quality remains essential. Integrity remains the difference between a transaction and a lasting relationship.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">Growth</p>
-        <h2 class="section-title">From Craft to Company</h2>
-      </div>
-    </div>
-    <div class="founder-prose">
-      <p>OrenkaFine began as a manufacturing business with a clear purpose: to create fine jewellery that retailers could sell with confidence.</p>
-      <p>Over the years, the company built its strength quietly and steadily. Retailers returned because quality was consistent, communication was clear, delivery commitments were respected, and the founders remained accessible.</p>
-      <p>Throughout this journey, every stage of growth was guided by the same philosophy: long-term relationships are built through reliability, transparency, and attention to detail. Rather than pursuing rapid expansion, the company focused on strengthening its capabilities, refining its craftsmanship, and creating a foundation that retailers could continue to trust.</p>
-      <p>As the business evolved, OrenkaFine strengthened its systems, expanded its manufacturing discipline, and invested in better processes without losing the personal accountability that shaped the company from the beginning.</p>
-    </div>
+    <p class="slogan-text">&ldquo;Find Your Exquisite&rdquo;</p>
   </div>
 </section>
 
@@ -279,10 +303,39 @@
       </div>
     </div>
     <div class="founder-prose">
-      <p>Mumbai has always been at the heart of OrenkaFine. As one of India's leading centres for diamonds, jewellery, manufacturing, and trade, the city provides the ideal environment where craftsmanship, expertise, and commerce come together.</p>
-      <p>OrenkaFine operates from its trade office at Bharat Diamond Bourse, BKC, and its manufacturing facility in Andheri East. This strategic presence enables the company to maintain close coordination between production and trade while ensuring every piece is crafted under direct supervision.</p>
-      <p>With complete oversight of the manufacturing process and a strong connection to the jewellery trade, the company delivers consistent quality, timely execution, and the flexibility to meet the evolving requirements of retailers and business partners.</p>
-      <p>This integrated Mumbai-based foundation reflects OrenkaFine's commitment to precision, reliability, and lasting business relationships, combining skilled craftsmanship with efficient operations to serve customers with confidence.</p>
+      <p>Mumbai has always been the home of OrenkaFine.</p>
+      <p>Located in one of the world's most respected jewellery and diamond trading hubs, we benefit from generations of craftsmanship, skilled artisans, and access to the finest materials.</p>
+      <p>Our manufacturing and operations are built on precision, quality, and attention to detail. Every stage—from design and sourcing to production, polishing, and final inspection—is carefully managed to ensure every piece meets our highest standards.</p>
+      <p>This strong foundation allows us to deliver jewellery that customers can wear with complete confidence.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">The OrenkaFine promise</p>
+        <h2 class="section-title">Why Choose Us</h2>
+      </div>
+    </div>
+    <div class="why-choose-grid">
+      <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/OurStory/image1.png" alt="OrenkaFine craftsmanship" loading="lazy" />
+      <p style="font-size:1.02rem; color:var(--ink-soft); line-height:1.8; margin:0;">Choosing fine jewellery is about more than beauty—it's about trust, quality, and lasting value. With over 30 years of expertise, OrenkaFine combines exceptional craftsmanship, premium materials, and a direct-to-customer approach to deliver timeless jewellery at honest prices. Every piece is thoughtfully designed, meticulously crafted, and carefully inspected so you can wear it with complete confidence.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Our commitment</p>
+        <h2 class="section-title">Our Promise</h2>
+      </div>
+    </div>
+    <div class="our-promise-image">
+      <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/OurStory/image2.png" alt="Our Promise" loading="lazy" />
     </div>
   </div>
 </section>
@@ -361,36 +414,30 @@
   </div>
 </div>
 
-<section>
-  <div class="container">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">The difference</p>
-        <h2 class="section-title">What Makes OrenkaFine Different</h2>
-      </div>
-    </div>
-    <ul class="founder-list">
-      <li>In-house manufacturing with direct control over quality, process, and timelines</li>
-      <li>Product development shaped by retailer needs and customer expectations</li>
-      <li>Documented, certified, and BIS hallmarked jewellery where applicable</li>
-      <li>GJEPC membership and trade presence at Bharat Diamond Bourse, BKC</li>
-      <li>Client visits to the manufacturing facility for greater transparency</li>
-      <li>Long-term relationships built through reliable delivery and honest communication</li>
-    </ul>
-  </div>
-</section>
-
 <section class="section-dim">
   <div class="container">
     <div class="section-head">
       <div>
-        <p class="eyebrow">Looking ahead</p>
-        <h2 class="section-title">The Next Chapter</h2>
+        <p class="eyebrow">Reviews</p>
+        <h2 class="section-title">What Our Customers Say</h2>
       </div>
     </div>
-    <div class="founder-prose">
-      <p>The goal ahead is to grow stronger: with better systems, wider reach, deeper retailer relationships, and continued commitment to certified, consistent, in-house jewellery manufacturing.</p>
-      <p>OrenkaFine is a brand built for retailers who value reliability as much as design, documentation as much as beauty, and partnership as much as product. The story began in 1996. It continues today with every piece we make, every order we deliver, and every relationship we build.</p>
+    <div class="marquee-wrap testimonial-marquee">
+      <div class="marquee-track" id="testimonialTrack"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Just for you</p>
+        <h2 class="section-title">Recommended For You</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap recommend-marquee">
+      <div class="marquee-track" id="recommendTrack"></div>
     </div>
   </div>
 </section>
@@ -418,12 +465,59 @@
 </button>
 
 <script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
 <script src="js/auth-modal.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script src="js/search.js"></script>
 <script src="js/footer.js"></script>
 <script>
+  // productCardHTML() (js/main.js) colors each swatch dot from this
+  // lookup — the full table normally comes from js/products.js, but
+  // that also ships ~200 demo products this page has no use for, so
+  // just the swatch colors are duplicated here instead.
+  const COLOR_SWATCHES = {
+    "Rose Gold": "#caa593",
+    "Yellow Gold": "#e6c78b",
+    "White Gold": "#d9d9d9",
+  };
+
+  const TESTIMONIALS = [
+    { name: "Priya Sharma", text: "The quality exceeded my expectations. The finish, sparkle, and craftsmanship are absolutely beautiful." },
+    { name: "Rahul Mehta", text: "I love knowing that I'm buying directly from the brand. The quality is outstanding and the pricing feels honest." },
+    { name: "Neha Kapoor", text: "Elegant packaging, quick delivery, and a necklace that looks even more stunning in person." },
+    { name: "Aditi Verma", text: "My favourite jewellery purchase. Beautifully crafted and perfect for everyday luxury." },
+  ];
+
+  function testimonialCardHTML(t) {
+    return `
+      <div class="testimonial-card testimonial-item">
+        <p class="stars">★★★★★</p>
+        <p>&ldquo;${t.text}&rdquo;</p>
+        <span>${t.name}</span>
+      </div>
+    `;
+  }
+
+  // Marquees loop by duplicating the item list once and animating to
+  // -50% — as long as both halves render identically, the seam is invisible.
+  const testimonialTrack = document.getElementById("testimonialTrack");
+  if (testimonialTrack) {
+    testimonialTrack.innerHTML = [...TESTIMONIALS, ...TESTIMONIALS].map(testimonialCardHTML).join("");
+  }
+
+  const recommendTrack = document.getElementById("recommendTrack");
+  if (recommendTrack && typeof loadProductsFromDB === "function") {
+    loadProductsFromDB().then((products) => {
+      const picks = products.slice(0, 10);
+      if (!picks.length) return;
+      recommendTrack.innerHTML = [...picks, ...picks]
+        .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)
+        .join("");
+      attachProductHoverSwap();
+    });
+  }
+
   const profileModal = document.getElementById("profile-modal");
   const profileName = document.getElementById("profile-modal-name");
   const profileRole = document.getElementById("profile-modal-role");
