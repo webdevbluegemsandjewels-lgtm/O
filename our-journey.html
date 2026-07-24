@@ -17,6 +17,18 @@
   body.founder-page .section-head{ margin-bottom: .9rem; justify-content: center; text-align: center; }
   body.founder-page .section-title{ margin-top: .2rem; }
 
+  /* The white-background override above also flattened the
+     newsletter's dark emerald bg, washing out its light text (meant
+     to sit on dark, not white) — restore it here. */
+  body.founder-page .newsletter{ background: var(--emerald); color: var(--bone); }
+  body.founder-page .newsletter h2{ color: var(--bone); }
+  body.founder-page .newsletter p{ color: var(--bone-dim); }
+  body.founder-page .field-row input[type="email"]{
+    background: #fff; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: .8rem 1rem;
+  }
+  body.founder-page .field-row input::placeholder{ color: var(--ink-soft); }
+
   .founder-prose{ max-width: none; }
   .founder-prose p{ font-size: 1.02rem; color: var(--ink-soft); line-height:1.6; margin-bottom: .5rem; }
   .founder-prose p:last-child{ margin-bottom: 0; }
@@ -32,19 +44,28 @@
     letter-spacing:.02em;
   }
 
-  /* Mobile default: stacked in DOM order — image, then paragraph. */
-  .why-choose-grid{ margin-top: .4rem; display:flex; flex-direction:column; gap: 1.1rem; }
-  .why-choose-grid img{
-    display:block; width:100%; max-height:340px; object-fit:contain;
+  /* Mobile default: stacked in DOM order — video, then paragraph. */
+  .why-choose-grid{ margin-top: .4rem; display:flex; flex-direction:column; gap: 1.1rem; align-items:center; }
+  .why-choose-grid img,
+  .why-choose-video{
+    display:block; width:100%; max-width: 320px; height:auto;
     border-radius:10px; border:1px solid var(--line);
   }
 
-  /* Desktop: image beside the paragraph, side by side. */
+  /* Desktop: paragraph on the left, video on the right — reordered
+     with named grid areas rather than DOM order, so mobile keeps its
+     own stacking without needing separate markup. Media box is capped
+     narrower than the grid column so it doesn't dominate the section. */
   @media (min-width: 761px){
     .why-choose-grid{
       display:grid; grid-template-columns: 1fr 1fr;
+      grid-template-areas: "para img";
       gap: 1.4rem; align-items:center;
     }
+    .why-choose-grid img,
+    .why-choose-video{ max-width: 380px; justify-self:center; }
+    .why-choose-grid > :nth-child(1){ grid-area: img; }
+    .why-choose-grid > :nth-child(2){ grid-area: para; }
   }
 
   .our-promise-image{ margin-top: .6rem; }
@@ -71,7 +92,6 @@
   .recommend-item{ flex: 0 0 220px; }
 
   @media (max-width: 760px){
-    .why-choose-grid img{ max-height:220px; }
     .testimonial-item{ flex-basis: 280px; }
     .recommend-item{ flex-basis: 180px; }
   }
@@ -320,7 +340,9 @@
       </div>
     </div>
     <div class="why-choose-grid">
-      <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/OurStory/image1.png" alt="OrenkaFine craftsmanship" loading="lazy" />
+      <video class="why-choose-video" autoplay muted loop playsinline preload="metadata">
+        <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/OurStory/video1.mp4" type="video/mp4" />
+      </video>
       <p style="font-size:1.02rem; color:var(--ink-soft); line-height:1.8; margin:0;">Choosing fine jewellery is about more than beauty—it's about trust, quality, and lasting value. With over 30 years of expertise, OrenkaFine combines exceptional craftsmanship, premium materials, and a direct-to-customer approach to deliver timeless jewellery at honest prices. Every piece is thoughtfully designed, meticulously crafted, and carefully inspected so you can wear it with complete confidence.</p>
     </div>
   </div>
