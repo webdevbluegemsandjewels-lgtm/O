@@ -1343,8 +1343,12 @@ section{ padding: 3rem 0; }
     gap: 1rem;
   }
 }
-.breadcrumb{ font-size:.78rem; color: var(--bone-dim); margin-top: 1rem; letter-spacing:.05em; text-transform:uppercase;}
-.breadcrumb a:hover{ color: var(--gold-light); }
+.breadcrumb{ font-size:.78rem; color: var(--ink-soft); margin-top: 1rem; letter-spacing:.05em; text-transform:uppercase;}
+.breadcrumb a{ color: var(--ink-soft); }
+.breadcrumb a:hover{ color: var(--gold); }
+.page-hero .hero-content .breadcrumb,
+.page-hero .hero-content .breadcrumb a{ color: var(--bone-dim); }
+.page-hero .hero-content .breadcrumb a:hover{ color: var(--gold-light); }
 
 /* Contact */
 .contact-grid{
@@ -1795,4 +1799,157 @@ body.search-overlay-open{ overflow: hidden; }
 @media (max-width: 640px){
   .search-overlay-backdrop{ padding: 70px .8rem .8rem; }
   .search-overlay{ max-height: 82vh; }
+}
+
+/* =========================================================
+   Gold / Diamond / Ring-size guide popups
+   ========================================================= */
+body.guide-modal-open{ overflow: hidden; }
+
+.guide-modal-backdrop{
+  position: fixed; inset: 0; z-index: 1100;
+  background: rgba(22,20,15,.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.4rem;
+  animation: guideFadeIn .2s ease;
+}
+.guide-modal-backdrop.closing{ animation: guideFadeOut .2s ease forwards; }
+@keyframes guideFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes guideFadeOut{ to{ opacity:0; } }
+
+.guide-modal{
+  position: relative;
+  width: 100%; max-width: 760px;
+  max-height: 88vh; max-height: 88dvh;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 24px 70px rgba(22,20,15,.35);
+  animation: guidePopIn .25s cubic-bezier(.22,.9,.32,1);
+}
+.guide-modal-backdrop.closing .guide-modal{ animation: guidePopOut .2s ease forwards; }
+@keyframes guidePopIn{ from{ opacity:0; transform: scale(.96) translateY(8px); } to{ opacity:1; transform: scale(1) translateY(0); } }
+@keyframes guidePopOut{ to{ opacity:0; transform: scale(.97); } }
+
+.guide-modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 1.1rem 1.5rem; background: var(--bone-dim, #f4f1ec);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.guide-modal-head h3{
+  margin:0; font-family: var(--font-display); font-size: 1.15rem;
+  letter-spacing: .04em; color: var(--ink);
+}
+.guide-modal-close{
+  background: var(--ink); color:#fff; border:none; cursor:pointer;
+  width: 28px; height: 28px; border-radius: 4px;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 1.2rem; line-height:1; flex-shrink:0;
+}
+.guide-modal-close:hover{ background: var(--gold); }
+
+.guide-modal-body{
+  padding: 1.6rem 1.8rem 2rem;
+  overflow-y: auto;
+  font-size: .92rem; line-height: 1.7; color: var(--ink);
+}
+.guide-modal-body p{ margin: 0 0 .9rem; }
+.guide-modal-body h5{ margin: 0 0 .5rem; font-family: var(--font-display); font-size: 1.02rem; }
+
+.guide-lead{ text-align:center; color: var(--ink-soft); }
+.guide-heading-bold{ text-align:center; font-weight:600; font-size:1.02rem; margin-bottom:.3rem !important; }
+.guide-subhead{ margin-top: 1.6rem !important; padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.guide-note{ background: var(--bone-dim, #f4f1ec); border-radius: 8px; padding: 1rem 1.1rem; }
+
+.guide-card-row{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.2rem; }
+.guide-card{ background: var(--bone-dim, #f4f1ec); border-radius: 8px; padding: 1rem 1.1rem; }
+.guide-card h5{ color: var(--gold); }
+.guide-card p{ margin:0; font-size:.86rem; }
+
+.guide-cert-row{ display:flex; align-items:center; gap: 1rem; margin: .8rem 0 1.2rem; flex-wrap: wrap; }
+.guide-cert-badge{
+  flex-shrink:0; width: 54px; height: 54px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--bone-dim, #f4f1ec);
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display); font-size: .72rem; letter-spacing:.04em;
+  color: var(--gold); font-weight:600;
+}
+.guide-cert-row p{ margin:0; flex:1; min-width: 200px; }
+
+.guide-scale-row{ display:flex; gap: 1rem; justify-content:space-between; margin: 1rem 0 1.4rem; flex-wrap: wrap; }
+.guide-scale-group{ flex:1; min-width: 110px; text-align:center; }
+.guide-scale-label{ display:block; font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color: var(--ink-soft); margin-bottom:.5rem; }
+.guide-scale-icons{ display:flex; gap:.4rem; justify-content:center; flex-wrap:wrap; }
+.guide-diamond-icon{ display:flex; flex-direction:column; align-items:center; gap:.2rem; font-size:.68rem; color: var(--ink-soft); }
+.guide-clarity-row .guide-scale-group{ min-width: 90px; }
+
+.guide-option-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; }
+.guide-option-row + .guide-option-row{ margin-top: 1.8rem; padding-top: 1.6rem; border-top: 1px solid var(--line); }
+.guide-option-tag{
+  display:inline-block; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em;
+  color: var(--gold); font-weight:600; margin-bottom:.4rem;
+}
+.guide-option-col ol, .guide-option-col ul{ margin: 0 0 1rem 1.1rem; padding:0; }
+.guide-option-col li{ margin-bottom:.4rem; font-size:.88rem; }
+
+.guide-ring-illustration{ display:flex; flex-direction:column; align-items:center; gap:.3rem; margin: .8rem 0; color: var(--ink-soft); font-size:.8rem; }
+
+.guide-table-wrap{ overflow-x:auto; }
+.guide-table{ width:100%; border-collapse: collapse; font-size:.82rem; }
+.guide-table th, .guide-table td{ border: 1px solid var(--line); padding:.45rem .55rem; text-align:center; white-space:nowrap; }
+.guide-table th{ background: var(--bone-dim, #f4f1ec); text-align:left; font-weight:600; }
+.guide-table-vertical td{ white-space: normal; font-size:.78rem; min-width: 150px; }
+
+.guide-necklace-row{ align-items:center; }
+.guide-necklace-illustration{ display:flex; justify-content:center; }
+
+.guide-wrist-illustration{ display:flex; justify-content:center; margin: .6rem 0 1.2rem; }
+
+.guide-aani-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.6rem; }
+.guide-aani-card{
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:.15rem;
+  background: var(--bone-dim, #f4f1ec); border-radius: 8px; padding: .8rem .6rem 1rem;
+}
+.guide-aani-card strong{ font-size:.78rem; }
+.guide-aani-card span{ font-size:.72rem; color: var(--ink-soft); }
+.guide-aani-dims{ display:flex; gap: .8rem; font-size:.72rem; color: var(--ink-soft); margin-top:.2rem; }
+.guide-aani-dims span{ font-weight:600; color: var(--ink); }
+
+@media (max-width: 760px){
+  .guide-card-row{ grid-template-columns: 1fr 1fr; }
+}
+
+.spec-breakup-row{
+  grid-column: 1 / -1;
+  display: flex; gap: 1.4rem;
+  padding: 1.6rem 0; margin-top: .6rem;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.spec-col{ flex: 1; min-width: 0; padding-right: 1.4rem; border-right: 1px solid var(--line); }
+.spec-col:last-child{ border-right: none; padding-right: 0; }
+.spec-col h5{ margin: 0 0 .6rem; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ink); }
+.spec-col p{ margin: 0 0 .4rem; font-size: .82rem; color: var(--ink-soft); }
+.spec-col p strong{ color: var(--ink); font-weight: 500; }
+
+@media (max-width: 760px){
+  .spec-breakup-row{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem .8rem; }
+  .spec-col{ padding-right: .8rem; }
+  .spec-col h5{ font-size: .68rem; }
+  .spec-col p{ font-size: .74rem; }
+}
+
+.product-gallery .product-detail-desc{
+  margin: .3rem 0 0; padding-top: .9rem; border-top: 1px solid var(--line);
+  max-width: none;
+}
+
+@media (max-width: 640px){
+  .guide-modal{ max-width: 96vw; max-height: 92vh; max-height: 92dvh; border-radius: 12px; }
+  .guide-modal-body{ padding: 1.2rem 1.1rem 1.6rem; }
+  .guide-card-row{ grid-template-columns: 1fr; }
+  .guide-option-row{ grid-template-columns: 1fr; gap: 1.2rem; }
+  .guide-scale-row{ gap: .6rem; }
+  .guide-aani-grid{ grid-template-columns: 1fr 1fr; }
 }

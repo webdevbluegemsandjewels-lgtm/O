@@ -202,28 +202,28 @@
 
         <p class="product-detail-desc" id="productDesc">Description loading…</p>
 
-        <div class="product-meta-row">
+        <div class="product-meta-row" id="productMetaRow">
           <span>Material: <strong id="productMaterial">18 karat gold</strong></span>
           <span>Brand: <strong id="productBrand">OrenkaFine</strong></span>
         </div>
 
-        <div class="product-options" id="colorSection">
+        <div class="product-options" id="colorSection" style="display:none;">
           <h4>Color</h4>
           <div class="option-pill-row" id="colorRow"></div>
         </div>
 
         <div class="product-options" id="metalSection">
-          <h4>Metal Type <a href="#" class="option-guide-link" onclick="return false;" style="font-size:.72rem;text-transform:none;letter-spacing:normal;color:var(--ink-soft);text-decoration:underline;">Gold Purity Guide</a></h4>
+          <h4>Metal Type <a href="#" class="option-guide-link" data-guide="gold" style="font-size:.72rem;text-transform:none;letter-spacing:normal;color:var(--ink-soft);text-decoration:underline;">Gold Purity Guide</a></h4>
           <div class="option-pill-row" id="metalRow"></div>
         </div>
 
         <div class="product-options" id="sizeSection" style="display:none;">
-          <h4>Size</h4>
+          <h4>Size <a href="#" class="option-guide-link" id="sizeGuideLink" data-guide="size" style="font-size:.72rem;text-transform:none;letter-spacing:normal;color:var(--ink-soft);text-decoration:underline;">Size Guide</a></h4>
           <div class="option-chip-row" id="sizeRow"></div>
         </div>
 
         <div class="product-options" id="diamondSection" style="display:none;">
-          <h4>Diamond Type &amp; Quality</h4>
+          <h4>Diamond Type &amp; Quality <a href="#" class="option-guide-link" data-guide="diamond" style="font-size:.72rem;text-transform:none;letter-spacing:normal;color:var(--ink-soft);text-decoration:underline;">Diamond Guide</a></h4>
           <div class="option-pill-row" id="diamondRow"></div>
         </div>
 
@@ -265,6 +265,31 @@
           <span>✓ BIS hallmarked gold, certified diamonds</span>
           <span>✓ Fast &amp; secure shipping, fully insured</span>
           <span>✓ 15-day returns &middot; lifetime exchange &amp; buyback</span>
+        </div>
+      </div>
+
+      <div class="spec-breakup-row" id="specBreakupRow" style="display:none;">
+        <div class="spec-col">
+          <h5>Product Details</h5>
+          <p id="specProductCode"></p>
+          <p id="specWidth"></p>
+          <p id="specThickness"></p>
+        </div>
+        <div class="spec-col" id="specDiamondCol" style="display:none;">
+          <h5>Natural Diamond Details</h5>
+          <p id="specDiamondWeight"></p>
+        </div>
+        <div class="spec-col">
+          <h5>Metal Details</h5>
+          <p id="specMetalType"></p>
+          <p id="specNetWeight"></p>
+        </div>
+        <div class="spec-col">
+          <h5>Price Break Up</h5>
+          <p id="specGold"></p>
+          <p id="specDiamondPrice" style="display:none;"></p>
+          <p id="specMaking"></p>
+          <p id="specGst"></p>
         </div>
       </div>
     </div>
@@ -318,6 +343,7 @@
 <script src="js/products-db.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/auth-modal.js"></script>
+<script src="js/guide-modals.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script src="js/footer.js"></script>
@@ -378,6 +404,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("productBrand").textContent = product.brand || "OrenkaFine";
   document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the OrenkaFine collection.";
 
+  // On laptop/desktop (the two-column layout — see the 900px grid
+  // breakpoint above), move the description under the gallery image
+  // to use the space the sticky gallery leaves blank once its own
+  // content runs out. Mobile keeps its original single-column order
+  // (description stays with the rest of the product info) untouched.
+  const descEl = document.getElementById("productDesc");
+  const galleryEl = document.querySelector(".product-gallery");
+  const metaRowEl = document.getElementById("productMetaRow");
+  function positionProductDesc() {
+    if (window.matchMedia("(min-width: 901px)").matches) {
+      galleryEl.appendChild(descEl);
+    } else if (descEl.parentElement !== metaRowEl.parentElement || descEl.nextElementSibling !== metaRowEl) {
+      metaRowEl.parentElement.insertBefore(descEl, metaRowEl);
+    }
+  }
+  positionProductDesc();
+  window.addEventListener("resize", positionProductDesc);
+
   if (product.rating) {
     document.getElementById("productRating").innerHTML = `${product.rating} <span class="star">★</span>`;
   }
@@ -386,8 +430,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { data: goldRateRow } = await supabaseClient.from("gold_rates").select("*").eq("id", 1).maybeSingle();
   const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_gram) : null;
 
-  const KARAT_PURITY = { "24kt": 1, "18kt": 0.75, "14kt": 14 / 24, "9kt": 9 / 24 };
-  const KARAT_LABELS = { "24kt": "24 Kt Gold", "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
+  const KARAT_PURITY = { "18kt": 0.75, "14kt": 14 / 24, "9kt": 9 / 24 };
+  const KARAT_LABELS = { "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
 
   // Diamonds don't have a simple live "price per gram" feed the way
   // gold does, so Diamond Quality uses a fixed approximate markup
@@ -497,17 +541,46 @@ document.addEventListener("DOMContentLoaded", async () => {
     refreshDisplayedPrice();
   }
 
-  // Rings should always offer a size picker — real sibling data
-  // (from the scraper) when it exists, otherwise a standard ring
-  // size range, same fallback pattern as Diamond Quality below.
+  // Rings, bangles, bracelets, and necklaces/pendants should always
+  // offer a size picker — real sibling data (from the scraper) when
+  // it exists, otherwise a standard fallback range for that product
+  // type, same fallback pattern as Diamond Quality below. "Bracelets"
+  // is the only DB category for both bangles and chain bracelets, so
+  // the two are told apart by product name (rigid bangles vs
+  // adjustable chains use completely different sizing systems and
+  // guides).
   const RING_SIZE_FALLBACK = ["06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16"];
-  const isRing = (product.category || "").toLowerCase() === "rings";
-  const sizeOptionsToShow = sizeOptions.length ? sizeOptions : (isRing ? RING_SIZE_FALLBACK : []);
+  const BANGLE_SIZE_FALLBACK = ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5"];
+  const BRACELET_SIZE_FALLBACK = ["06", "07", "08"];
+  const NECKLACE_SIZE_FALLBACK = ["14", "15", "16", "17", "18"];
+  const categoryLower = (product.category || "").toLowerCase();
+  const isRing = categoryLower === "rings";
+  const isBangleProduct = categoryLower === "bracelets" && /bangle/i.test(product.name || "");
+  const isBraceletProduct = categoryLower === "bracelets" && !isBangleProduct;
+  const isNecklaceProduct = categoryLower === "necklaces" || categoryLower === "charms & pendants";
+
+  let sizeGuideType = "size";
+  let sizeGuideLabel = "Ring Size Guide";
+  let sizeFallback = RING_SIZE_FALLBACK;
+  if (isBangleProduct) {
+    sizeGuideType = "bangle"; sizeGuideLabel = "Bangle Size Guide"; sizeFallback = BANGLE_SIZE_FALLBACK;
+  } else if (isBraceletProduct) {
+    sizeGuideType = "bracelet"; sizeGuideLabel = "Bracelet Size Guide"; sizeFallback = BRACELET_SIZE_FALLBACK;
+  } else if (isNecklaceProduct) {
+    sizeGuideType = "necklace"; sizeGuideLabel = "Necklace Size Guide"; sizeFallback = NECKLACE_SIZE_FALLBACK;
+  } else if (!isRing) {
+    sizeFallback = [];
+  }
+
+  const sizeOptionsToShow = sizeOptions.length ? sizeOptions : sizeFallback;
   const sizeSection = document.getElementById("sizeSection");
   const sizeRow = document.getElementById("sizeRow");
   if (!selectedAttrs.size && sizeOptionsToShow.length) selectedAttrs.size = sizeOptionsToShow[0];
   if (sizeOptionsToShow.length > 1) {
     sizeSection.style.display = "block";
+    const sizeGuideLink = document.getElementById("sizeGuideLink");
+    sizeGuideLink.dataset.guide = sizeGuideType;
+    sizeGuideLink.textContent = sizeGuideLabel;
     sizeRow.innerHTML = sizeOptionsToShow.map((opt) => `
       <button type="button" class="option-chip ${opt === selectedAttrs.size ? "active" : ""}" data-value="${opt}">${opt}</button>
     `).join("");
@@ -522,17 +595,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     applySelection();
   });
 
-  // ---------- Color (fixed 2 options — cosmetic, not tied to price) ----------
-  let selectedColor = "Rose Gold";
-  const colorRow = document.getElementById("colorRow");
-  colorRow.innerHTML = ["Rose Gold", "Yellow Gold"].map((c, i) => `
-    <label class="option-pill ${i === 0 ? "active-pill" : ""}"><input type="radio" name="color" value="${c}" ${i === 0 ? "checked" : ""}> ${c}</label>
-  `).join("");
-  colorRow.addEventListener("change", (e) => {
-    if (e.target.name !== "color") return;
-    selectedColor = e.target.value;
-    colorRow.querySelectorAll(".option-pill").forEach((p) => p.classList.toggle("active-pill", p.querySelector("input").checked));
-  });
+  // ---------- Color (from the product's own `colors` column — cosmetic, not tied to price) ----------
+  const colorSection = document.getElementById("colorSection");
+  const colorOptions = Array.isArray(product.colors) ? product.colors.filter(Boolean) : [];
+  let selectedColor = colorOptions[0] || null;
+  if (colorOptions.length) {
+    colorSection.style.display = "block";
+    const colorRow = document.getElementById("colorRow");
+    colorRow.innerHTML = colorOptions.map((c, i) => `
+      <label class="option-pill ${i === 0 ? "active-pill" : ""}"><input type="radio" name="color" value="${c}" ${i === 0 ? "checked" : ""}> ${c}</label>
+    `).join("");
+    colorRow.addEventListener("change", (e) => {
+      if (e.target.name !== "color") return;
+      selectedColor = e.target.value;
+      colorRow.querySelectorAll(".option-pill").forEach((p) => p.classList.toggle("active-pill", p.querySelector("input").checked));
+    });
+  } else {
+    colorSection.style.display = "none";
+  }
 
   // ---------- Diamond Type & Quality ----------
   // Only shown for products that actually have a diamond
@@ -565,8 +645,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedKarat = "18kt";
   if (product.variant_metal_type) {
     const m = product.variant_metal_type.toLowerCase();
-    if (m.includes("24")) selectedKarat = "24kt";
-    else if (m.includes("14")) selectedKarat = "14kt";
+    if (m.includes("14")) selectedKarat = "14kt";
     else if (m.includes("9")) selectedKarat = "9kt";
   }
   const metalRow = document.getElementById("metalRow");
@@ -604,6 +683,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       addBtn.disabled = false;
       addBtn.style.opacity = "1";
       addBtn.dataset.contactMode = "true";
+      document.getElementById("specBreakupRow").style.display = "none";
       return;
     }
 
@@ -638,6 +718,53 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     pointsEl.textContent =
       `🎁 Purchase this item and get ${Math.round(displayPrice / 10).toLocaleString("en-IN")} Points`;
+
+    updateSpecBreakup(displayPrice, weight);
+  }
+
+  // ---------- Product Details / Diamond Details / Metal Details / Price Break Up ----------
+  // Sourced from the products table's *_share_pct columns (see
+  // supabase/seed_product_specs.sql) — those four always add up to
+  // 100, so the ₹ figures shown here always sum back to the
+  // displayed price. Rows/columns with no data on this product are
+  // hidden rather than shown as "₹0" or blank.
+  const specRow = document.getElementById("specBreakupRow");
+  function updateSpecBreakup(displayPrice, weightGrams) {
+    if (!product.product_code) {
+      specRow.style.display = "none";
+      return;
+    }
+    specRow.style.display = "flex";
+
+    document.getElementById("specProductCode").innerHTML = `Product Code: <strong>${product.product_code}</strong>`;
+    document.getElementById("specWidth").style.display = product.width_mm ? "block" : "none";
+    if (product.width_mm) document.getElementById("specWidth").innerHTML = `Width: <strong>${product.width_mm}MM</strong>`;
+    document.getElementById("specThickness").style.display = product.thickness_mm ? "block" : "none";
+    if (product.thickness_mm) document.getElementById("specThickness").innerHTML = `Thickness: <strong>${product.thickness_mm} mm</strong>`;
+
+    const diamondCol = document.getElementById("specDiamondCol");
+    if (product.has_diamond && product.diamond_weight_ct) {
+      diamondCol.style.display = "block";
+      document.getElementById("specDiamondWeight").innerHTML = `Weight: <strong>${product.diamond_weight_ct} ct</strong>`;
+    } else {
+      diamondCol.style.display = "none";
+    }
+
+    document.getElementById("specMetalType").innerHTML = `Type: <strong>${KARAT_LABELS[selectedKarat]}</strong>`;
+    document.getElementById("specNetWeight").style.display = weightGrams ? "block" : "none";
+    if (weightGrams) document.getElementById("specNetWeight").innerHTML = `Net Weight (approx): <strong>${weightGrams.toFixed(2)} g</strong>`;
+
+    const fmt = (n) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+    document.getElementById("specGold").innerHTML = `Gold: <strong>${fmt(displayPrice * (product.gold_share_pct || 0) / 100)}</strong>`;
+    const diamondPriceEl = document.getElementById("specDiamondPrice");
+    if (product.has_diamond && product.diamond_share_pct) {
+      diamondPriceEl.style.display = "block";
+      diamondPriceEl.innerHTML = `Diamond: <strong>${fmt(displayPrice * product.diamond_share_pct / 100)}</strong>`;
+    } else {
+      diamondPriceEl.style.display = "none";
+    }
+    document.getElementById("specMaking").innerHTML = `Making: <strong>${fmt(displayPrice * (product.making_share_pct || 0) / 100)}</strong>`;
+    document.getElementById("specGst").innerHTML = `GST: <strong>${fmt(displayPrice * (product.gst_share_pct || 0) / 100)}</strong>`;
   }
 
   refreshDisplayedPrice();
