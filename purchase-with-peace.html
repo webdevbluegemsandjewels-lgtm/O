@@ -24,16 +24,18 @@
   .peace-split{
     display:grid;
     grid-template-columns: 1.1fr .9fr;
+    grid-template-areas: "head img" "text img";
     align-items: center;
-    gap: 2.2rem;
+    gap: .3rem 2.2rem;
   }
-  .peace-split-body{ order: 1; max-width: 58ch; }
-  .peace-split img, .peace-split video{ order: 2; }
-  .peace-split-reverse .peace-split-body{ order: 2; }
-  .peace-split-reverse .peace-split img,
-  .peace-split-reverse .peace-split video{ order: 1; }
+  .peace-split-reverse .peace-split{
+    grid-template-areas: "img head" "img text";
+  }
+  .peace-split-head{ grid-area: head; max-width: 58ch; }
+  .peace-split-text{ grid-area: text; max-width: 58ch; }
+  .peace-split img, .peace-split video{ grid-area: img; }
   .peace-split-title{ font-size: clamp(1.85rem, 2.8vw, 2.55rem); line-height:1.1; margin: 0 0 .35rem; }
-  .peace-split-body .eyebrow{ display:block; margin-bottom: .6rem; }
+  .peace-split-head .eyebrow{ display:block; }
   .peace-split img, .peace-split video{
     width: 100%;
     max-width: 480px;
@@ -41,12 +43,14 @@
     border-radius: 10px;
     justify-self: center;
   }
-  .peace-split-body p{ margin-bottom: .6rem; line-height:1.65; color: var(--ink-soft); }
-  .peace-split-body .btn{ margin-top:.3rem; }
+  .peace-split-text p{ margin-bottom: .6rem; line-height:1.65; color: var(--ink-soft); }
+  .peace-split-text .btn{ margin-top:.3rem; }
   @media (max-width: 760px){
-    .peace-split{ grid-template-columns: 1fr; }
-    .peace-split-body{ order: 2 !important; }
-    .peace-split img, .peace-split video{ order: 1 !important; max-width: 100%; }
+    .peace-split, .peace-split-reverse .peace-split{
+      grid-template-columns: 1fr;
+      grid-template-areas: "head" "img" "text";
+    }
+    .peace-split img, .peace-split video{ max-width: 100%; }
   }
 
   .factory-head{ text-align:center; margin-bottom: 1.2rem; }
@@ -115,60 +119,70 @@
 </section>
 <section>
   <div class="container peace-split">
-    <div class="peace-split-body">
+    <div class="peace-split-head">
       <h2 class="peace-split-title">SGL Certified Diamond</h2>
       <p class="eyebrow">Certified &amp; verified</p>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image1.png" alt="SGL certified diamond jewellery" loading="lazy" />
+    <div class="peace-split-text">
       <p>Every diamond we set comes with its own Certificate of Authenticity from SGL — and each certificate can be independently verified on the SGL website, so you always know exactly what you're wearing.</p>
       <p>Combined with our BIS hallmarking on gold, it means every OrenkaFine piece can be checked and trusted, long after it leaves our hands.</p>
     </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image1.png" alt="SGL certified diamond jewellery" loading="lazy" />
   </div>
 </section>
 <section class="peace-split-reverse section-dim">
   <div class="container peace-split">
-    <div class="peace-split-body">
+    <div class="peace-split-head">
       <h2 class="peace-split-title">BIS Hallmarked Gold</h2>
       <p class="eyebrow">Purity guaranteed</p>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image2.png" alt="BIS hallmarked gold jewellery" loading="lazy" />
+    <div class="peace-split-text">
       <p>All OrenkaFine jewellery meets the standards set by the Bureau of Indian Standards (BIS). Every piece is hallmarked for gold purity, with its HUID printed right on your invoice.</p>
       <p>The Hallmark Unique Identification (HUID) is a six-digit alphanumeric code, unique to every single piece of jewellery — assigned and hand-stamped at the Assaying &amp; Hallmarking Centre at the time of hallmarking. You can look it up any time on the official BIS portal or the BIS Care app.</p>
       <p>Our diamond jewellery carries its SGL certification alongside the gold hallmark, so both the metal and the stone are independently verified.</p>
     </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image2.png" alt="BIS hallmarked gold jewellery" loading="lazy" />
   </div>
 </section>
 <section>
   <div class="container peace-split">
-    <div class="peace-split-body">
+    <div class="peace-split-head">
       <h2 class="peace-split-title">15 Day Return</h2>
       <p class="eyebrow">Change of heart</p>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image3.png" alt="Jewellery packed for a return" loading="lazy" />
+    <div class="peace-split-text">
       <p>Live with your purchase at home, and if it isn't quite right, sending it back is easy. We offer an exchange or a full refund within 15 days of delivery, processed once our QA team has inspected the piece — and return shipping is on us.</p>
       <p>To be eligible, jewellery must be unworn, with all tags attached and the original packaging intact.</p>
       <p>Engraved or customised pieces aren't eligible for return or exchange, though our Lifetime Exchange &amp; Buyback still applies.</p>
       <a href="contact.html" class="btn btn-outline-dark">Know more</a>
     </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image3.png" alt="Jewellery packed for a return" loading="lazy" />
   </div>
 </section>
 <section class="peace-split-reverse section-dim">
   <div class="container peace-split">
-    <div class="peace-split-body">
+    <div class="peace-split-head">
       <h2 class="peace-split-title">Fast &amp; Secure Shipping</h2>
       <p class="eyebrow">On its way to you</p>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image4.png" alt="Jewellery box being securely shipped" loading="lazy" />
+    <div class="peace-split-text">
       <p>Your jewellery is fully insured until it reaches your doorstep, and we work only with reputed, established courier partners. Every order is packed in a tamper-proof box and sent straight to you, free of charge — typically arriving 2-3 business days after dispatch.</p>
       <p>Please don't accept any package that looks like it's been tampered with — get in touch with us right away instead.</p>
     </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image4.png" alt="Jewellery box being securely shipped" loading="lazy" />
   </div>
 </section>
 <section>
   <div class="container peace-split">
-    <div class="peace-split-body">
+    <div class="peace-split-head">
       <h2 class="peace-split-title">Lifetime Exchange &amp; Buyback</h2>
       <p class="eyebrow">For years to come</p>
+    </div>
+    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image5.png" alt="Jewellery being exchanged" loading="lazy" />
+    <div class="peace-split-text">
       <p>Every OrenkaFine purchase comes with a Lifetime Exchange &amp; Buyback. Bring your piece back with its original certificate, and we'll exchange it or buy it back at its current market value — less making charges and a &#8377;500 return-shipping fee.</p>
       <a href="contact.html" class="btn btn-outline-dark">Know more</a>
     </div>
-    <img src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Pwp/image5.png" alt="Jewellery being exchanged" loading="lazy" />
   </div>
 </section>
 <section>
