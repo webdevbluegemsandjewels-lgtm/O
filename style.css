@@ -729,7 +729,7 @@ section{ padding: 3rem 0; }
 .cat-item h4{ font-size: 1.05rem; letter-spacing:.04em; }
 
 .unique-set{
-  background: linear-gradient(180deg, #efe6d6 0%, #e7dcc9 100%);
+  background: url("https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/Index/uniquebg.png") center/cover no-repeat;
 }
 
 .unique-set-content{
@@ -1056,6 +1056,13 @@ section{ padding: 3rem 0; }
   font-size:.76rem; color: var(--ink-soft);
 }
 .footer-bottom .legal-links{ display:flex; gap: 1.4rem; }
+
+.popular-searches{ padding: 1.6rem 0; border-top: 1px solid var(--line-light); display:flex; flex-direction:column; gap:1.2rem; }
+.popular-block h5{ font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
+.popular-links{ display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; font-size:.78rem; }
+.popular-links a{ color:var(--ink-soft); text-decoration:none; text-transform:uppercase; letter-spacing:.02em; }
+.popular-links a:hover{ color:var(--ink); text-decoration:underline; }
+.popular-links span{ color:var(--line); }
 
 .footer-newsletter input{ padding:.6rem .8rem; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:6px; }
 .footer-newsletter .btn{ background:var(--gold); color:var(--ink); border-color:var(--gold); }

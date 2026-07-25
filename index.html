@@ -10,8 +10,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .home-page{ background:#fff; }
+  .home-page section:not(.hero):not(.unique-set){ background:#fff; }
+  .featured-products .section-head,
+  .featured-products ~ section .section-head{ flex-direction:column; align-items:center; text-align:center; }
+  .marquee-wrap{
+    overflow:hidden; margin-top:.6rem;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .marquee-track{ display:flex; gap:1.3rem; width:max-content; }
+  .testimonial-item.testimonial-card{ flex:0 0 320px; padding:1.3rem 1.5rem; }
+  .testimonial-item .stars{ color:var(--gold); font-size:.9rem; margin-bottom:.4rem; letter-spacing:.15em; }
+  .testimonial-item p{ margin-bottom:.7rem; }
+  .recommend-item{ flex:0 0 220px; }
+  @media (max-width: 760px){
+    .testimonial-item{ flex-basis:280px; }
+    .recommend-item{ flex-basis:180px; }
+  }
+</style>
 </head>
-<body>
+<body class="home-page">
 
 <!-- ============ UTILITY BAR ============ -->
 <div class="utility-bar">
@@ -143,9 +163,8 @@
     </div>
   </div>
 </section>
-
 <!-- ============ FEATURED PRODUCTS ============ -->
-<section>
+<section class="featured-products">
   <div class="container">
     <div class="section-head">
       <div>
@@ -170,8 +189,6 @@
     </div>
   </div>
 </section>
-
-
 <!-- ============ CATEGORIES ============ -->
 <section class="section-dim">
   <div class="container">
@@ -206,7 +223,6 @@
     </div>
   </div>
 </section>
-
 <section class="section-dim unique-set">
   <div class="container">
     <div class="section-head">
@@ -216,16 +232,12 @@
         </h2>
       </div>
     </div>
-
     <div class="unique-set-content">
       <div class="unique-set-copy">
         <p>Explore the premium set through interactive hotspots. Tap each pin to reveal styling details, pricing and craftsmanship notes for the necklace, earrings and bracelet.</p>
-        
       </div>
-
       <div class="image-container">
         <img src="Assets/Set/1783932728470-019f5aac-ff07-786e-9e88-3da546966c0b.png" alt="Jewellery" />
-
         <div class="hotspot necklace">
           <span class="pulse"></span>
           <div class="card right">
@@ -237,7 +249,6 @@
             </div>
           </div>
         </div>
-
         <div class="hotspot earring">
           <span class="pulse"></span>
           <div class="card right">
@@ -249,7 +260,6 @@
             </div>
           </div>
         </div>
-
         <div class="hotspot bracelet">
           <span class="pulse"></span>
           <div class="card left">
@@ -265,7 +275,35 @@
     </div>
   </div>
 </section>
- 
+<!-- ============ CUSTOMER REVIEWS ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Reviews</p>
+        <h2 class="section-title">What Our Customers Say</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap testimonial-marquee">
+      <div class="marquee-track" id="testimonialTrack"></div>
+    </div>
+  </div>
+</section>
+<!-- ============ PRODUCT RECOMMENDATIONS ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Just for you</p>
+        <h2 class="section-title">Recommended For You</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap recommend-marquee">
+      <div class="marquee-track" id="recommendTrack"></div>
+    </div>
+  </div>
+</section>
+
 <footer class="site-footer" id="footer"></footer>
 
 <button class="to-top" aria-label="Back to top">
@@ -273,6 +311,7 @@
 </button>
 
 <script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
 <script src="js/auth-modal.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/products.js"></script>
@@ -296,6 +335,42 @@
   // unique picks (dark section) — different slice of products
   const unique = document.getElementById("unique-picks");
   if (unique) unique.innerHTML = PRODUCTS.slice(4, 8).map(productCardHTML).join("");
+
+  // customer reviews
+  const TESTIMONIALS = [
+    { name: "Priya Sharma", text: "The quality exceeded my expectations. The finish, sparkle, and craftsmanship are absolutely beautiful." },
+    { name: "Rahul Mehta", text: "I love knowing that I'm buying directly from the brand. The quality is outstanding and the pricing feels honest." },
+    { name: "Neha Kapoor", text: "Elegant packaging, quick delivery, and a necklace that looks even more stunning in person." },
+    { name: "Aditi Verma", text: "My favourite jewellery purchase. Beautifully crafted and perfect for everyday luxury." },
+  ];
+  function testimonialCardHTML(t) {
+    return `
+      <div class="testimonial-card testimonial-item">
+        <p class="stars">★★★★★</p>
+        <p>&ldquo;${t.text}&rdquo;</p>
+        <span>${t.name}</span>
+      </div>
+    `;
+  }
+  const testimonialTrack = document.getElementById("testimonialTrack");
+  if (testimonialTrack) {
+    testimonialTrack.innerHTML = [...TESTIMONIALS, ...TESTIMONIALS].map(testimonialCardHTML).join("");
+    initDraggableMarquee(testimonialTrack, 60);
+  }
+
+  // product recommendations
+  const recommendTrack = document.getElementById("recommendTrack");
+  if (recommendTrack && typeof loadProductsFromDB === "function") {
+    loadProductsFromDB().then((products) => {
+      const picks = products.slice(0, 10);
+      if (!picks.length) return;
+      recommendTrack.innerHTML = [...picks, ...picks]
+        .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)
+        .join("");
+      attachProductHoverSwap();
+      initDraggableMarquee(recommendTrack, 50);
+    });
+  }
 </script>
 </body>
 </html>

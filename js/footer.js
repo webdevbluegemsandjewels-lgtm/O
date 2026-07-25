@@ -2,6 +2,44 @@
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("footer");
   if (!el || el.children.length) return;
+
+  // Terms that match a real shop category link straight into it (collections.html?cat=…);
+  // everything else (price bands, marketing collection names, unstocked categories) falls
+  // back to the general collections page since there's no matching filter to deep-link to.
+  const POPULAR_SEARCHES = [
+    ["Rings", "collections.html?cat=Rings"],
+    ["Necklaces", "collections.html?cat=Necklaces"],
+    ["Bangles & Bracelets", "collections.html?cat=Bracelets"],
+    ["Earrings", "collections.html?cat=Earrings"],
+    ["Custom Solitaire Jewellery", "collections.html"],
+    ["Loose Diamonds", "collections.html"],
+    ["Charms & Pendants", `collections.html?cat=${encodeURIComponent("Charms & Pendants")}`],
+    ["Gold Chains", "collections.html?cat=Necklaces"],
+    ["Engravable Jewellery", "collections.html"],
+    ["Nose Pins", "collections.html"],
+    ["Kids Jewellery", "collections.html"],
+    ["Men's Jewellery", "collections.html"],
+    ["Under ₹15K", "collections.html"],
+    ["Under ₹25K", "collections.html"],
+    ["Mangalsutra", "collections.html?cat=Necklaces"],
+    ["Pre-Set Solitaire Rings", "collections.html?cat=Rings"],
+    ["Diamond Earrings", "collections.html?cat=Earrings"],
+  ];
+  const POPULAR_COLLECTIONS = [
+    ["Script Necklaces", "collections.html"],
+    ["Evil Eye Collection", "collections.html"],
+    ["Bunchberry Collection", "collections.html"],
+    ["Space Letter Necklaces", "collections.html"],
+    ["Tiny Studs", "collections.html"],
+    ["Name Necklaces", "collections.html"],
+    ["Office Wear Jewellery", "collections.html"],
+    ["Eternity Rings", "collections.html"],
+    ["Fashion Earrings", "collections.html"],
+    ["Pendant Necklaces", "collections.html"],
+  ];
+  const popularLinksHTML = (items) =>
+    items.map(([label, href]) => `<a href="${href}">${label}</a>`).join('<span aria-hidden="true">|</span>');
+
   el.innerHTML = `
     <div class="container">
       <div class="footer-top">
@@ -51,6 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="about.html">Warranty</a></li>
             <li><a href="about.html">Cookie Policy</a></li>
           </ul>
+        </div>
+      </div>
+      <div class="popular-searches">
+        <div class="popular-block">
+          <h5>Popular Searches</h5>
+          <nav class="popular-links" aria-label="Popular searches">${popularLinksHTML(POPULAR_SEARCHES)}</nav>
+        </div>
+        <div class="popular-block">
+          <h5>Popular Collections</h5>
+          <nav class="popular-links" aria-label="Popular collections">${popularLinksHTML(POPULAR_COLLECTIONS)}</nav>
         </div>
       </div>
       <div class="footer-bottom">
