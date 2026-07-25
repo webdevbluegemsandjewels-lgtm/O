@@ -167,6 +167,97 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// Drives a ".marquee-track" (duplicated-content, infinite-loop strip):
+// auto-scrolls via rAF, pauses on hover, and lets the user grab/drag
+// (mouse or touch, via Pointer Events) to scroll it manually. Dragging
+// past a few pixels suppresses the click so it doesn't also navigate
+// a product-card-link underneath the pointer.
+function initDraggableMarquee(track, pxPerSecond) {
+  if (!track || track.dataset.marqueeInit) return;
+  track.dataset.marqueeInit = "1";
+  track.style.animation = "none";
+  track.style.cursor = "grab";
+  track.style.touchAction = "pan-y";
+
+  let x = 0;
+  let halfWidth = track.scrollWidth / 2;
+  let hovered = false;
+  let dragging = false;
+  let dragStartX = 0;
+  let dragStartTranslate = 0;
+  let dragDistance = 0;
+  let lastTime = null;
+
+  const recalc = () => { halfWidth = track.scrollWidth / 2 || 1; };
+  new ResizeObserver(recalc).observe(track);
+
+  const apply = () => { track.style.transform = `translateX(${x}px)`; };
+  const wrap = () => {
+    if (x <= -halfWidth) x += halfWidth;
+    if (x > 0) x -= halfWidth;
+  };
+
+  function frame(t) {
+    if (lastTime == null) lastTime = t;
+    const dt = (t - lastTime) / 1000;
+    lastTime = t;
+    if (!dragging && !hovered) {
+      x -= pxPerSecond * dt;
+      wrap();
+      apply();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  track.addEventListener("mouseenter", () => { hovered = true; });
+  track.addEventListener("mouseleave", () => { hovered = false; });
+
+  // Pointer capture / active dragging only kick in once the pointer has
+  // actually moved past a small threshold — a plain click/tap on a
+  // product-card-link (or any button) inside the track is never touched,
+  // so it navigates exactly like it would outside the marquee.
+  let pointerDownId = null;
+  let pressStartX = 0;
+
+  track.addEventListener("pointerdown", (e) => {
+    pointerDownId = e.pointerId;
+    dragDistance = 0;
+    pressStartX = e.clientX;
+  });
+  track.addEventListener("pointermove", (e) => {
+    if (pointerDownId !== e.pointerId) return;
+    if (!dragging) {
+      if (Math.abs(e.clientX - pressStartX) < 4) return;
+      dragging = true;
+      dragStartX = e.clientX;
+      dragStartTranslate = x;
+      track.style.cursor = "grabbing";
+      track.setPointerCapture(e.pointerId);
+    }
+    dragDistance += Math.abs(e.movementX || 0);
+    x = dragStartTranslate + (e.clientX - dragStartX);
+    wrap();
+    apply();
+  });
+  const endDrag = () => {
+    pointerDownId = null;
+    dragging = false;
+    track.style.cursor = "grab";
+  };
+  track.addEventListener("pointerup", endDrag);
+  track.addEventListener("pointercancel", endDrag);
+
+  // Swallow the click that follows an actual drag so it doesn't also
+  // trigger navigation on a product-card-link the pointer ends up over.
+  track.addEventListener("click", (e) => {
+    if (dragDistance > 5) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+}
+
 function attachProductHoverSwap() {
   document.querySelectorAll(".product-card").forEach((card) => {
     const img = card.querySelector("img");

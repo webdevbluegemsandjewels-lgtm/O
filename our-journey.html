@@ -79,16 +79,12 @@
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
   }
-  .marquee-track{ display:flex; gap: 1.3rem; width: max-content; animation: marqueeScroll linear infinite; }
-  .marquee-track:hover{ animation-play-state: paused; }
-  @keyframes marqueeScroll{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+  .marquee-track{ display:flex; gap: 1.3rem; width: max-content; }
 
-  .testimonial-marquee .marquee-track{ animation-duration: 34s; }
   .testimonial-item.testimonial-card{ flex: 0 0 320px; padding: 1.3rem 1.5rem; }
   .testimonial-item .stars{ color: var(--gold); font-size:.9rem; margin-bottom:.4rem; letter-spacing:.15em; }
   .testimonial-item p{ margin-bottom: .7rem; }
 
-  .recommend-marquee .marquee-track{ animation-duration: 38s; }
   .recommend-item{ flex: 0 0 220px; }
 
   @media (max-width: 760px){
@@ -521,11 +517,12 @@
     `;
   }
 
-  // Marquees loop by duplicating the item list once and animating to
+  // Marquees loop by duplicating the item list once and scrolling to
   // -50% — as long as both halves render identically, the seam is invisible.
   const testimonialTrack = document.getElementById("testimonialTrack");
   if (testimonialTrack) {
     testimonialTrack.innerHTML = [...TESTIMONIALS, ...TESTIMONIALS].map(testimonialCardHTML).join("");
+    initDraggableMarquee(testimonialTrack, 60);
   }
 
   const recommendTrack = document.getElementById("recommendTrack");
@@ -537,6 +534,7 @@
         .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)
         .join("");
       attachProductHoverSwap();
+      initDraggableMarquee(recommendTrack, 50);
     });
   }
 
