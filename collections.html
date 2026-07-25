@@ -10,16 +10,40 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .gift-promo-banner{
-      background: var(--gold-pale);
+    .collections-page section:not(.collections-hero){ background: #fff; }
+
+    /* Gift section */
+    .collections-page section.gift-promo-banner{
+      background: #fff2d6;
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
+      padding: 1rem 0;
+      margin: 0;
     }
+
+    /* Container */
+    .gift-promo-banner .container{
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    /* Inner content */
     .gift-promo-inner{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:1.2rem; flex-wrap:wrap; padding: 1rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      flex-wrap: wrap;
+      padding: 0;
+      min-height: 70px;
     }
-    .gift-promo-inner p{ margin:0; font-size:.95rem; color: var(--ink); }
+    .gift-promo-inner p{
+      margin: 0;
+      line-height: 1.4;
+      font-size: .95rem;
+      color: var(--ink);
+    }
+    .gift-promo-inner .btn{ margin: 0; }
     @media (max-width:640px){
       .gift-promo-inner{ flex-direction:column; align-items:flex-start; }
     }
@@ -45,7 +69,7 @@
     }
   </style>
   </head>
-  <body>
+  <body class="collections-page">
 
   <div class="utility-bar">
     <div class="container">
@@ -97,9 +121,8 @@
       <a href="gift-card.html" class="btn btn-outline-dark">Explore Digital Gift Cards</a>
     </div>
   </section>
-
   <!-- Shop with sidebar filters and toolbar -->
-  <section class="section-dim">
+  <section>
     <div class="container">
       <div class="section-head">
         <div>
@@ -200,6 +223,7 @@
   <script src="js/main.js"></script>
   <script src="js/search.js"></script>
   <script src="js/footer.js"></script>
+  <script src="js/guide-modals.js"></script>
   <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const SHOP_CATS = ["Rings", "Bracelets", "Necklaces", "Earrings", "Ear Cuffs", "Charms & Pendants"];

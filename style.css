@@ -24,12 +24,13 @@
 }
 
 *,*::before,*::after{ box-sizing: border-box; }
-html{ scroll-behavior: smooth; width: 100%; overflow-x: hidden; }
+html{ scroll-behavior: smooth; width: 100%; overflow-x: hidden; overflow-x: clip; }
 img, video, canvas, svg{ max-width: 100%; height: auto; }
 body{
   margin:0;
   width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
   background: var(--bone);
   color: var(--ink);
   font-family: var(--font-body);
@@ -1036,7 +1037,7 @@ section{ padding: 3rem 0; }
    ========================================================= */
 .site-footer{ background: var(--bone); color: var(--ink); padding-top: 4rem; border-top: 1px solid var(--line-light); }
 .footer-top{
-  display:grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 2.4rem;
+  display:grid; grid-template-columns: 1.4fr repeat(5, 1fr); gap: 2rem;
   padding-bottom: 2.4rem;
 }
 .footer-brand .brand{ color: var(--ink); display:inline-flex; align-items:center; gap:.6rem; }
@@ -1230,6 +1231,16 @@ section{ padding: 3rem 0; }
 .filter-check-row .swatch-label{ display:flex; align-items:center; gap:.6rem; }
 .filter-check-row .count{ color:var(--ink-soft); font-size:.78rem; }
 .shop-layout{ display:grid; grid-template-columns:220px 1fr; gap:2.4rem; align-items:start; }
+@media (min-width:901px){
+  .shop-sidebar{
+    position: sticky;
+    align-self: start;
+    top: 104px;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+    z-index: 2;
+  }
+}
 @media (max-width:900px){
   .shop-layout{ grid-template-columns:1fr; }
   .filter-drawer-toggle{ display:inline-flex; align-items:center; justify-content:center; }

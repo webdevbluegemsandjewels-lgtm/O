@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Purchase with Peace — OrenkaFine Fine &amp; Fashion Jewellery</title>
+<meta name="description" content="Shop OrenkaFine with confidence — SGL certified diamonds, BIS hallmarked gold, 15 day returns, fully insured shipping and a lifetime exchange & buyback." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .peace-page section:not(.hero):not(.newsletter){ padding: 1rem 0; background: #fff; }
+  .peace-page .newsletter{ background: var(--emerald); color: var(--bone); }
+  .peace-page .newsletter h2{ color: var(--bone); }
+  .peace-page .newsletter p{ color: var(--bone-dim); }
+  .peace-page .field-row input[type="email"]{
+    background: #fff; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: .8rem 1rem;
+  }
+  .peace-page .field-row input::placeholder{ color: var(--ink-soft); }
+  .peace-page .section-head{ justify-content:center; text-align:center; margin-bottom: 1.4rem; }
+
+  .peace-split{
+    display:grid;
+    grid-template-columns: 1.1fr .9fr;
+    align-items: center;
+    gap: 2.2rem;
+  }
+  .peace-split-body{ order: 1; max-width: 58ch; }
+  .peace-split img, .peace-split video{ order: 2; }
+  .peace-split-reverse .peace-split-body{ order: 2; }
+  .peace-split-reverse .peace-split img,
+  .peace-split-reverse .peace-split video{ order: 1; }
+  .peace-split-title{ font-size: clamp(1.85rem, 2.8vw, 2.55rem); line-height:1.1; margin: 0 0 .35rem; }
+  .peace-split-body .eyebrow{ display:block; margin-bottom: .6rem; }
+  .peace-split img, .peace-split video{
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    border-radius: 10px;
+    justify-self: center;
+  }
+  .peace-split-body p{ margin-bottom: .6rem; line-height:1.65; color: var(--ink-soft); }
+  .peace-split-body .btn{ margin-top:.3rem; }
+  @media (max-width: 760px){
+    .peace-split{ grid-template-columns: 1fr; }
+    .peace-split-body{ order: 2 !important; }
+    .peace-split img, .peace-split video{ order: 1 !important; max-width: 100%; }
+  }
+
+  .factory-head{ text-align:center; margin-bottom: 1.2rem; }
+  .factory-video{
+    width:100%; max-width: 900px; aspect-ratio: 16/9; object-fit:cover;
+    border-radius: 12px; display:block; margin: 0 auto;
+  }
+  .factory-body{ max-width: 62ch; margin: 1.2rem auto 0; text-align:center; }
+  .factory-body p{ color: var(--ink-soft); line-height:1.65; margin-bottom: 1rem; }
+
+  .marquee-wrap{
+    overflow:hidden; margin-top:.4rem;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .marquee-track{ display:flex; gap:1.3rem; width:max-content; }
+  .testimonial-item.testimonial-card{ flex:0 0 320px; padding:1.3rem 1.5rem; }
+  .testimonial-item .stars{ color:var(--gold); font-size:.9rem; margin-bottom:.4rem; letter-spacing:.15em; }
+  .testimonial-item p{ margin-bottom:.7rem; }
+  .recommend-item{ flex:0 0 220px; }
+  @media (max-width: 760px){
+    .testimonial-item{ flex-basis:280px; }
+    .recommend-item{ flex-basis:180px; }
+  }
+</style>
+</head>
+<body class="peace-page">
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="our-journey.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+<section class="hero page-hero">
+  <div class="hero-media">
+    <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1605201206717-cb9eca0d2eb2?auto=format&fit=crop&w=1600&q=80">
+      <source src="Assets/Hero/hero6.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="container hero-content">
+    <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Purchase with Peace</p>
+    <p class="eyebrow">Buy with confidence</p>
+    <h1>Purchase with Peace</h1>
+  </div>
+</section>
+<section>
+  <div class="container peace-split">
+    <div class="peace-split-body">
+      <h2 class="peace-split-title">SGL Certified Diamond</h2>
+      <p class="eyebrow">Certified &amp; verified</p>
+      <p>Every diamond we set comes with its own Certificate of Authenticity from SGL — and each certificate can be independently verified on the SGL website, so you always know exactly what you're wearing.</p>
+      <p>Combined with our BIS hallmarking on gold, it means every OrenkaFine piece can be checked and trusted, long after it leaves our hands.</p>
+    </div>
+    <img src="https://images.unsplash.com/photo-1605201206717-cb9eca0d2eb2?auto=format&fit=crop&w=800&q=80" alt="SGL certified diamond jewellery" loading="lazy" />
+  </div>
+</section>
+<section class="peace-split-reverse section-dim">
+  <div class="container peace-split">
+    <div class="peace-split-body">
+      <h2 class="peace-split-title">BIS Hallmarked Gold</h2>
+      <p class="eyebrow">Purity guaranteed</p>
+      <p>All OrenkaFine jewellery meets the standards set by the Bureau of Indian Standards (BIS). Every piece is hallmarked for gold purity, with its HUID printed right on your invoice.</p>
+      <p>The Hallmark Unique Identification (HUID) is a six-digit alphanumeric code, unique to every single piece of jewellery — assigned and hand-stamped at the Assaying &amp; Hallmarking Centre at the time of hallmarking. You can look it up any time on the official BIS portal or the BIS Care app.</p>
+      <p>Our diamond jewellery carries its SGL certification alongside the gold hallmark, so both the metal and the stone are independently verified.</p>
+    </div>
+    <img src="https://images.unsplash.com/photo-1598009632415-1b42a2c686b6?auto=format&fit=crop&w=800&q=80" alt="BIS hallmarked gold jewellery" loading="lazy" />
+  </div>
+</section>
+<section>
+  <div class="container peace-split">
+    <div class="peace-split-body">
+      <h2 class="peace-split-title">15 Day Return</h2>
+      <p class="eyebrow">Change of heart</p>
+      <p>Live with your purchase at home, and if it isn't quite right, sending it back is easy. We offer an exchange or a full refund within 15 days of delivery, processed once our QA team has inspected the piece — and return shipping is on us.</p>
+      <p>To be eligible, jewellery must be unworn, with all tags attached and the original packaging intact.</p>
+      <p>Engraved or customised pieces aren't eligible for return or exchange, though our Lifetime Exchange &amp; Buyback still applies.</p>
+      <a href="contact.html" class="btn btn-outline-dark">Know more</a>
+    </div>
+    <img src="https://images.unsplash.com/photo-1640724390912-4d92d9a985fe?auto=format&fit=crop&w=800&q=80" alt="Jewellery packed for a return" loading="lazy" />
+  </div>
+</section>
+<section class="peace-split-reverse section-dim">
+  <div class="container peace-split">
+    <div class="peace-split-body">
+      <h2 class="peace-split-title">Fast &amp; Secure Shipping</h2>
+      <p class="eyebrow">On its way to you</p>
+      <p>Your jewellery is fully insured until it reaches your doorstep, and we work only with reputed, established courier partners. Every order is packed in a tamper-proof box and sent straight to you, free of charge — typically arriving 2-3 business days after dispatch.</p>
+      <p>Please don't accept any package that looks like it's been tampered with — get in touch with us right away instead.</p>
+    </div>
+    <img src="https://images.unsplash.com/photo-1736855719599-c0298b8faf95?auto=format&fit=crop&w=800&q=80" alt="Jewellery box being securely shipped" loading="lazy" />
+  </div>
+</section>
+<section>
+  <div class="container peace-split">
+    <div class="peace-split-body">
+      <h2 class="peace-split-title">Lifetime Exchange &amp; Buyback</h2>
+      <p class="eyebrow">For years to come</p>
+      <p>Every OrenkaFine purchase comes with a Lifetime Exchange &amp; Buyback. Bring your piece back with its original certificate, and we'll exchange it or buy it back at its current market value — less making charges and a &#8377;500 return-shipping fee.</p>
+      <a href="contact.html" class="btn btn-outline-dark">Know more</a>
+    </div>
+    <img src="https://images.unsplash.com/photo-1589128530085-7e772389eb7a?auto=format&fit=crop&w=800&q=80" alt="Jewellery being exchanged" loading="lazy" />
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="factory-head">
+      <p class="eyebrow">Behind every piece</p>
+      <h2 class="section-title">Our Factory</h2>
+    </div>
+    <video class="factory-video" autoplay muted loop playsinline preload="metadata">
+      <source src="Pwp/Op.mp4" type="video/mp4" />
+    </video>
+    <div class="factory-body">
+      <p>Every setting, hallmark and certificate starts on the bench in our own workshop, where goldsmiths finish each piece in small batches rather than on a production line. Quality control happens at every stage — from casting through to the final polish — before a piece is ever hallmarked, certified or packed for you.</p>
+      <a href="about.html" class="btn btn-outline-dark">More about our craft</a>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Reviews</p>
+        <h2 class="section-title">What Our Customers Say</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap testimonial-marquee">
+      <div class="marquee-track" id="testimonialTrack"></div>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Just for you</p>
+        <h2 class="section-title">Recommended For You</h2>
+      </div>
+    </div>
+    <div class="marquee-wrap recommend-marquee">
+      <div class="marquee-track" id="recommendTrack"></div>
+    </div>
+  </div>
+</section>
+<section class="newsletter">
+  <div class="container newsletter-inner">
+    <div>
+      <p class="eyebrow">Join the house</p>
+      <h2>Be part of the OrenkaFine world</h2>
+      <p>Sign up for early access to new arrivals, styling edits and members-only offers.</p>
+    </div>
+    <form class="newsletter-form">
+      <div class="field-row">
+        <input type="email" required placeholder="Email address" aria-label="Email address" />
+        <button type="submit" class="btn btn-gold">Subscribe</button>
+      </div>
+    </form>
+  </div>
+</section>
+<footer class="site-footer" id="footer"></footer>
+<button class="to-top" aria-label="Back to top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+<script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/guide-modals.js"></script>
+<script>
+  const TESTIMONIALS = [
+    { name: "Ananya Rao", text: "The SGL certificate gave me total peace of mind — everything matched exactly what was promised." },
+    { name: "Vikram Singh", text: "Returned a ring that didn't fit and had a refund within days, no hassle at all." },
+    { name: "Sanya Kapoor", text: "Loved that the HUID was right there on the invoice. Buying gold has never felt this transparent." },
+    { name: "Ishaan Malhotra", text: "Fast, fully insured shipping and beautifully packed — arrived exactly on time." },
+  ];
+  function testimonialCardHTML(t) {
+    return `
+      <div class="testimonial-card testimonial-item">
+        <p class="stars">★★★★★</p>
+        <p>&ldquo;${t.text}&rdquo;</p>
+        <span>${t.name}</span>
+      </div>
+    `;
+  }
+  const testimonialTrack = document.getElementById("testimonialTrack");
+  if (testimonialTrack) {
+    testimonialTrack.innerHTML = [...TESTIMONIALS, ...TESTIMONIALS].map(testimonialCardHTML).join("");
+    initDraggableMarquee(testimonialTrack, 60);
+  }
+
+  const recommendTrack = document.getElementById("recommendTrack");
+  if (recommendTrack && typeof loadProductsFromDB === "function") {
+    loadProductsFromDB().then((products) => {
+      const picks = products.slice(0, 10);
+      if (!picks.length) return;
+      recommendTrack.innerHTML = [...picks, ...picks]
+        .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)
+        .join("");
+      attachProductHoverSwap();
+      initDraggableMarquee(recommendTrack, 50);
+    });
+  }
+</script>
+</body>
+</html>

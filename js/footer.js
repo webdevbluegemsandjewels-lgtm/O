@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="footer-top">
         <div class="footer-brand">
           <a href="index.html" class="brand">OrenkaFine</a>
-          <p>The world is my catwalk. Fine and fashion jewellery designed for everyday elegance, since 1996.</p>
+          <p>Find your exquisite. Fine and fashion jewellery designed for everyday elegance, since 1996.</p>
           <div class="footer-social">
             <a href="#" class="icon-btn" aria-label="Instagram">IG</a>
             <a href="#" class="icon-btn" aria-label="Facebook">FB</a>
@@ -70,7 +70,18 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="contact.html">Point of Sale</a></li>
             <li><a href="about.html">Care Guide</a></li>
             <li><a href="about.html">Journal</a></li>
+            <li><a href="purchase-with-peace.html">Purchase with Peace</a></li>
             <li><a href="contact.html">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Size Guide</h5>
+          <ul>
+            <li><a href="#" data-guide="size">Ring Size Guide</a></li>
+            <li><a href="#" data-guide="diamond">Diamond Size Guide</a></li>
+            <li><a href="#" data-guide="gold">Gold Size Guide</a></li>
+            <li><a href="#" data-guide="necklace">Necklace Size Guide</a></li>
+            <li><a href="#" data-guide="bracelet">Bracelet Size Guide</a></li>
           </ul>
         </div>
         <div class="footer-col">
