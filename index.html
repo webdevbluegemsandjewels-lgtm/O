@@ -25,9 +25,33 @@
   .testimonial-item .stars{ color:var(--gold); font-size:.9rem; margin-bottom:.4rem; letter-spacing:.15em; }
   .testimonial-item p{ margin-bottom:.7rem; }
   .recommend-item{ flex:0 0 220px; }
+
+  /* Small men's-collection CTA banner between the category band and
+     the Unique Set section — same image+overlay pattern as
+     .brand-card (see style.css), just shorter (that one is a tall
+     520px two-up split; this is one compact full-width card). */
+  .mens-cta-card{
+    position:relative; display:block; overflow:hidden; border-radius:12px;
+    min-height: 260px; color:#fff; text-decoration:none;
+  }
+  .mens-cta-card img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    transition: transform .8s ease;
+  }
+  .mens-cta-card:hover img{ transform: scale(1.04); }
+  .mens-cta-card::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(22,20,15,0) 30%, rgba(22,20,15,.55) 100%);
+  }
+  .mens-cta-content{ position:relative; z-index:2; padding:2rem; max-width: 26rem; }
+  .mens-cta-content .eyebrow{ color: var(--gold-light); margin-bottom:.5rem; }
+  .mens-cta-content .section-title{ color:#fff; margin:0 0 .6rem; }
+  .mens-cta-content p{ margin-bottom:1.2rem; opacity:.9; }
   @media (max-width: 760px){
     .testimonial-item{ flex-basis:280px; }
     .recommend-item{ flex-basis:180px; }
+    .mens-cta-card{ min-height:200px; }
+    .mens-cta-content{ padding:1.4rem; }
   }
 </style>
 </head>
@@ -47,6 +71,7 @@
     <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html" class="active">Collections</a>
+      <a href="mens-collection.html">Men's Collection</a>
       <a href="about.html">The House</a>
       <a href="our-journey.html">Our Story</a>
       <a href="contact.html">Contact</a>
@@ -223,6 +248,20 @@
     </div>
   </div>
 </section>
+<!-- ============ MEN'S COLLECTION CTA ============ -->
+<section class="mens-cta-section">
+  <div class="container">
+    <a href="mens-collection.html" class="mens-cta-card">
+      <img src="https://images.unsplash.com/photo-1615655406736-b37c4fabf923?auto=format&fit=crop&w=1600&q=80" alt="Orenka Men's Collection" loading="lazy" />
+      <div class="mens-cta-content">
+        <p class="eyebrow">Orenka Men</p>
+        <h2 class="section-title">Explore Our Men's Collection</h2>
+        <p>Rings, chains, bracelets and cufflinks, crafted in fine gold.</p>
+        <span class="btn btn-outline-light">Shop Men's Collection</span>
+      </div>
+    </a>
+  </div>
+</section>
 <section class="section-dim unique-set">
   <div class="container">
     <div class="section-head">
@@ -363,7 +402,11 @@
   const recommendTrack = document.getElementById("recommendTrack");
   if (recommendTrack && typeof loadProductsFromDB === "function") {
     loadProductsFromDB().then((products) => {
-      const picks = products.slice(0, 10);
+      // Gift Card rows live in the same products table (see
+      // supabase_schema.sql's Gift Card seed) so they'd otherwise show
+      // up here alongside real jewellery — they're not something to
+      // "recommend."
+      const picks = products.filter((p) => p.cat !== "Gift Card").slice(0, 10);
       if (!picks.length) return;
       recommendTrack.innerHTML = [...picks, ...picks]
         .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)

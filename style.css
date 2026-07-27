@@ -1947,10 +1947,24 @@ body.guide-modal-open{ overflow: hidden; }
 }
 
 .spec-breakup-row{
+  /* grid-row:2 is explicit (desktop >900px) so it can never be
+     disturbed by auto-placement — row1 is gallery+detail side by
+     side (see product.html/product-men.html's own <style> block,
+     which explicitly pins gallery=row1/col1, detail=row1/col2), this
+     is row2, full width. Reset back to auto in each page's own
+     max-width:900px block, where the grid drops to a single column
+     and everything just stacks in DOM order again. */
   grid-column: 1 / -1;
+  grid-row: 2;
   display: flex; gap: 1.4rem;
   padding: 1.6rem 0; margin-top: .6rem;
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  /* An opaque background plus a stacking context keeps this row's
+     text readable even in case anything above it (e.g. the sticky
+     gallery) ever visually extends past its own row for a moment. */
+  position: relative;
+  z-index: 1;
+  background: #fff;
 }
 .spec-col{ flex: 1; min-width: 0; padding-right: 1.4rem; border-right: 1px solid var(--line); }
 .spec-col:last-child{ border-right: none; padding-right: 0; }
@@ -1965,9 +1979,11 @@ body.guide-modal-open{ overflow: hidden; }
   .spec-col p{ font-size: .74rem; }
 }
 
-.product-gallery .product-detail-desc{
-  margin: .3rem 0 0; padding-top: .9rem; border-top: 1px solid var(--line);
-  max-width: none;
+/* Desktop only — nudges "Product Details" (and the row generally) in
+   from the edge a little; mobile/tablet keep the base rule above
+   untouched. */
+@media (min-width: 901px){
+  .spec-breakup-row{ padding-left: 1.4rem; }
 }
 
 @media (max-width: 640px){

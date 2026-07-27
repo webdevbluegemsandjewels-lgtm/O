@@ -493,3 +493,25 @@ alter table public.cart_items add column if not exists selected_size text;
 alter table public.cart_items add column if not exists selected_metal_type text;
 alter table public.cart_items add column if not exists selected_diamond_quality text;
 alter table public.cart_items add column if not exists unit_price numeric;
+
+-- Added: 2026-07-27 — ⚠ NOT YET RUN — run this now (scrape-gabriel-mens.js,
+-- kept outside this repo on the Desktop, inserts rows with a `gender`
+-- column that doesn't exist in the live table yet — that upsert will
+-- fail with an "unknown column" error until this runs)
+-- =========================================================
+-- gender column for men's catalog import
+--
+-- Nothing in this repo filters or displays by gender yet (the "Men's
+-- Jewellery" footer link just points at collections.html with no
+-- filter) — this only adds the column so the scraper's upsert has
+-- somewhere to write "Men". Wiring an actual Men/Women filter into
+-- collections.html is separate, not-yet-done frontend work.
+--
+-- After adding the column, run supabase/seed_mens_products.sql once
+-- to backfill colors, gold weight, material, and the price-breakup
+-- columns for whatever the scraper just inserted — those all default
+-- to null/empty on a fresh insert, same gap the products table had
+-- before seed_product_colors.sql / seed_product_specs.sql ran.
+-- =========================================================
+
+alter table public.products add column if not exists gender text;

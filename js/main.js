@@ -291,7 +291,7 @@ function productCardHTML(p) {
 
   // Real DB-backed products have a slug -> link to the product detail page.
   // Legacy static placeholder products (no slug) stay unlinked for now.
-  const href = p.slug ? `product.html?slug=${encodeURIComponent(p.slug)}` : null;
+  const href = p.slug ? `${p.detailPage || "product.html"}?slug=${encodeURIComponent(p.slug)}` : null;
   const openTag = href ? `<a href="${href}" class="product-card-link">` : "";
   const closeTag = href ? `</a>` : "";
 

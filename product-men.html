@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title id="pageTitle">Product — OrenkaFine</title>
-<meta name="description" id="pageDesc" content="OrenkaFine fine and fashion jewelry." />
+<title id="pageTitle">Product — Orenka Men</title>
+<meta name="description" id="pageDesc" content="Orenka Men's fine jewelry." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
@@ -208,12 +208,12 @@
 
 <section class="product-page-section">
   <div class="container">
-    <p class="breadcrumb" id="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; <a href="collections.html">Collections</a> &nbsp;/&nbsp; <span id="breadcrumbName">Loading…</span></p>
+    <p class="breadcrumb" id="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; <a href="mens-collection.html">Men's Collection</a> &nbsp;/&nbsp; <span id="breadcrumbName">Loading…</span></p>
 
     <div id="loadingState" style="padding: 4rem 0; text-align:center; color: var(--ink-soft);">Loading product…</div>
     <div id="notFoundState" style="display:none; padding: 4rem 0; text-align:center; color: var(--ink-soft);">
       <p>We couldn't find that product.</p>
-      <a href="collections.html" class="btn btn-outline-dark" style="margin-top:1rem;">Back to Collections</a>
+      <a href="mens-collection.html" class="btn btn-outline-dark" style="margin-top:1rem;">Back to Men's Collection</a>
     </div>
 
     <div class="product-page-grid" id="productContent" style="display:none;">
@@ -403,7 +403,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const { data: product, error } = await supabaseClient
-    .from("products")
+    .from("mens_products")
     .select("*")
     .eq("slug", slug)
     .eq("is_active", true)
@@ -416,16 +416,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  document.getElementById("pageTitle").textContent = `${product.name} — OrenkaFine`;
+  document.getElementById("pageTitle").textContent = `${product.name} — Orenka Men`;
   document.getElementById("pageDesc").setAttribute("content", (product.description || "").slice(0, 155));
   document.getElementById("breadcrumbName").textContent = product.name;
 
   const images = (product.gallery && product.gallery.length ? product.gallery : [product.image, product.secondary_image]).filter(Boolean);
   const mainImage = document.getElementById("mainImage");
-  // An empty src makes browsers re-request the current page itself as
-  // "image data," which fails to decode and leaves a broken-image icon
-  // sitting in the sticky gallery box for the rest of the page. Hide
-  // the box entirely instead, and the same for a real image URL that 404s.
+  // An empty src (some scraped men's items have no image at all) makes
+  // browsers re-request the current page itself as "image data," which
+  // fails to decode and leaves a broken-image icon sitting in the
+  // sticky gallery box for the rest of the page. Hide the box entirely
+  // instead, and the same for a real image URL that 404s.
   if (images[0]) {
     mainImage.src = images[0];
     mainImage.onerror = () => { mainImage.closest(".product-gallery-main").style.display = "none"; };
@@ -485,7 +486,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("productName").textContent = product.name;
   document.getElementById("productMaterial").textContent = product.gold_type || "18 karat gold";
   document.getElementById("productBrand").textContent = product.brand || "OrenkaFine";
-  document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the OrenkaFine collection.";
+  document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the Orenka Men's collection.";
 
   if (product.rating) {
     document.getElementById("productRating").innerHTML = `${product.rating} <span class="star">★</span>`;
@@ -542,7 +543,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // actually works today instead of only for future scraper updates.
   const ASSUMED_GOLD_SHARE_OF_PRICE = 0.65;
 
-  // Scraped price is treated as the 18kt baseline (matches Foro's default material).
+  // Scraped price is treated as the 18kt baseline.
   function computeAdjustedPrice(basePrice, weightGrams, karatKey) {
     const baseGoldValue = goldValueAt("18kt", weightGrams);
     const selectedGoldValue = goldValueAt(karatKey, weightGrams);
@@ -561,7 +562,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let siblings = [product];
   if (product.woo_parent_id) {
     const { data: siblingRows } = await supabaseClient
-      .from("products")
+      .from("mens_products")
       .select("*")
       .eq("woo_parent_id", product.woo_parent_id)
       .eq("is_active", true);
@@ -602,7 +603,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("addToCartBtn").disabled = false;
     activeVariant = matched;
     if (matched.image) mainImage.src = matched.image;
-    history.replaceState(null, "", `product.html?slug=${encodeURIComponent(matched.slug)}`);
+    history.replaceState(null, "", `product-men.html?slug=${encodeURIComponent(matched.slug)}`);
     refreshDisplayedPrice();
   }
 
@@ -788,11 +789,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ---------- Product Details / Diamond Details / Metal Details / Price Break Up ----------
-  // Sourced from the products table's *_share_pct columns (see
-  // supabase/seed_product_specs.sql) — those four always add up to
-  // 100, so the ₹ figures shown here always sum back to the
-  // displayed price. Rows/columns with no data on this product are
-  // hidden rather than shown as "₹0" or blank.
+  // Sourced from mens_products's *_share_pct columns (see
+  // supabase/mens_schema.sql) — those four always add up to 100, so
+  // the ₹ figures shown here always sum back to the displayed price.
+  // Rows/columns with no data on this product are hidden rather than
+  // shown as "₹0" or blank.
   const specRow = document.getElementById("specBreakupRow");
   function updateSpecBreakup(displayPrice, weightGrams) {
     if (!product.product_code) {
@@ -898,6 +899,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     trialMenu.classList.remove("open");
     await window.OrenkaFineCart.addItem({
       id: activeVariant.id,
+      source: "men",
       slug: activeVariant.slug,
       name: `${activeVariant.name} (Trial)`,
       image: activeVariant.image || images[0] || "",
@@ -927,6 +929,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await window.OrenkaFineCart.addItem({
       id: activeVariant.id,
+      source: "men",
       slug: activeVariant.slug,
       name: activeVariant.name,
       image: activeVariant.image || images[0] || "",
@@ -945,7 +948,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   productContent.style.display = "grid";
 
   const { data: related } = await supabaseClient
-    .from("products")
+    .from("mens_products")
     .select("*")
     .eq("category", product.category)
     .eq("is_active", true)
@@ -953,7 +956,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     .limit(4);
 
   if (related && related.length) {
-    const relatedCards = related.map(mapDbProductToCard);
+    const relatedCards = related.map((row) => mapDbProductToCard(row, "product-men.html"));
     document.getElementById("relatedGrid").innerHTML = relatedCards.map(productCardHTML).join("");
     relatedSection.style.display = "block";
     if (typeof attachProductHoverSwap === "function") attachProductHoverSwap();
@@ -985,7 +988,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadReviews() {
     const { data: reviews, error: reviewsErr } = await supabaseClient
-      .from("reviews")
+      .from("mens_reviews")
       .select("*")
       .eq("product_id", product.id)
       .order("created_at", { ascending: false });
@@ -1044,7 +1047,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting…";
 
-    const { error: insertErr } = await supabaseClient.from("reviews").insert({
+    const { error: insertErr } = await supabaseClient.from("mens_reviews").insert({
       product_id: product.id,
       user_id: user.id,
       reviewer_name: user.user_metadata?.full_name || null,

@@ -57,28 +57,44 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const shipping = body.shipping || {};
 
-    // Price/quantity come from the caller's real cart_items rows, not
-    // the request body — see security note above.
-    const { data: cartRows, error: cartErr } = await supabase
-      .from("cart_items")
-      .select("product_id, quantity, color, selected_size, selected_metal_type, selected_diamond_quality, unit_price, products(price)")
-      .eq("user_id", userId);
+    // One checkout can span both catalogs — cart_items/products for
+    // women's items, mens_cart_items/mens_products for men's items
+    // (see supabase/mens_schema.sql) — so both are read and combined
+    // into a single priced order below.
+    const [womensCart, mensCart] = await Promise.all([
+      supabase
+        .from("cart_items")
+        .select("product_id, quantity, color, selected_size, selected_metal_type, selected_diamond_quality, unit_price, products(price)")
+        .eq("user_id", userId),
+      supabase
+        .from("mens_cart_items")
+        .select("product_id, quantity, color, selected_size, selected_metal_type, selected_diamond_quality, unit_price, mens_products(price)")
+        .eq("user_id", userId),
+    ]);
 
-    if (cartErr) return json({ error: cartErr.message }, 500);
-    if (!cartRows || cartRows.length === 0) return json({ error: "Your cart is empty" }, 400);
+    if (womensCart.error) return json({ error: womensCart.error.message }, 500);
+    if (mensCart.error) return json({ error: mensCart.error.message }, 500);
+
+    const cartRows = [
+      ...(womensCart.data || []).map((row: any) => ({ ...row, source: "women", basePrice: Number(row.products?.price) || 0 })),
+      ...(mensCart.data || []).map((row: any) => ({ ...row, source: "men", basePrice: Number(row.mens_products?.price) || 0 })),
+    ];
+    if (cartRows.length === 0) return json({ error: "Your cart is empty" }, 400);
 
     // unit_price is legitimately variable (karat/diamond/size adjustments
-    // happen client-side in product.html), but cart_items is writable via
-    // the anon key — a request crafted directly against the REST API
-    // could set an arbitrary (even negative) unit_price on a real
-    // product_id. Floor it against the real product price so a tampered
-    // row can't check out for a fraction of, or less than, nothing.
+    // happen client-side in product.html/product-men.html), but cart_items
+    // is writable via the anon key — a request crafted directly against
+    // the REST API could set an arbitrary (even negative) unit_price on a
+    // real product_id. Floor it against the real product price so a
+    // tampered row can't check out for a fraction of, or less than,
+    // nothing.
     const MIN_PRICE_RATIO = 0.5;
     const orderItems = cartRows.map((row: any) => {
-      const basePrice = Number(row.products?.price) || 0;
+      const basePrice = row.basePrice;
       const claimedPrice = row.unit_price != null ? Number(row.unit_price) : basePrice;
       const price = claimedPrice > 0 && claimedPrice >= basePrice * MIN_PRICE_RATIO ? claimedPrice : basePrice;
       return {
+        source: row.source,
         product_id: row.product_id,
         quantity: row.quantity,
         price,
@@ -133,18 +149,24 @@ serve(async (req) => {
 
     if (orderErr || !orderRow) return json({ error: orderErr?.message || "Could not create order" }, 500);
 
-    const { error: itemsErr } = await supabase.from("order_items").insert(
-      orderItems.map((i) => ({
-        order_id: orderRow.id,
-        product_id: i.product_id,
-        quantity: i.quantity,
-        price: i.price,
-        color: i.color,
-        selected_size: i.selected_size,
-        selected_metal_type: i.selected_metal_type,
-        selected_diamond_quality: i.selected_diamond_quality,
-      }))
-    );
+    const toRow = (i: any) => ({
+      order_id: orderRow.id,
+      product_id: i.product_id,
+      quantity: i.quantity,
+      price: i.price,
+      color: i.color,
+      selected_size: i.selected_size,
+      selected_metal_type: i.selected_metal_type,
+      selected_diamond_quality: i.selected_diamond_quality,
+    });
+    const womensOrderItems = orderItems.filter((i) => i.source === "women").map(toRow);
+    const mensOrderItems = orderItems.filter((i) => i.source === "men").map(toRow);
+
+    const [womensInsert, mensInsert] = await Promise.all([
+      womensOrderItems.length ? supabase.from("order_items").insert(womensOrderItems) : Promise.resolve({ error: null }),
+      mensOrderItems.length ? supabase.from("mens_order_items").insert(mensOrderItems) : Promise.resolve({ error: null }),
+    ]);
+    const itemsErr = womensInsert.error || mensInsert.error;
 
     if (itemsErr) {
       // Order header exists but items failed — mark it failed rather

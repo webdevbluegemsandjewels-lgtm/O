@@ -26,7 +26,16 @@
      await window.OrenkaFineCart.clearCart()
      await window.OrenkaFineCart.getSubtotal()
 
-   variantKey / product shape: { id, color, size, metalType, diamondQuality }
+   variantKey / product shape: { id, color, size, metalType, diamondQuality, source }
+
+   `source` is "women" (default, omit it) or "men" — it's how one
+   shared cart spans the two separate catalogs (public.products /
+   public.mens_products, see supabase/mens_schema.sql). For a
+   signed-in account cart it picks which Supabase table a line lives
+   in (cart_items vs mens_cart_items); for a guest cart it's just
+   another field on the localStorage item. product-men.html passes
+   { source: "men", ... } into addItem(); product.html doesn't set it,
+   which defaults to "women".
    ========================================================= */
 
 const OrenkaFine_CART_KEY = "OrenkaFine_cart_v1";
@@ -49,6 +58,7 @@ function writeLocalCart(items) {
 
 function matchesVariant(item, key) {
   return item.id === key.id
+    && (item.source || "women") === (key.source || "women")
     && (item.color || null) === (key.color || null)
     && (item.size || null) === (key.size || null)
     && (item.metalType || null) === (key.metalType || null)
@@ -72,45 +82,69 @@ function notifyCartUpdated(items) {
 
 // ---------- account (Supabase) cart ----------
 
-async function fetchDbCart(userId) {
+// "women" (default) lives in cart_items / joins products; "men" lives
+// in mens_cart_items / joins mens_products — see supabase/mens_schema.sql.
+function cartTableFor(source) {
+  return source === "men" ? "mens_cart_items" : "cart_items";
+}
+function productJoinFor(source) {
+  return source === "men" ? "mens_products" : "products";
+}
+
+async function fetchDbCartFrom(userId, source) {
+  const table = cartTableFor(source);
+  const join = productJoinFor(source);
   const { data, error } = await supabaseClient
-    .from("cart_items")
-    .select("product_id, color, quantity, selected_size, selected_metal_type, selected_diamond_quality, unit_price, products(name, image, price, slug)")
+    .from(table)
+    .select(`product_id, color, quantity, selected_size, selected_metal_type, selected_diamond_quality, unit_price, ${join}(name, image, price, slug)`)
     .eq("user_id", userId);
 
   if (error) {
-    console.error("Failed to load account cart:", error.message);
+    console.error(`Failed to load account cart (${table}):`, error.message);
     return [];
   }
 
-  return (data || []).map((row) => ({
-    id: row.product_id,
-    slug: row.products?.slug,
-    name: row.products?.name,
-    image: row.products?.image,
-    // unit_price is the exact price selected on product.html (varies by
-    // karat/diamond/size); older rows without it fall back to the live
-    // product price.
-    price: row.unit_price != null ? Number(row.unit_price) : row.products?.price,
-    color: row.color || null,
-    size: row.selected_size || null,
-    metalType: row.selected_metal_type || null,
-    diamondQuality: row.selected_diamond_quality || null,
-    qty: row.quantity,
-  }));
+  return (data || []).map((row) => {
+    const product = row[join];
+    return {
+      id: row.product_id,
+      source,
+      slug: product?.slug,
+      name: product?.name,
+      image: product?.image,
+      // unit_price is the exact price selected on product.html (varies by
+      // karat/diamond/size); older rows without it fall back to the live
+      // product price.
+      price: row.unit_price != null ? Number(row.unit_price) : product?.price,
+      color: row.color || null,
+      size: row.selected_size || null,
+      metalType: row.selected_metal_type || null,
+      diamondQuality: row.selected_diamond_quality || null,
+      qty: row.quantity,
+    };
+  });
+}
+
+async function fetchDbCart(userId) {
+  const [womens, mens] = await Promise.all([
+    fetchDbCartFrom(userId, "women"),
+    fetchDbCartFrom(userId, "men"),
+  ]);
+  return womens.concat(mens);
 }
 
 // Returns true on success, false on failure (and logs why) — callers
 // need this so they don't wipe data (e.g. the guest cart) based on an
 // operation that silently didn't actually happen.
 async function upsertDbCartItem(userId, product, qtyDelta) {
+  const table = cartTableFor(product.source);
   const colorKey = product.color || "";
   const sizeKey = product.size || "";
   const metalKey = product.metalType || "";
   const diamondKey = product.diamondQuality || "";
 
   const { data: existing, error: selectErr } = await supabaseClient
-    .from("cart_items")
+    .from(table)
     .select("id, quantity")
     .eq("user_id", userId)
     .eq("product_id", product.id)
@@ -121,20 +155,20 @@ async function upsertDbCartItem(userId, product, qtyDelta) {
     .maybeSingle();
 
   if (selectErr) {
-    console.error("Cart: failed to look up existing cart_items row (has supabase_schema.sql been run against this database?):", selectErr.message);
+    console.error(`Cart: failed to look up existing ${table} row (has supabase_schema.sql / supabase/mens_schema.sql been run against this database?):`, selectErr.message);
     return false;
   }
 
   if (existing) {
     const update = { quantity: existing.quantity + qtyDelta, updated_at: new Date().toISOString() };
     if (product.price != null) update.unit_price = product.price;
-    const { error } = await supabaseClient.from("cart_items").update(update).eq("id", existing.id);
+    const { error } = await supabaseClient.from(table).update(update).eq("id", existing.id);
     if (error) {
-      console.error("Cart: failed to update cart_items row:", error.message);
+      console.error(`Cart: failed to update ${table} row:`, error.message);
       return false;
     }
   } else if (qtyDelta > 0) {
-    const { error } = await supabaseClient.from("cart_items").insert({
+    const { error } = await supabaseClient.from(table).insert({
       user_id: userId,
       product_id: product.id,
       color: colorKey,
@@ -145,7 +179,7 @@ async function upsertDbCartItem(userId, product, qtyDelta) {
       quantity: qtyDelta,
     });
     if (error) {
-      console.error("Cart: failed to insert cart_items row:", error.message);
+      console.error(`Cart: failed to insert ${table} row:`, error.message);
       return false;
     }
   }
@@ -177,6 +211,7 @@ async function addItem(product, qty = 1) {
   const userId = await getCurrentUserId();
   const normalized = {
     id: product.id,
+    source: product.source || "women",
     slug: product.slug,
     name: product.name,
     image: product.image,
@@ -211,6 +246,7 @@ async function updateQty(variantKey, qty) {
   const userId = await getCurrentUserId();
 
   if (userId) {
+    const table = cartTableFor(variantKey.source);
     const colorKey = variantKey.color || "";
     const sizeKey = variantKey.size || "";
     const metalKey = variantKey.metalType || "";
@@ -218,7 +254,7 @@ async function updateQty(variantKey, qty) {
 
     if (qty <= 0) {
       await supabaseClient
-        .from("cart_items")
+        .from(table)
         .delete()
         .eq("user_id", userId)
         .eq("product_id", variantKey.id)
@@ -228,7 +264,7 @@ async function updateQty(variantKey, qty) {
         .eq("selected_diamond_quality", diamondKey);
     } else {
       await supabaseClient
-        .from("cart_items")
+        .from(table)
         .update({ quantity: qty, updated_at: new Date().toISOString() })
         .eq("user_id", userId)
         .eq("product_id", variantKey.id)
@@ -260,7 +296,10 @@ async function removeItem(variantKey) {
 async function clearCart() {
   const userId = await getCurrentUserId();
   if (userId) {
-    await supabaseClient.from("cart_items").delete().eq("user_id", userId);
+    await Promise.all([
+      supabaseClient.from("cart_items").delete().eq("user_id", userId),
+      supabaseClient.from("mens_cart_items").delete().eq("user_id", userId),
+    ]);
   } else {
     writeLocalCart([]);
   }

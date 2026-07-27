@@ -65,6 +65,7 @@
     <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html">Collections</a>
+      <a href="mens-collection.html">Men's Collection</a>
       <a href="about.html">The House</a>
       <a href="our-journey.html">Our Story</a>
       <a href="contact.html">Contact</a>
@@ -167,10 +168,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  const { data: items } = await supabaseClient
-    .from("order_items")
-    .select("quantity, price, color, selected_size, selected_metal_type, selected_diamond_quality, products(name, image)")
-    .eq("order_id", orderId);
+  // One order can contain both women's and men's items (see
+  // supabase/mens_schema.sql — mens_order_items shares the same
+  // order_id but points at mens_products instead of products), so
+  // both tables are fetched and merged for display.
+  const [{ data: womensItems }, { data: mensItems }] = await Promise.all([
+    supabaseClient
+      .from("order_items")
+      .select("quantity, price, color, selected_size, selected_metal_type, selected_diamond_quality, products(name, image)")
+      .eq("order_id", orderId),
+    supabaseClient
+      .from("mens_order_items")
+      .select("quantity, price, color, selected_size, selected_metal_type, selected_diamond_quality, mens_products(name, image)")
+      .eq("order_id", orderId),
+  ]);
+  const items = (womensItems || []).concat(
+    (mensItems || []).map((row) => ({ ...row, products: row.mens_products }))
+  );
 
   orderLayout.style.display = "block";
 

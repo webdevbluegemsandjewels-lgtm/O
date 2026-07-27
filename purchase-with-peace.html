@@ -89,6 +89,7 @@
     <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
     <nav class="main-nav" aria-label="Primary">
       <a href="collections.html">Collections</a>
+      <a href="mens-collection.html">Men's Collection</a>
       <a href="about.html">The House</a>
       <a href="our-journey.html">Our Story</a>
       <a href="contact.html">Contact</a>
@@ -280,7 +281,10 @@
   const recommendTrack = document.getElementById("recommendTrack");
   if (recommendTrack && typeof loadProductsFromDB === "function") {
     loadProductsFromDB().then((products) => {
-      const picks = products.slice(0, 10);
+      // Gift Card rows live in the same products table (see
+      // supabase_schema.sql's Gift Card seed) — exclude them from
+      // "recommended" jewellery picks.
+      const picks = products.filter((p) => p.cat !== "Gift Card").slice(0, 10);
       if (!picks.length) return;
       recommendTrack.innerHTML = [...picks, ...picks]
         .map((p) => `<div class="recommend-item">${productCardHTML(p)}</div>`)
