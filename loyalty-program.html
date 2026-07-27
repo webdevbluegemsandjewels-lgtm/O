@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Loyalty Program — OrenkaFine Fine &amp; Fashion Jewellery</title>
+<meta name="description" content="Join the OrenkaFine Loyalty Program — earn points on sign up, every purchase, birthdays and reviews, then redeem them for savings on future orders." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .loyalty-page section:not(.hero):not(.newsletter){ padding: 3.2rem 0; background: #fff; }
+  .loyalty-page .newsletter{ background: var(--emerald); color: var(--bone); }
+  .loyalty-page .newsletter h2{ color: var(--bone); }
+  .loyalty-page .newsletter p{ color: var(--bone-dim); }
+  .loyalty-page .field-row input[type="email"]{
+    background: #fff; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: .8rem 1rem;
+  }
+  .loyalty-page .field-row input::placeholder{ color: var(--ink-soft); }
+  .loyalty-page .section-head{ justify-content:center; text-align:center; margin-bottom: 2rem; }
+  .loyalty-page .section-head p.lede{ max-width: 62ch; margin: .6rem auto 0; color: var(--ink-soft); line-height: 1.65; }
+
+  /* Rewards grid */
+  .rewards-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+  }
+  .reward-card{
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.8rem 1.6rem;
+    background: var(--bone);
+    text-align: left;
+  }
+  .reward-card .reward-points{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: .5rem;
+  }
+  .reward-card h3{
+    font-size: 1.05rem;
+    margin-bottom: .4rem;
+    color: var(--ink);
+  }
+  .reward-card p{ color: var(--ink-soft); font-size: .92rem; line-height: 1.5; margin: 0; }
+  @media (max-width: 900px){ .rewards-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px){ .rewards-grid{ grid-template-columns: 1fr; } }
+
+  /* How to join steps */
+  .steps-row{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .step-card{
+    text-align:center;
+    padding: 1.6rem 1.2rem;
+  }
+  .step-number{
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto .9rem;
+  }
+  .step-card h3{ font-size: 1rem; margin-bottom: .4rem; }
+  .step-card p{ color: var(--ink-soft); font-size: .9rem; margin:0; }
+  @media (max-width: 700px){ .steps-row{ grid-template-columns: 1fr; } }
+
+  /* FAQ accordion */
+  .faq-list{ max-width: 780px; margin: 0 auto; }
+  .faq-item{
+    border-bottom: 1px solid var(--line);
+  }
+  .faq-item summary{
+    list-style: none;
+    cursor: pointer;
+    padding: 1.1rem 1.8rem 1.1rem 0;
+    position: relative;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary::after{
+    content: '+';
+    position: absolute;
+    right: 0;
+    top: 1rem;
+    font-size: 1.3rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .faq-item[open] summary::after{ content: '\2212'; }
+  .faq-item .faq-answer{
+    padding: 0 0 1.2rem;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    max-width: 68ch;
+  }
+
+  /* Join loyalty CTA */
+  .join-loyalty{ background: var(--bone); text-align:center; }
+  .join-loyalty-inner{ max-width: 62ch; margin: 0 auto; }
+  .join-loyalty-inner .lede{ margin: .8rem 0 1.6rem; color: var(--ink-soft); line-height: 1.65; }
+
+  /* Conversion strip */
+  .convert-strip{
+    background: var(--emerald);
+    color: var(--bone);
+    border-radius: 12px;
+    padding: 2rem 2.2rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .convert-strip .convert-text{ max-width: 46ch; }
+  .convert-strip h3{ color: var(--bone); margin-bottom: .4rem; }
+  .convert-strip p{ color: var(--bone-dim); margin:0; line-height:1.6; }
+  .convert-strip .convert-figure{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--gold-light);
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body class="loyalty-page">
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="mens-collection.html">Men's Collection</a>
+      <a href="about.html">The House</a>
+      <a href="our-journey.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero page-hero">
+  <div class="hero-media">
+    <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1605201206717-cb9eca0d2eb2?auto=format&fit=crop&w=1600&q=80">
+      <source src="Assets/Hero/hero6.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="container hero-content">
+    <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Loyalty Program</p>
+    <p class="eyebrow">Rewards, just for you</p>
+    <h1>OrenkaFine Loyalty Program</h1>
+  </div>
+</section>
+
+<section class="join-loyalty">
+  <div class="container">
+    <div class="join-loyalty-inner">
+      <p class="eyebrow">Membership, made rewarding</p>
+      <h2 class="section-title">Join Our Loyalty Program</h2>
+      <p class="lede">Create your free account today and start earning points on every sign up, purchase, review and more — redeemable for real savings on your next order.</p>
+      <a href="signup.html" class="btn btn-gold">Join the Loyalty Program</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Program overview &amp; how to earn</p>
+        <h2 class="section-title">Start Earning Exclusive Rewards</h2>
+        <p class="lede">At OrenkaFine, we value and appreciate YOU, who continue to support us. Start earning exclusive rewards and advantages!</p>
+      </div>
+    </div>
+    <div class="rewards-grid">
+      <div class="reward-card">
+        <p class="reward-points">500 Points</p>
+        <h3>Sign Up Rewards</h3>
+        <p>Earn points instantly the moment you create your OrenkaFine account.</p>
+      </div>
+      <div class="reward-card">
+        <p class="reward-points">10 Points</p>
+        <h3>Shop &amp; Earn</h3>
+        <p>10 Points on every &#8377;100 spent, on every order you place.</p>
+      </div>
+      <div class="reward-card">
+        <p class="reward-points">1000 Points</p>
+        <h3>Birthday Rewards</h3>
+        <p>A birthday treat from us — 1000 points added to your account.</p>
+      </div>
+      <div class="reward-card">
+        <p class="reward-points">7500 Points</p>
+        <h3>Repeat Purchase Rewards</h3>
+        <p>Additional 7500 points once you complete 5 orders with us.</p>
+      </div>
+      <div class="reward-card">
+        <p class="reward-points">2500 Points</p>
+        <h3>Review Rewards</h3>
+        <p>2500 points on each review and image you upload for a purchase.</p>
+      </div>
+      <div class="reward-card">
+        <p class="reward-points">2000 Points</p>
+        <h3>Volume Rewards</h3>
+        <p>Additional 2000 points once your balance crosses 30,000 points.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-dim">
+  <div class="container">
+    <div class="convert-strip">
+      <div class="convert-text">
+        <h3>How points convert</h3>
+        <p>10 loyalty points = &#8377;1. So 10,000 points can be redeemed for &#8377;1,000 off your order.</p>
+      </div>
+      <p class="convert-figure">10 pts = &#8377;1</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Getting started</p>
+        <h2 class="section-title">How to Join</h2>
+      </div>
+    </div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Create Your Account</h3>
+        <p>Sign in from the top right of our menu and set up your account in moments.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Complete Your Profile</h3>
+        <p>Fill in your details so we can track your points and rewards correctly.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Start Shopping and Earn Points</h3>
+        <p>Every order, review and milestone adds points to your balance automatically.</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 2.2rem;">
+      <a href="signup.html" class="btn btn-gold">Join the Loyalty Program</a>
+    </div>
+  </div>
+</section>
+
+<section class="section-dim">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Questions, answered</p>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+      </div>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How do I join the loyalty program?</summary>
+        <div class="faq-answer">
+          <p>In order to join the program, just click &ldquo;Sign in&rdquo; on the top right corner of our navigation menu and create an account. Once completed, you are welcome to participate in all actions we have prepared for you to earn points. You will be automatically opted into the OrenkaFine Loyalty Program after agreeing to our terms and conditions. If you already have an account, you will automatically be enrolled in the program and will begin earning points on your future purchases (just make sure you log into your account before completing your order).</p>
+          <p>It is free to join and customers are not obligated to participate and use points earned or accumulated. Once a customer deactivates their account, points will not be redeemable, transferable, or applicable to any future purchases after deactivation.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How long do I remain a member of the loyalty programme?</summary>
+        <div class="faq-answer">
+          <p>OrenkaFine membership is for lifetime. There is no downgrade once you become a member.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How can I earn loyalty points?</summary>
+        <div class="faq-answer">
+          <p>You can earn the points by completing actions listed in the rewards tab. Just click on the &ldquo;Rewards&rdquo; tab to see the list of activities available for you to participate in. You automatically earn 500 points just for signing up! You will earn 1 point for every &#8377;10 you spend on the website.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What is the conversion of these loyalty points?</summary>
+        <div class="faq-answer">
+          <p>10 loyalty points is worth 1 Rupee. So if you have 10,000 loyalty points, you can redeem it against your order for &#8377;1000.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What is the validity of the loyalty points?</summary>
+        <div class="faq-answer">
+          <p>Loyalty points expire 6 months from the day of credit to your account.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I combine loyalty points with other offers?</summary>
+        <div class="faq-answer">
+          <p>Loyalty points are like your money that you can combine with any offer, promotion or discount.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I combine loyalty points with other coupon codes?</summary>
+        <div class="faq-answer">
+          <p>Loyalty points can't be redeemed if there is an active coupon code applied to your cart.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How do I redeem my loyalty points?</summary>
+        <div class="faq-answer">
+          <p>10 points = &#8377;1. In order to redeem your OrenkaFine loyalty points, you will have to log into your account and during checkout select the amount you want to redeem to apply the points.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What is the maximum redeemable loyalty points valid for a single purchase?</summary>
+        <div class="faq-answer">
+          <p>You can redeem a maximum of 20,000 points.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How do I check my loyalty points balance?</summary>
+        <div class="faq-answer">
+          <p>Log into your account by clicking &ldquo;Sign in&rdquo; on the upper right-hand side of the screen. Enter your email address and password and check &ldquo;My Account&rdquo;. Your point balance will appear under the &ldquo;My points&rdquo; section.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How long will it take for the points to post to my account?</summary>
+        <div class="faq-answer">
+          <p>Your points will automatically post to your account after a purchase is completed from our end.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I transfer my loyalty points?</summary>
+        <div class="faq-answer">
+          <p>OrenkaFine loyalty points and membership are not transferrable. The facilities and benefits of the membership can be availed only by the member.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What happens if I return or cancel the order made using loyalty points?</summary>
+        <div class="faq-answer">
+          <p>When you return an item, you forfeit the associated points earned from the original purchase.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What if there is missing credit for a purchase?</summary>
+        <div class="faq-answer">
+          <p>If you do not see your points appear in your account after your original order was completed, please email us at <a href="mailto:contact@orenkafine.com">contact@orenkafine.com</a>.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What happens while returning a product under exchange policy?</summary>
+        <div class="faq-answer">
+          <p>Any points redeemed during a previous purchase will be deducted during Lifetime Exchange value and buy back calculations.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter">
+  <div class="container newsletter-inner">
+    <div>
+      <p class="eyebrow">Join the house</p>
+      <h2>Be part of the OrenkaFine world</h2>
+      <p>Sign up for early access to new arrivals, styling edits and members-only offers.</p>
+    </div>
+    <form class="newsletter-form">
+      <div class="field-row">
+        <input type="email" required placeholder="Email address" aria-label="Email address" />
+        <button type="submit" class="btn btn-gold">Subscribe</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+<button class="to-top" aria-label="Back to top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+<script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/guide-modals.js"></script>
+</body>
+</html>

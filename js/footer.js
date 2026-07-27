@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="about.html">Care Guide</a></li>
             <li><a href="about.html">Journal</a></li>
             <li><a href="purchase-with-peace.html">Purchase with Peace</a></li>
+            <li><a href="loyalty-program.html">Loyalty Program</a></li>
             <li><a href="contact.html">FAQ</a></li>
           </ul>
         </div>
