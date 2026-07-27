@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ["Gold Chains", "collections.html?cat=Necklaces"],
     ["Engravable Jewellery", "collections.html"],
     ["Nose Pins", "collections.html"],
-    ["Kids Jewellery", "collections.html"],
     ["Men's Jewellery", "collections.html"],
     ["Under ₹15K", "collections.html"],
     ["Under ₹25K", "collections.html"],
