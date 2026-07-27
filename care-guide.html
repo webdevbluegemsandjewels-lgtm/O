@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Care Guide — OrenkaFine Fine &amp; Fashion Jewellery</title>
+<meta name="description" content="How to care for your OrenkaFine jewellery — what to avoid, how to clean it at home, and when to bring it in for professional servicing." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .care-page section:not(.hero):not(.newsletter){ padding: 1.2rem 0; background: #fff; }
+  .care-page .newsletter{ background: var(--emerald); color: var(--bone); }
+  .care-page .newsletter h2{ color: var(--bone); }
+  .care-page .newsletter p{ color: var(--bone-dim); }
+  .care-page .field-row input[type="email"]{
+    background: #fff; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: .8rem 1rem;
+  }
+  .care-page .field-row input::placeholder{ color: var(--ink-soft); }
+  .care-page .section-head{ text-align:center; margin-bottom: 1.6rem; }
+
+  .care-intro{ max-width: 74ch; margin: 0 auto; text-align:center; }
+  .care-intro p{ color: var(--ink-soft); line-height: 1.75; }
+
+  .care-block{ max-width: 74ch; margin: 0 auto; }
+  .care-block + .care-block{ margin-top: 2.6rem; }
+  .care-block h3{
+    font-size: 1.35rem;
+    margin-bottom: .8rem;
+    color: var(--ink);
+  }
+  .care-block p{ color: var(--ink-soft); line-height: 1.75; margin-bottom: 1rem; }
+
+  .care-tag{
+    display:inline-block;
+    font-size: .72rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: .3rem .8rem;
+    border-radius: 100px;
+    margin-bottom: .8rem;
+  }
+  .care-tag.donts{ background: #f5e3e0; color: #9c3b2e; }
+  .care-tag.dos{ background: var(--gold-pale); color: var(--gold); }
+
+  .care-video{
+    width: 100%;
+    max-width: 720px;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 1rem;
+  }
+
+  .care-signoff{ text-align:center; margin-top: 2.8rem; }
+  .care-signoff p{ color: var(--ink-soft); margin-bottom: .3rem; }
+  .care-signoff .signoff-brand{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    letter-spacing: .08em;
+    color: var(--gold);
+  }
+
+  /* Desktop-only side rails: sticky while the main column scrolls,
+     released back into flow once the column ends (just above the footer). */
+  .care-rails-wrap{ display:block; }
+  .side-rail{ display:none; }
+  @media (min-width: 1024px){
+    .care-rails-wrap{
+      display:grid;
+      grid-template-columns: minmax(240px, 280px) 1fr minmax(240px, 280px);
+      gap: 1.6rem;
+      max-width: 1760px;
+      margin: 0 auto;
+      padding: 0 1.2rem;
+      align-items: start;
+    }
+    .care-main{ min-width: 0; }
+    .side-rail{
+      display:flex;
+      flex-direction: column;
+      position: sticky;
+      top: 96px;
+      align-self: start;
+      height: calc(100vh - 112px);
+    }
+    .rail-heading{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: .4rem;
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: center;
+      margin-bottom: 0;
+      padding-bottom: .6rem;
+    }
+    .rail-heading .rail-icon{ color: var(--gold); font-size: .85rem; }
+    .rail-heading-wrap{
+      position: relative;
+      margin-bottom: .8rem;
+      flex: none;
+    }
+    .rail-heading-wrap::after{
+      content: '';
+      display:block;
+      width: 34px;
+      height: 1px;
+      background: var(--gold);
+      margin: 0 auto;
+      opacity: .6;
+    }
+    .rail-viewport{
+      flex: 1 1 auto;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent);
+      mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent);
+    }
+    .rail-track{
+      display:flex;
+      flex-direction: column;
+      gap: .5rem;
+      cursor: grab;
+      touch-action: pan-x;
+      will-change: transform;
+    }
+    .rail-track:active{ cursor: grabbing; }
+  }
+  @media (min-width: 1440px){
+    .care-rails-wrap{
+      grid-template-columns: minmax(240px, 320px) 1fr minmax(240px, 320px);
+      gap: 2.2rem;
+      padding: 0 1.5rem;
+    }
+  }
+  .rail-review{
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 2.1rem 1.7rem 1.7rem;
+    background: #fff;
+    box-shadow: 0 8px 22px -12px rgba(22,20,15,.18);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .rail-review:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -14px rgba(169,130,76,.35);
+  }
+  .rail-review::before{
+    content: '\201C';
+    position: absolute;
+    top: -.4rem;
+    right: 1rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.8rem;
+    color: var(--gold-pale);
+    line-height: 1;
+    z-index: 0;
+  }
+  .rail-review .stars{ position:relative; color: var(--gold); font-size: 1rem; letter-spacing: .2em; margin-bottom: .7rem; }
+  .rail-review p{ position:relative; font-size: 1.05rem; line-height: 1.75; color: var(--ink-soft); margin: 0 0 .9rem; font-style: italic; }
+  .rail-review span{
+    position:relative;
+    display:block;
+    font-size: .85rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--ink);
+    padding-top: .8rem;
+    border-top: 1px solid var(--line);
+  }
+  /* Same card proportions as the "Recommended For You" strips elsewhere
+     on the site (.recommend-item / productCardHTML) — only the gap
+     between cards is tightened, not the card itself. */
+  .rail-product{ width: 100%; }
+  .rail-product .product-media{ border-radius: 8px; }
+</style>
+</head>
+<body class="care-page">
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="mens-collection.html">Men's Collection</a>
+      <a href="about.html">The House</a>
+      <a href="our-journey.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero page-hero">
+  <div class="hero-media">
+    <video autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1605201206717-cb9eca0d2eb2?auto=format&fit=crop&w=1600&q=80">
+      <source src="Assets/Hero/hero6.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="container hero-content">
+    <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Care Guide</p>
+    <p class="eyebrow">Keep it beautiful</p>
+    <h1>Care Guide</h1>
+  </div>
+</section>
+
+<div class="care-rails-wrap">
+<aside class="side-rail side-rail-left" aria-label="Customer reviews">
+  <div class="rail-heading-wrap">
+    <p class="rail-heading"><span class="rail-icon">&#9733;</span> Customer Reviews</p>
+  </div>
+  <div class="rail-viewport">
+    <div class="rail-track" id="railReviews"></div>
+  </div>
+</aside>
+
+<div class="care-main">
+
+<section>
+  <div class="container care-intro">
+    <p>OrenkaFine Jewelry, like most jewelry, is delicate and not designed to be worn when doing physical activity. The delicacy of fine jewelry demands the wearer take ultimate care of your jewelry pieces. We would suggest that high-intensity sports such as tennis, golf, running, gardening, heavy-duty home cleaning, and intense work-related situations etc. are not helpful or advisable in the wearing of fine jewelry.</p>
+    <p>Gold and silver are relatively soft materials and diamonds and gemstones are very soft and often brittle and prone to breaking or cracking. So please pay extra attention and protect your fine jewelry — just as you would not use your lovely automobile for rough extreme off-road conditions, you should not use your jewelry for rough and heavy-duty activities.</p>
+  </div>
+</section>
+
+<section class="section-dim">
+  <div class="container care-block">
+    <span class="care-tag donts">Don'ts</span>
+    <h3>What to Avoid</h3>
+    <p>We understand that you wish to always wear your OrenkaFine Jewelry, even on the beach or in the ocean and while playing sports etc. However, this we would not recommend. Please note that elements such as salt and sand play a negative role in the durability of your OrenkaFine pieces. Even washing your hair with shampoos can dull the brilliance of our diamonds and cloud the luster of our colored gemstones — not to mention an overabundance of hairsprays, cosmetics and perfumes. All of the above are not in the interest of keeping your jewelry beautiful.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container care-block">
+    <span class="care-tag dos">Do's</span>
+    <h3>Cleaning at Home</h3>
+    <p>Soap, shampoos, perfumes, hairsprays and cosmetics etc. can easily be rinsed away. So no panic — all you have to do is soak your OrenkaFine Jewelry in warm, non-toxic soapy water (preferably a drop of liquid dishwashing soap) and use a small soft toothbrush to wash the grime away. Scrub the soft toothbrush lightly over the gold, diamonds and gemstones, taking extra care using a light and delicate hand. Rinse thoroughly with first warm water and then again with cold water. Dry the items lightly and quickly with a hair dryer using the lukewarm or cool position, or use a clean microfiber cloth. If the result is not up to your standard, please contact your official OrenkaFine Retailer.</p>
+  </div>
+</section>
+
+<section class="section-dim">
+  <div class="container care-block">
+    <h3>Is Your White Gold Losing Its Shine?</h3>
+    <p>White gold does not exist in its natural form. It is the result of mixing certain alloys with yellow gold (which is naturally yellow) that give white gold its color. But the real magic of white gold comes to life when it is rhodium plated. Rhodium plating is the final touch that gives you the shiny and perfectly white color you demand from your jewelry.</p>
+    <p>All brands use white gold as it is strong and durable. But eventually, after many years, it's best to have your white gold rhodium plated once again. Your official OrenkaFine Retailer will help you with this chore.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container care-block">
+    <video class="care-video" autoplay muted loop playsinline preload="metadata">
+      <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/careguide/Dos.mp4" type="video/mp4" />
+    </video>
+    <h3>Professional Servicing</h3>
+    <p>Your OrenkaFine jewels are precious objects that need attention every now and then. So just as you take your delicate garments to the dry cleaners, jewelry also needs a good clean-up once in a while. Do not hesitate to let it be serviced by an official OrenkaFine Retailer, who will be happy to give your OrenkaFine pieces some extra care with ultrasounds to remove grime that has collected over time. However, a new high polish may be considered if the surface is too scratched or the gold is too worn.</p>
+    <p>In case of doubt, or for an annual checkup, do not hesitate to visit an official OrenkaFine Retailer for expert advice. To find your nearest retailer, visit our store locator on our website.</p>
+  </div>
+</section>
+
+<section class="section-dim">
+  <div class="container care-signoff">
+    <p>If you have any questions please <a href="contact.html">get in touch with us</a>.</p>
+    <p>With love,</p>
+    <p class="signoff-brand">OrenkaFine</p>
+  </div>
+</section>
+
+</div>
+
+<aside class="side-rail side-rail-right" aria-label="Recommended products">
+  <div class="rail-heading-wrap">
+    <p class="rail-heading"><span class="rail-icon">&#10022;</span> You May Also Like</p>
+  </div>
+  <div class="rail-viewport">
+    <div class="rail-track" id="railProducts"></div>
+  </div>
+</aside>
+</div>
+
+<section class="newsletter">
+  <div class="container newsletter-inner">
+    <div>
+      <p class="eyebrow">Join the house</p>
+      <h2>Be part of the OrenkaFine world</h2>
+      <p>Sign up for early access to new arrivals, styling edits and members-only offers.</p>
+    </div>
+    <form class="newsletter-form">
+      <div class="field-row">
+        <input type="email" required placeholder="Email address" aria-label="Email address" />
+        <button type="submit" class="btn btn-gold">Subscribe</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+<button class="to-top" aria-label="Back to top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+<script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/guide-modals.js"></script>
+<script>
+  const RAIL_REVIEWS = [
+    { name: "Ananya Rao", text: "The care guide saved my rings — the toothbrush trick really works." },
+    { name: "Vikram Singh", text: "Had my white gold rhodium plated after two years, looks brand new again." },
+    { name: "Sanya Kapoor", text: "Love that OrenkaFine tells you exactly how to keep pieces looking new." },
+    { name: "Ishaan Malhotra", text: "Ultrasonic clean at the retailer brought back the sparkle instantly." },
+    { name: "Meera Nair", text: "Simple, honest advice — no more dull diamonds after my morning routine." },
+    { name: "Rohan Das", text: "Appreciate the reminder to skip the gym and gardening with my jewellery on." },
+  ];
+  function railReviewHTML(r) {
+    return `
+      <div class="rail-review">
+        <p class="stars">★★★★★</p>
+        <p>&ldquo;${r.text}&rdquo;</p>
+        <span>${r.name}</span>
+      </div>
+    `;
+  }
+  // Vertical counterpart of main.js's initDraggableMarquee: auto-loops the
+  // track upward, pauses on hover, and lets the user grab/drag it (mouse,
+  // touch or trackpad) to scroll through the loop manually.
+  function initVerticalDraggableMarquee(track, pxPerSecond) {
+    if (!track || track.dataset.marqueeInit) return;
+    track.dataset.marqueeInit = "1";
+
+    let y = 0;
+    let halfHeight = track.scrollHeight / 2 || 1;
+    let hovered = false;
+    let dragging = false;
+    let dragStartY = 0;
+    let dragStartTranslate = 0;
+    let dragDistance = 0;
+    let lastTime = null;
+
+    const recalc = () => { halfHeight = track.scrollHeight / 2 || 1; };
+    new ResizeObserver(recalc).observe(track);
+
+    const apply = () => { track.style.transform = `translateY(${y}px)`; };
+    const wrap = () => {
+      if (y <= -halfHeight) y += halfHeight;
+      if (y > 0) y -= halfHeight;
+    };
+
+    function frame(t) {
+      if (lastTime == null) lastTime = t;
+      const dt = (t - lastTime) / 1000;
+      lastTime = t;
+      if (!dragging && !hovered) {
+        y -= pxPerSecond * dt;
+        wrap();
+        apply();
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    track.addEventListener("mouseenter", () => { hovered = true; });
+    track.addEventListener("mouseleave", () => { hovered = false; });
+    track.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      y -= e.deltaY;
+      wrap();
+      apply();
+    }, { passive: false });
+
+    let pointerDownId = null;
+    let pressStartY = 0;
+
+    track.addEventListener("pointerdown", (e) => {
+      pointerDownId = e.pointerId;
+      dragDistance = 0;
+      pressStartY = e.clientY;
+    });
+    track.addEventListener("pointermove", (e) => {
+      if (pointerDownId !== e.pointerId) return;
+      if (!dragging) {
+        if (Math.abs(e.clientY - pressStartY) < 4) return;
+        dragging = true;
+        dragStartY = e.clientY;
+        dragStartTranslate = y;
+        track.setPointerCapture(e.pointerId);
+      }
+      dragDistance += Math.abs(e.movementY || 0);
+      y = dragStartTranslate + (e.clientY - dragStartY);
+      wrap();
+      apply();
+    });
+    const endDrag = () => {
+      pointerDownId = null;
+      dragging = false;
+    };
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+
+    // Swallow the click that follows an actual drag so it doesn't also
+    // trigger navigation on a product-card-link underneath the pointer.
+    track.addEventListener("click", (e) => {
+      if (dragDistance > 5) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+  }
+
+  const railReviews = document.getElementById("railReviews");
+  if (railReviews) {
+    railReviews.innerHTML = [...RAIL_REVIEWS, ...RAIL_REVIEWS].map(railReviewHTML).join("");
+    initVerticalDraggableMarquee(railReviews, 38);
+  }
+
+  const railProducts = document.getElementById("railProducts");
+  if (railProducts && typeof loadProductsFromDB === "function") {
+    loadProductsFromDB().then((products) => {
+      const picks = products.filter((p) => p.cat !== "Gift Card").slice(0, 10);
+      if (!picks.length) return;
+      railProducts.innerHTML = [...picks, ...picks]
+        .map((p) => `<div class="rail-product">${productCardHTML(p)}</div>`)
+        .join("");
+      attachProductHoverSwap();
+      initVerticalDraggableMarquee(railProducts, 30);
+    });
+  }
+</script>
+</body>
+</html>

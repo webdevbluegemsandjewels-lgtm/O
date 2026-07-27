@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <ul>
             <li><a href="contact.html">Our Services</a></li>
             <li><a href="contact.html">Point of Sale</a></li>
-            <li><a href="about.html">Care Guide</a></li>
+            <li><a href="care-guide.html">Care Guide</a></li>
             <li><a href="about.html">Journal</a></li>
             <li><a href="purchase-with-peace.html">Purchase with Peace</a></li>
             <li><a href="loyalty-program.html">Loyalty Program</a></li>
