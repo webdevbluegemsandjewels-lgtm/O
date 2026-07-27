@@ -137,13 +137,14 @@ document.addEventListener("DOMContentLoaded", () => {
     cartItemsEl.innerHTML = items.map((item) => {
       const detailHref = `cart-item.html?${new URLSearchParams({
         id: item.id,
+        source: item.source || "women",
         color: item.color || "",
         size: item.size || "",
         metal: item.metalType || "",
         diamond: item.diamondQuality || "",
       })}`;
       return `
-      <div class="cart-row" data-id="${item.id}" data-color="${item.color || ""}" data-size="${item.size || ""}" data-metal="${item.metalType || ""}" data-diamond="${item.diamondQuality || ""}">
+      <div class="cart-row" data-id="${item.id}" data-source="${item.source || "women"}" data-color="${item.color || ""}" data-size="${item.size || ""}" data-metal="${item.metalType || ""}" data-diamond="${item.diamondQuality || ""}">
         <a href="${detailHref}"><img src="${item.image}" alt="${escapeHtml(item.name)}" /></a>
         <div>
           <h4><a href="${detailHref}" style="color:inherit; text-decoration:none;">${escapeHtml(item.name)}</a></h4>
@@ -179,6 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const row = btn.closest(".cart-row");
     const variantKey = {
       id: row.dataset.id,
+      source: row.dataset.source || "women",
       color: row.dataset.color || null,
       size: row.dataset.size || null,
       metalType: row.dataset.metal || null,
@@ -187,6 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = await window.OrenkaFineCart.getItems();
     const item = items.find((i) =>
       i.id === variantKey.id &&
+      (i.source || "women") === variantKey.source &&
       (i.color || null) === variantKey.color &&
       (i.size || null) === variantKey.size &&
       (i.metalType || null) === variantKey.metalType &&

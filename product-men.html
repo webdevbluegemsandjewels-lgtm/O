@@ -252,7 +252,7 @@
           <div class="option-pill-row" id="colorRow"></div>
         </div>
 
-        <div class="product-options" id="metalSection">
+        <div class="product-options" id="metalSection" style="display:none;">
           <h4>Metal Type <a href="#" class="option-guide-link" data-guide="gold" style="font-size:.72rem;text-transform:none;letter-spacing:normal;color:var(--ink-soft);text-decoration:underline;">Gold Purity Guide</a></h4>
           <div class="option-pill-row" id="metalRow"></div>
         </div>
@@ -489,6 +489,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("productBrand").textContent = product.brand || "OrenkaFine";
   document.getElementById("productDesc").textContent = product.description || "A handcrafted piece from the Orenka Men's collection.";
 
+  // The Metal Type picker and its "18 Kt Gold" spec line only make
+  // sense for pieces that are actually gold — showing a gold-karat
+  // badge on a silver piece would be wrong. Gated on the product's own
+  // name/description text rather than a dedicated column, since that's
+  // the only place "gold" vs. "silver" is reliably recorded for both
+  // the scraped women's catalog and mens_products.
+  const hasGoldInText = /gold/i.test(`${product.name || ""} ${product.description || ""}`);
+
   if (product.rating) {
     document.getElementById("productRating").innerHTML = `${product.rating} <span class="star">★</span>`;
   }
@@ -708,7 +716,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // ---------- Metal Type (always 4 options — real market-price math when gold_weight_grams is known) ----------
+  // ---------- Metal Type (4 karat options — real market-price math when gold_weight_grams is known) ----------
+  // Only shown for actual gold pieces (see hasGoldInText) — a silver
+  // item showing "18 Kt Gold" / "14 Kt Gold" options would be wrong.
+  document.getElementById("metalSection").style.display = hasGoldInText ? "" : "none";
   let selectedKarat = "18kt";
   if (product.variant_metal_type) {
     const m = product.variant_metal_type.toLowerCase();
@@ -817,7 +828,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       diamondCol.style.display = "none";
     }
 
-    document.getElementById("specMetalType").innerHTML = `Type: <strong>${KARAT_LABELS[selectedKarat]}</strong>`;
+    const specMetalTypeEl = document.getElementById("specMetalType");
+    if (hasGoldInText) {
+      specMetalTypeEl.style.display = "block";
+      specMetalTypeEl.innerHTML = `Type: <strong>${KARAT_LABELS[selectedKarat]}</strong>`;
+    } else if (product.metal) {
+      specMetalTypeEl.style.display = "block";
+      specMetalTypeEl.innerHTML = `Type: <strong>${product.metal}</strong>`;
+    } else {
+      specMetalTypeEl.style.display = "none";
+    }
     document.getElementById("specNetWeight").style.display = weightGrams ? "block" : "none";
     if (weightGrams) document.getElementById("specNetWeight").innerHTML = `Net Weight (approx): <strong>${weightGrams.toFixed(2)} g</strong>`;
 

@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const variantKey = {
     id: params.get("id"),
+    source: params.get("source") || "women",
     color: params.get("color") || null,
     size: params.get("size") || null,
     metalType: params.get("metal") || null,
@@ -156,6 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function matches(i) {
     return i.id === variantKey.id &&
+      (i.source || "women") === variantKey.source &&
       (i.color || null) === variantKey.color &&
       (i.size || null) === variantKey.size &&
       (i.metalType || null) === variantKey.metalType &&

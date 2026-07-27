@@ -280,6 +280,7 @@
       }
 
       if (typeof syncAccountUI === "function") syncAccountUI();
+      if (window.OrenkaFineCart?.syncCartAfterLogin) await window.OrenkaFineCart.syncCartAfterLogin();
       close(data.user);
     });
 
@@ -327,6 +328,7 @@
 
       if (data.session) {
         if (typeof syncAccountUI === "function") syncAccountUI();
+        if (window.OrenkaFineCart?.syncCartAfterLogin) await window.OrenkaFineCart.syncCartAfterLogin();
         close(data.user);
       } else {
         showOtpStep(modal, email, `We sent a verification code to ${email}. Enter it below to activate your account — without this, you won't be able to log in.`);
@@ -356,6 +358,7 @@
       }
 
       if (typeof syncAccountUI === "function") syncAccountUI();
+      if (window.OrenkaFineCart?.syncCartAfterLogin) await window.OrenkaFineCart.syncCartAfterLogin();
       close(data.user);
     });
 

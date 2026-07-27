@@ -321,6 +321,25 @@ async function updateCartBadge() {
   });
 }
 
+// Explicitly merges the guest cart + refreshes the badge/any open
+// cart page right at the moment a login/signup succeeds, instead of
+// relying solely on the SIGNED_IN listener below. That listener is
+// registered once on page load and should catch this too, but it's
+// reactive to a supabase-js event whose exact timing isn't guaranteed
+// relative to a caller (e.g. cart.html's checkout button) that awaits
+// login and then immediately navigates away — if that navigation
+// happens before the event fires and the merge finishes, the guest
+// cart is never actually written to the account and just silently
+// stays in localStorage. auth-modal.js awaits this directly after
+// every successful login/signup, before doing anything else.
+async function syncCartAfterLogin() {
+  const userId = await getCurrentUserId();
+  if (!userId) return;
+  await mergeLocalCartIntoAccount(userId);
+  await updateCartBadge();
+  notifyCartUpdated(await getItems());
+}
+
 window.OrenkaFineCart = {
   getItems,
   addItem,
@@ -328,6 +347,7 @@ window.OrenkaFineCart = {
   removeItem,
   clearCart,
   getSubtotal,
+  syncCartAfterLogin,
 };
 
 // Merge guest cart into account cart the moment someone signs in,

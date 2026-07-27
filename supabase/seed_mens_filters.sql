@@ -88,17 +88,18 @@ end
 where style is null;
 
 -- ---------------------------------------------------------------
--- Metal — "Silver" wins if mentioned at all (OrenkaFine's silver
--- division is a distinct product line, not just another gold tone).
--- Otherwise built from the `colors` array seed_mens_products.sql
--- already assigned (1-3 gold tones per row): one tone -> "14k <tone>",
--- two -> "Two Tone Gold", three -> "Mixed Metal".
+-- Metal — "White" wins if the text says "silver" at all (OrenkaFine's
+-- silver-toned division is a distinct product line, not just another
+-- gold tone — named "White" rather than "Silver" to match the site's
+-- own terminology). Otherwise built from the `colors` array
+-- seed_mens_products.sql already assigned (1-3 gold tones per row):
+-- one tone -> "14k <tone>", two -> "Two Tone Gold", three -> "Mixed Metal".
 -- ---------------------------------------------------------------
 update public.mens_products
 set metal = case
   when (name || ' ' || coalesce(description, '')) ilike '%silver%'
-    and (name || ' ' || coalesce(description, '')) ilike '%gold%' then 'Silver/14K Yellow Gold'
-  when (name || ' ' || coalesce(description, '')) ilike '%silver%' then 'Silver'
+    and (name || ' ' || coalesce(description, '')) ilike '%gold%' then 'White/14K Yellow Gold'
+  when (name || ' ' || coalesce(description, '')) ilike '%silver%' then 'White'
   when array_length(colors, 1) >= 3 then 'Mixed Metal'
   when array_length(colors, 1) = 2 then 'Two Tone Gold'
   when colors[1] = 'Rose Gold' then '14k Rose Gold'
@@ -232,25 +233,29 @@ end
 where collection is null;
 
 -- ---------------------------------------------------------------
--- Division — Orenka's men's silver line vs. everything else. Named
--- "Orenka", not "OrenkaFine", to match the men's line's own branding
--- (see mens-collection.html/product-men.html: "Orenka Men").
+-- Division — Orenka's men's white-metal line vs. everything else.
+-- Named "Orenka", not "OrenkaFine", to match the men's line's own
+-- branding (see mens-collection.html/product-men.html: "Orenka Men").
+-- Checked against the raw name/description text (not the `metal`
+-- column) since metal itself now says "White", not "Silver" — this
+-- stays correct regardless of that column's exact wording.
 -- ---------------------------------------------------------------
 update public.mens_products
 set division = case
-  when metal ilike '%silver%' then 'Orenka Men Silver'
+  when (name || ' ' || coalesce(description, '')) ilike '%silver%' then 'Orenka Men White'
   else 'Orenka Mens Fashion'
 end
 where division is null;
 
 -- Corrects rows already populated by an earlier run of this file
 -- (before the division values were renamed, first from "Gabriel ..."
--- to "OrenkaFine ...", then from "OrenkaFine ..." to "Orenka ..." to
--- match the men's line's actual branding) — the guard on the update
--- above only fills NULLs, so it wouldn't touch those on its own. Safe
--- no-op if nothing matches. See also
--- supabase/replace_gabriel_with_orenka.sql, which also sweeps any
--- leftover "Gabriel" text out of scraped product names/descriptions,
--- not just this column.
-update public.mens_products set division = 'Orenka Men Silver' where division in ('Gabriel Men Silver', 'OrenkaFine Men Silver');
+-- to "OrenkaFine ...", then to "Orenka ..." to match the men's line's
+-- actual branding, then from "Silver" to "White" for the same reason)
+-- — the guard on the update above only fills NULLs, so it wouldn't
+-- touch those on its own. Safe no-op if nothing matches. See also
+-- supabase/replace_gabriel_with_orenka.sql and
+-- supabase/replace_silver_with_white.sql, which also sweep any
+-- leftover "Gabriel"/"Silver" text out of scraped product
+-- names/descriptions, not just this column.
+update public.mens_products set division = 'Orenka Men White' where division in ('Gabriel Men Silver', 'OrenkaFine Men Silver', 'Orenka Men Silver');
 update public.mens_products set division = 'Orenka Mens Fashion' where division in ('Gabriel Mens Fashion', 'OrenkaFine Mens Fashion');
