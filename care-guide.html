@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  body.care-page{ background: #fff; }
   .care-page section:not(.hero):not(.newsletter){ padding: 1.2rem 0; background: #fff; }
   .care-page .newsletter{ background: var(--emerald); color: var(--bone); }
   .care-page .newsletter h2{ color: var(--bone); }
@@ -65,19 +66,19 @@
 
   /* Desktop-only side rails: sticky while the main column scrolls,
      released back into flow once the column ends (just above the footer). */
-  .care-rails-wrap{ display:block; }
+  .care-rails-wrap{ display:block; background: #fff; }
   .side-rail{ display:none; }
   @media (min-width: 1024px){
     .care-rails-wrap{
       display:grid;
       grid-template-columns: minmax(240px, 280px) 1fr minmax(240px, 280px);
-      gap: 1.6rem;
+      gap: .05rem;
       max-width: 1760px;
       margin: 0 auto;
       padding: 0 1.2rem;
       align-items: start;
     }
-    .care-main{ min-width: 0; }
+    .care-main{ min-width: 0; background: #fff; }
     .side-rail{
       display:flex;
       flex-direction: column;
@@ -85,6 +86,7 @@
       top: 96px;
       align-self: start;
       height: calc(100vh - 112px);
+      background: #fff;
     }
     .rail-heading{
       display:flex;
@@ -134,7 +136,7 @@
   @media (min-width: 1440px){
     .care-rails-wrap{
       grid-template-columns: minmax(240px, 320px) 1fr minmax(240px, 320px);
-      gap: 2.2rem;
+      gap: .3rem;
       padding: 0 1.5rem;
     }
   }
