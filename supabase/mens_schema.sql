@@ -59,7 +59,7 @@ create table if not exists public.mens_products (
 
 -- Filter-sidebar facets (see supabase/seed_mens_filters.sql — all
 -- derived from name+description keyword matching, mirroring the
--- Gabriel & Co men's-jewelry filter taxonomy). `category` above is
+-- OrenkaFine men's-jewelry filter taxonomy). `category` above is
 -- also re-derived by that script into this taxonomy's finer-grained
 -- values (Bangles/Cross Pendants/Pendants/Pins/etc.), superseding
 -- the broader buckets scrape-gabriel-mens.js's categorize() used.

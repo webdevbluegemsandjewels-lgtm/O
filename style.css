@@ -13,6 +13,12 @@
   --emerald:    #22392c;
   --emerald-light:#3c5a49;
   --rose:       #ded0c4;
+  /* Shown behind a product image while it's still loading, or in
+     place of it entirely if it's blank/broken (see .product-media,
+     .product-gallery-main, and the img onerror handlers in
+     js/main.js) — a deliberate, visible brown container rather than
+     a blank white flash. */
+  --placeholder-brown: #8a6a52;
   --line:       rgba(22,20,15,.14);
   --line-light: rgba(243,238,228,.22);
 
@@ -654,7 +660,7 @@ section{ padding: 3rem 0; }
   position:relative;
   aspect-ratio: 1/1.15;
   overflow:hidden;
-  background: var(--bone-dim);
+  background: var(--placeholder-brown);
 }
 .product-media img{
   width:100%; height:100%; object-fit:cover;

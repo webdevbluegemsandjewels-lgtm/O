@@ -2,7 +2,7 @@
 -- the bottom of the mens_products create table in
 -- supabase/mens_schema.sql) by scanning each row's name + description
 -- for keywords — same technique as supabase_schema.sql's `material`
--- derivation, just extended to the full Gabriel & Co men's-jewelry
+-- derivation, just extended to the full OrenkaFine men's-jewelry
 -- filter taxonomy the storefront's sidebar now mirrors:
 --   Product Category (re-derived, finer-grained than the scraper's
 --   categorize() buckets), Style, Metal, Stone Color, Gemstone,
@@ -88,7 +88,7 @@ end
 where style is null;
 
 -- ---------------------------------------------------------------
--- Metal — "Silver" wins if mentioned at all (Gabriel's silver
+-- Metal — "Silver" wins if mentioned at all (OrenkaFine's silver
 -- division is a distinct product line, not just another gold tone).
 -- Otherwise built from the `colors` array seed_mens_products.sql
 -- already assigned (1-3 gold tones per row): one tone -> "14k <tone>",
@@ -147,7 +147,7 @@ where stone_color is null and gemstone is not null and array_length(gemstone, 1)
 -- ---------------------------------------------------------------
 -- Birthstone Month — only the gemstones above with a standard
 -- birthstone-chart month; most rows will have none, same sparsity
--- as Gabriel's own "Birthstone Month" filter (which only lists
+-- as OrenkaFine's own "Birthstone Month" filter (which only lists
 -- September in the reference taxonomy).
 -- ---------------------------------------------------------------
 update public.mens_products
@@ -211,9 +211,9 @@ end
 where enamel_color is null;
 
 -- ---------------------------------------------------------------
--- Collection — literal Gabriel & Co collection/line names; "Diamond"
+-- Collection — literal OrenkaFine collection/line names; "Diamond"
 -- is the catch-all bucket for diamond pieces that don't name a
--- specific line, matching Gabriel's own taxonomy. Most rows will
+-- specific line, matching OrenkaFine's own taxonomy. Most rows will
 -- have none, same sparsity as the real filter.
 -- ---------------------------------------------------------------
 update public.mens_products
@@ -232,11 +232,25 @@ end
 where collection is null;
 
 -- ---------------------------------------------------------------
--- Division — Gabriel's men's silver line vs. everything else.
+-- Division — Orenka's men's silver line vs. everything else. Named
+-- "Orenka", not "OrenkaFine", to match the men's line's own branding
+-- (see mens-collection.html/product-men.html: "Orenka Men").
 -- ---------------------------------------------------------------
 update public.mens_products
 set division = case
-  when metal ilike '%silver%' then 'Gabriel Men Silver'
-  else 'Gabriel Mens Fashion'
+  when metal ilike '%silver%' then 'Orenka Men Silver'
+  else 'Orenka Mens Fashion'
 end
 where division is null;
+
+-- Corrects rows already populated by an earlier run of this file
+-- (before the division values were renamed, first from "Gabriel ..."
+-- to "OrenkaFine ...", then from "OrenkaFine ..." to "Orenka ..." to
+-- match the men's line's actual branding) — the guard on the update
+-- above only fills NULLs, so it wouldn't touch those on its own. Safe
+-- no-op if nothing matches. See also
+-- supabase/replace_gabriel_with_orenka.sql, which also sweeps any
+-- leftover "Gabriel" text out of scraped product names/descriptions,
+-- not just this column.
+update public.mens_products set division = 'Orenka Men Silver' where division in ('Gabriel Men Silver', 'OrenkaFine Men Silver');
+update public.mens_products set division = 'Orenka Mens Fashion' where division in ('Gabriel Mens Fashion', 'OrenkaFine Mens Fashion');

@@ -67,8 +67,8 @@ where gender = 'Men'
 -- how existing rows without an explicit karat behave.
 
 -- ---------------------------------------------------------------
--- Gold weight — no per-item weight data comes off the Gabriel site
--- (unlike the scraped women's variants, which is why product.html's
+-- Gold weight — no per-item weight data comes off the scraped source
+-- site (unlike the scraped women's variants, which is why product.html's
 -- sizeIsReal path exists), so this fills a realistic range per
 -- category the same way seed_product_specs.sql randomizes width/
 -- thickness elsewhere. Men's pieces run heavier than the equivalent

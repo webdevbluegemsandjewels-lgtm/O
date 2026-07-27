@@ -302,7 +302,7 @@ function productCardHTML(p) {
         ${p.discount ? `<span class="discount-ribbon">${p.discount} OFF</span>` : ""}
         ${(p.tag && !p.discount) ? `<span class="product-tag">${p.tag}</span>` : ""}
         <button class="product-wish" aria-label="Add ${p.name} to wishlist" onclick="event.preventDefault()">&hearts;</button>
-        <img src="${primaryImage}" data-secondary="${secondaryImage}" alt="${p.name}" loading="lazy" />
+        <img src="${primaryImage}" data-secondary="${secondaryImage}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" />
       </div>
       <div class="product-info">
         <div class="price-row">${priceHTML}</div>

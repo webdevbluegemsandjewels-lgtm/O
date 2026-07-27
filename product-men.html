@@ -40,7 +40,7 @@
     position: relative;
     aspect-ratio: 1/1.05;
     overflow:hidden;
-    background: var(--bone-dim);
+    background: var(--placeholder-brown);
     border: 1px solid var(--line);
     touch-action: pan-y;
   }
@@ -60,6 +60,7 @@
   .product-gallery-thumbs{ display:flex; gap:.7rem; flex-wrap:wrap; }
   .product-gallery-thumbs img{
     width: 74px; height: 74px; object-fit:cover;
+    background: var(--placeholder-brown);
     border: 1px solid var(--line); cursor:pointer; opacity:.7;
     transition: opacity .2s, border-color .2s;
   }
@@ -422,22 +423,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const images = (product.gallery && product.gallery.length ? product.gallery : [product.image, product.secondary_image]).filter(Boolean);
   const mainImage = document.getElementById("mainImage");
-  // An empty src (some scraped men's items have no image at all) makes
-  // browsers re-request the current page itself as "image data," which
-  // fails to decode and leaves a broken-image icon sitting in the
-  // sticky gallery box for the rest of the page. Hide the box entirely
-  // instead, and the same for a real image URL that 404s.
-  if (images[0]) {
-    mainImage.src = images[0];
-    mainImage.onerror = () => { mainImage.closest(".product-gallery-main").style.display = "none"; };
-  } else {
-    mainImage.closest(".product-gallery-main").style.display = "none";
-  }
+  const TRANSPARENT_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+  // .product-gallery-main has a brown placeholder background (see
+  // --placeholder-brown in style.css) so it always shows *something*
+  // while the image is loading or if it's blank/broken (some scraped
+  // men's items have no image at all) — rather than an empty white
+  // box or (worse) an empty src, which makes browsers re-request the
+  // current page itself as "image data" and show a broken-image icon.
+  // A real image URL that 404s falls back to the same transparent
+  // pixel so the brown container stays clean.
+  mainImage.src = images[0] || TRANSPARENT_PIXEL;
+  mainImage.onerror = () => { mainImage.onerror = null; mainImage.src = TRANSPARENT_PIXEL; };
   mainImage.alt = product.name;
 
   const thumbsEl = document.getElementById("galleryThumbs");
   thumbsEl.innerHTML = images.map((src, i) => `
-    <img src="${src}" alt="${product.name} view ${i + 1}" class="${i === 0 ? "active" : ""}" data-index="${i}" />
+    <img src="${src}" alt="${product.name} view ${i + 1}" class="${i === 0 ? "active" : ""}" data-index="${i}" onerror="this.onerror=null;this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" />
   `).join("");
 
   let currentImageIndex = 0;

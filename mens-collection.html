@@ -9,6 +9,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* White background on every section except the hero (video/image
+       background) and the footer (a <footer>, not a <section>, so
+       it's excluded automatically) — same pattern as collections.html. */
+    .collections-page section:not(.collections-hero){ background: #fff; }
+  </style>
   </head>
   <body class="collections-page">
 
@@ -164,7 +170,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return; // nothing to wire up if there's no data
   }
 
-  // Every facet mirrors Gabriel & Co's men's-jewelry filter sidebar.
+  // Every facet mirrors OrenkaFine's men's-jewelry filter sidebar.
   // `options` pins a fixed display order for facets with a known
   // taxonomy (Category, Material); everything else derives its
   // option list from whatever values actually appear in the data
