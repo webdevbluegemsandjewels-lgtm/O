@@ -4,21 +4,19 @@ This repository is a multi-page jewellery storefront built with plain HTML, CSS,
 
 The checked-in app is no longer just a static marketing site. It now includes:
 
-- Supabase Auth for login and signup
+- Supabase Auth for login and signup (with OTP email verification)
 - A profile table and account page backed by Supabase
 - A localStorage cart
 - A checkout flow that expects Supabase Edge Functions and Razorpay
 - A Supabase S3-compatible storage helper for server-side asset work
-- A welcome-email Supabase Edge Function
-
-
+- Welcome-email and signup-OTP Supabase Edge Functions
 
 ## Current stack
 
 - Frontend: plain HTML, CSS, and JavaScript
 - Auth and database: Supabase
 - Payment UI: Razorpay Checkout
-- Transactional email: Resend via a Supabase Edge Function
+- Transactional email: Resend via Supabase Edge Functions
 - Storage helper: AWS SDK v3 pointed at Supabase Storage's S3-compatible endpoint
 - Package manager: npm
 
@@ -28,15 +26,23 @@ The checked-in app is no longer just a static marketing site. It now includes:
 OrenkaFine/
 ├── about.html
 ├── account.html
+├── care-guide.html
+├── cart-item.html
 ├── cart.html
 ├── checkout.html
 ├── collections.html
 ├── contact.html
+├── gift-card.html
 ├── index.html
 ├── login.html
+├── loyalty-program.html
+├── mens-collection.html
 ├── order.html
 ├── our-journey.html
+├── product-men.html
 ├── product.html
+├── purchase-with-peace.html
+├── reset-password.html
 ├── signup.html
 ├── style.css
 ├── package.json
@@ -48,27 +54,37 @@ OrenkaFine/
 │   ├── auth.js
 │   ├── cart.js
 │   ├── footer.js
+│   ├── guide-modals.js
 │   ├── main.js
 │   ├── products-db.js
 │   ├── products.js
+│   ├── search.js
 │   └── supabaseClient.js
 └── supabase/
-	└── functions/
-		└── welcome-email/
-			└── index.ts
+    └── functions/
+        ├── create-razorpay-order/
+        ├── signup-otp/
+        ├── update-gold-rate/
+        ├── verify-razorpay-payment/
+        └── welcome-email/
 ```
 
 ## Page map
 
 - `index.html`: homepage with hero, featured products, collection highlights, and shared header/footer behavior
 - `collections.html`: collection listing page; loads the product grid and then replaces it with Supabase-backed products when available
-- `product.html`: single-product page with add-to-cart and authenticated review flow
+- `mens-collection.html`: men's collection listing, parallel to `collections.html`
+- `product.html` / `product-men.html`: single-product pages with add-to-cart and authenticated review flow
 - `cart.html`: client-side cart view powered by localStorage
+- `cart-item.html`: read-only detail view for a single bag item's specifications
 - `checkout.html`: shipping form and Razorpay checkout handoff; requires authenticated user plus backend Edge Functions
 - `order.html`: post-payment confirmation page
-- `login.html`: standalone login page using Supabase Auth
-- `signup.html`: standalone signup page collecting profile metadata for Supabase
+- `login.html` / `signup.html` / `reset-password.html`: standalone auth pages using Supabase Auth (signup includes OTP email verification)
 - `account.html`: authenticated account page for viewing and updating profile details in `profiles`
+- `gift-card.html`: gift card product/purchase page
+- `purchase-with-peace.html`: certification, hallmarking, returns, shipping and buyback assurances page
+- `care-guide.html`: jewellery care guide, with desktop-only sticky sidebars for customer reviews and recommended products
+- `loyalty-program.html`: loyalty program overview, rewards, how-to-join steps, and FAQ
 - `about.html`, `our-journey.html`, `contact.html`: content and brand pages using the shared site shell
 
 ## JavaScript modules
@@ -80,12 +96,17 @@ OrenkaFine/
 - `js/products.js`: static fallback product catalog, category metadata, and image helpers
 - `js/products-db.js`: loads active products from the Supabase `products` table and maps them into the card format used by the UI
 - `js/main.js`: shared site behavior, asset URL rewriting for Supabase Storage, product rendering, filters, hover image swap, and cart badge sync
-- `js/footer.js`: injects the shared footer
+- `js/footer.js`: injects the shared footer, including popular-search/collection links
+- `js/search.js`: site search overlay behavior
+- `js/guide-modals.js`: ring/diamond/gold/necklace/bracelet size-guide modals opened from the footer
 
 ## Backend-related files
 
 - `supabase_schema.sql`: creates and secures the `profiles` table, syncs new `auth.users` rows into profiles, and wires a welcome-email trigger
 - `supabase/functions/welcome-email/index.ts`: Edge Function that sends a welcome email through Resend when a profile is created
+- `supabase/functions/signup-otp/index.ts`: Edge Function that sends and verifies a 6-digit signup OTP via Resend, backed by a short-lived `signup_otp_codes` table
+- `supabase/functions/create-razorpay-order/index.ts` and `supabase/functions/verify-razorpay-payment/index.ts`: Edge Functions backing the Razorpay checkout flow (see "Important repo notes" below for deployment status)
+- `supabase/functions/update-gold-rate/index.ts`: Edge Function intended to refresh the live gold rate (see "Important repo notes")
 - `s3Client.js`: Node-side S3 client configuration for a Supabase Storage S3 endpoint
 - `storage.js`: helper utilities to list, fetch, and upload files in the configured bucket
 
@@ -127,17 +148,24 @@ This file sets up:
 - a trigger to mirror new `auth.users` records into `profiles`
 - a trigger that calls the welcome-email function after profile creation
 
-### 4. Welcome email function
+### 4. Welcome email and signup OTP functions
 
-Deploy `supabase/functions/welcome-email/index.ts` as a Supabase Edge Function.
+Deploy `supabase/functions/welcome-email/index.ts` and `supabase/functions/signup-otp/index.ts` as Supabase Edge Functions.
 
-Required secrets:
+Required secrets for `welcome-email`:
 
 - `RESEND_API_KEY`
 - `WELCOME_FROM_EMAIL`
 - `WEBHOOK_SECRET`
 
-The function comments also note that JWT verification should be turned off for this webhook-driven endpoint.
+Required secrets for `signup-otp`:
+
+- `RESEND_API_KEY`
+- `OTP_FROM_EMAIL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `OTP_SECRET`
+
+The function comments also note that JWT verification should be turned off for `welcome-email`, since it's a webhook-driven endpoint.
 
 ### 5. Optional Node storage helper
 
@@ -171,7 +199,7 @@ Frontend features that require external services already referenced in code:
 - live product loading from Supabase `products`
 - checkout via Razorpay
 - order creation and payment verification via Supabase Edge Functions
-- welcome emails via Resend
+- welcome emails and signup OTP emails via Resend
 - asset hosting through the configured Supabase Storage bucket
 
 ## Important repo notes
@@ -180,9 +208,9 @@ These are worth knowing before you try to run everything end to end:
 
 - `checkout.html` calls Supabase Edge Functions named `create-razorpay-order` and `verify-razorpay-payment` — the code for both now exists at `supabase/functions/create-razorpay-order/` and `supabase/functions/verify-razorpay-payment/`, but neither is **deployed** yet, and both need `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` secrets set before they'll work (unlike `welcome-email`, leave "Enforce JWT Verification" **ON** for these two — checkout.html calls them with a real signed-in user's token).
 - `supabase/functions/update-gold-rate/index.ts` exists but is **not deployed or scheduled**. Until it (or something like it) is wired up, `public.gold_rates.rate_24kt_per_gram` is a manually looked-up snapshot set by `supabase_schema.sql`, not a live feed — update it by hand periodically, or deploy the function per its header comment.
-- `index.html` references `js/hero-db.js`, but that file is not present in the `js/` folder.
-- `collections.html` and `product.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.
-- Product and brand naming are mixed between `OrenkaFine` and `OrenkaFine`.
+- `index.html` and `cart-item.html` reference `js/hero-db.js`, but that file is not present in the `js/` folder.
+- `collections.html`, `mens-collection.html`, and `product.html`/`product-men.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.
+- Product and brand naming are mixed between `OrenkaFine` and `Orenkafine`.
 - The README that was previously in this repo described an older, smaller structure and did not match the current files.
 
 ## Suggested next cleanup steps
@@ -190,6 +218,6 @@ These are worth knowing before you try to run everything end to end:
 If you continue working on this repo, the highest-value follow-ups are:
 
 1. Add the missing checkout Edge Functions or remove the broken checkout calls.
-2. Add or remove the missing `js/hero-db.js` reference in `index.html`.
+2. Add or remove the missing `js/hero-db.js` reference in `index.html` and `cart-item.html`.
 3. Move hardcoded Supabase credentials out of committed frontend code if you want cleaner environment separation.
-4. Standardize branding between `OrenkaFine`, `OrenkaFine`, and `OrenkaFine`.
+4. Standardize branding casing between `OrenkaFine` and `Orenkafine`.
