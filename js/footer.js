@@ -70,8 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="care-guide.html">Care Guide</a></li>
             <li><a href="about.html">Journal</a></li>
             <li><a href="purchase-with-peace.html">Purchase with Peace</a></li>
-            <li><a href="loyalty-program.html">Loyalty Program</a></li>
-            <li><a href="contact.html">FAQ</a></li>
+            <li><a href="loyalty-program.html">Loyalty Program & FAQ</a></li>
           </ul>
         </div>
         <div class="footer-col">
