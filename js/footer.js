@@ -3,38 +3,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("footer");
   if (!el || el.children.length) return;
 
-  // Terms that match a real shop category link straight into it (collections.html?cat=…);
-  // everything else (price bands, marketing collection names, unstocked categories) falls
-  // back to the general collections page since there's no matching filter to deep-link to.
+  // Terms that match a real shop category deep-link straight into it
+  // (collections.html?cat=…, case-insensitive match against collections.html's
+  // SHOP_CATS) or, for price bands, into its maxPrice filter. Terms with no
+  // matching category/price filter (marketing collection names, unstocked
+  // categories) fall back to the general collections page.
   const POPULAR_SEARCHES = [
     ["Rings", "collections.html?cat=Rings"],
     ["Necklaces", "collections.html?cat=Necklaces"],
     ["Bangles & Bracelets", "collections.html?cat=Bracelets"],
     ["Earrings", "collections.html?cat=Earrings"],
-    ["Custom Solitaire Jewellery", "collections.html"],
+    ["Custom Solitaire Jewellery", "collections.html?cat=Rings"],
     ["Loose Diamonds", "collections.html"],
     ["Charms & Pendants", `collections.html?cat=${encodeURIComponent("Charms & Pendants")}`],
     ["Gold Chains", "collections.html?cat=Necklaces"],
     ["Engravable Jewellery", "collections.html"],
     ["Nose Pins", "collections.html"],
     ["Men's Jewellery", "mens-collection.html"],
-    ["Under ₹15K", "collections.html"],
-    ["Under ₹25K", "collections.html"],
+    ["Under ₹15K", "collections.html?maxPrice=15000"],
+    ["Under ₹25K", "collections.html?maxPrice=25000"],
     ["Mangalsutra", "collections.html?cat=Necklaces"],
     ["Pre-Set Solitaire Rings", "collections.html?cat=Rings"],
     ["Diamond Earrings", "collections.html?cat=Earrings"],
   ];
   const POPULAR_COLLECTIONS = [
-    ["Script Necklaces", "collections.html"],
+    ["Script Necklaces", "collections.html?cat=Necklaces"],
     ["Evil Eye Collection", "collections.html"],
     ["Bunchberry Collection", "collections.html"],
-    ["Space Letter Necklaces", "collections.html"],
-    ["Tiny Studs", "collections.html"],
-    ["Name Necklaces", "collections.html"],
+    ["Space Letter Necklaces", "collections.html?cat=Necklaces"],
+    ["Tiny Studs", "collections.html?cat=Earrings"],
+    ["Name Necklaces", "collections.html?cat=Necklaces"],
     ["Office Wear Jewellery", "collections.html"],
-    ["Eternity Rings", "collections.html"],
-    ["Fashion Earrings", "collections.html"],
-    ["Pendant Necklaces", "collections.html"],
+    ["Eternity Rings", "collections.html?cat=Rings"],
+    ["Fashion Earrings", "collections.html?cat=Earrings"],
+    ["Pendant Necklaces", "collections.html?cat=Necklaces"],
   ];
   const popularLinksHTML = (items) =>
     items.map(([label, href]) => `<a href="${href}">${label}</a>`).join('<span aria-hidden="true">|</span>');
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="collections.html?cat=Necklaces">Necklaces</a></li>
             <li><a href="collections.html?cat=Earrings">Earrings</a></li>
             <li><a href="collections.html?cat=Bracelets">Bracelets</a></li>
-            <li><a href="collections.html?cat=Pendants">Pendants</a></li>
+            <li><a href="collections.html?cat=${encodeURIComponent("Charms & Pendants")}">Pendants</a></li>
             <li><a href="gift-card.html">Gift Cards</a></li>
           </ul>
         </div>
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="loyalty-program.html">Loyalty Program & FAQ</a></li>
           </ul>
         </div>
-        <div class="footer-col">
+        <div class="footer-col"> 
           <h5>Size Guide</h5>
           <ul>
             <li><a href="#" data-guide="size">Ring Size Guide</a></li>

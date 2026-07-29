@@ -265,14 +265,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     return; // nothing to wire up if there's no data
   }
 
-  const urlCat = new URLSearchParams(window.location.search).get("cat");
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlCat = urlParams.get("cat");
+  const urlMaxPrice = parseInt(urlParams.get("maxPrice"), 10);
   const initialCategory =
     (urlCat && SHOP_CATS.find((cat) => cat.toLowerCase() === urlCat.toLowerCase())) ||
     SHOP_CATS.find((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat)) ||
     SHOP_CATS[0];
   const HOUSE_OPTIONS = [...new Set(SHOP_PRODUCTS.map((p) => p.brand))];
   const CATEGORY_OPTIONS = SHOP_CATS.filter((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat));
-  const state = { maxPrice: 0, colors: new Set(), materials: new Set(), category: initialCategory, house: HOUSE_OPTIONS[0] };
+  const state = {
+    maxPrice: Number.isFinite(urlMaxPrice) && urlMaxPrice > 0 ? urlMaxPrice : 0,
+    colors: new Set(),
+    materials: new Set(),
+    category: initialCategory,
+    house: HOUSE_OPTIONS[0],
+  };
   const houseDisplayName = (brand) => (brand === "OrenkaFine Jewellery" ? "Fine Jewellery" : "Light Weight Jewellery");
 
   function renderTopMenus() {
@@ -328,8 +336,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     priceMax.max = String(max);
     if (!state.maxPrice || state.maxPrice < min || state.maxPrice > max) {
       state.maxPrice = max;
-      priceMax.value = String(max);
     }
+    priceMax.value = String(state.maxPrice);
     priceMaxLabel.textContent = `₹${min} to ₹${state.maxPrice}`;
   }
 
