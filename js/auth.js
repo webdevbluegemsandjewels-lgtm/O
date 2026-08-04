@@ -196,7 +196,47 @@ async function maybeShowSignupPrompt() {
   }, 1200);
 }
 
+/**
+ * Google sign-in never gives us a phone number (Google's OAuth scopes
+ * don't expose one), so accounts created that way land with
+ * profiles.phone empty. This asks for it once per browser session,
+ * skipping anyone who already has a phone on file or didn't sign in
+ * with Google, and skipping account.html since that page already has
+ * its own phone field to fill in directly.
+ */
+const PHONE_PROMPT_KEY = "orenka_phone_prompt_shown";
+
+async function maybeAskForPhone() {
+  if (sessionStorage.getItem(PHONE_PROMPT_KEY)) return;
+  if (/account\.html$/.test(window.location.pathname)) return;
+
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  const signedInWithGoogle =
+    (user.app_metadata && user.app_metadata.provider === "google") ||
+    (user.identities || []).some((i) => i.provider === "google");
+  if (!signedInWithGoogle) return;
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("phone")
+    .eq("id", user.id)
+    .single();
+  if (profile && profile.phone) return;
+
+  sessionStorage.setItem(PHONE_PROMPT_KEY, "1");
+
+  setTimeout(async () => {
+    const phone = await window.openPhonePromptModal();
+    if (phone) {
+      await supabaseClient.from("profiles").update({ phone }).eq("id", user.id);
+    }
+  }, 900);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   syncAccountUI();
   maybeShowSignupPrompt();
+  maybeAskForPhone();
 });

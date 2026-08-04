@@ -384,3 +384,95 @@
     });
   };
 })();
+
+/* =========================================================
+   Phone-number prompt — shown once, after a Google sign-in,
+   to accounts whose profiles row has no phone yet (Google
+   OAuth never hands us one). Separate mini-modal so it doesn't
+   disturb the login/signup modal's own state above.
+
+   Usage:
+     const phone = await window.openPhonePromptModal();
+     // Resolves with the trimmed phone string on save,
+     // or null if the person skips/dismisses it.
+   ========================================================= */
+(function () {
+  let modalEl = null;
+  let resolveFn = null;
+
+  function close(result) {
+    if (!modalEl) return;
+    const wrap = modalEl;
+    const modal = wrap.querySelector(".auth-modal");
+    wrap.classList.add("closing");
+    if (modal) modal.classList.add("closing");
+    document.removeEventListener("keydown", onKeydown);
+    modalEl = null;
+    setTimeout(() => {
+      wrap.remove();
+      if (!modalEl) document.body.classList.remove("auth-modal-open");
+    }, 280);
+    if (resolveFn) {
+      resolveFn(result);
+      resolveFn = null;
+    }
+  }
+
+  function onKeydown(e) {
+    if (e.key === "Escape") close(null);
+  }
+
+  window.openPhonePromptModal = function () {
+    if (modalEl) close(null);
+
+    const wrap = document.createElement("div");
+    wrap.className = "auth-modal-backdrop";
+    wrap.innerHTML = `
+      <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Add your phone number">
+        <button type="button" class="auth-modal-close" aria-label="Close">&times;</button>
+        <p style="font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); text-align:center; margin-bottom:.6rem;">One last thing</p>
+        <h2 style="text-align:center; margin-bottom:.6rem;">Add your phone number</h2>
+        <p style="text-align:center; font-size:.9rem; color:var(--ink-soft); line-height:1.6; margin-bottom:1.4rem;">Google doesn't share this with us — we'll use it to reach you about your orders.</p>
+        <p class="auth-error" data-role="phone-error" style="display:none;"></p>
+        <form data-role="phone-form">
+          <div class="auth-field">
+            <label>Phone</label>
+            <input type="tel" required autocomplete="tel" data-role="phone-input" />
+          </div>
+          <button type="submit" class="btn btn-gold auth-submit" data-role="phone-submit">Save</button>
+        </form>
+        <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
+          <a href="#" data-role="phone-skip" style="color:var(--gold); text-decoration:underline;">Maybe later</a>
+        </p>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    modalEl = wrap;
+    const modal = wrap.querySelector(".auth-modal");
+    document.body.classList.add("auth-modal-open");
+
+    wrap.querySelector(".auth-modal-close").addEventListener("click", () => close(null));
+    wrap.addEventListener("click", (e) => {
+      if (e.target === wrap) close(null);
+    });
+    document.addEventListener("keydown", onKeydown);
+
+    wrap.querySelector('[data-role="phone-skip"]').addEventListener("click", (e) => {
+      e.preventDefault();
+      close(null);
+    });
+
+    modal.querySelector('[data-role="phone-form"]').addEventListener("submit", (e) => {
+      e.preventDefault();
+      const errorEl = modal.querySelector('[data-role="phone-error"]');
+      errorEl.style.display = "none";
+      const phone = modal.querySelector('[data-role="phone-input"]').value.trim();
+      if (!phone) return;
+      close(phone);
+    });
+
+    return new Promise((resolve) => {
+      resolveFn = resolve;
+    });
+  };
+})();
