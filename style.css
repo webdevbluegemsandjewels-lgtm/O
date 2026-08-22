@@ -52,6 +52,20 @@ p{ margin:0; }
 button{ font-family: inherit; cursor:pointer; }
 :focus-visible{ outline: 2px solid var(--gold); outline-offset: 3px; }
 
+/* Mobile Safari auto-zooms the whole page in when you focus any
+   input/select/textarea whose computed font-size is under 16px.
+   Several forms across the site (auth modal, delivery pincode check,
+   contact form, newsletter fields, filter dropdowns) use font sizes
+   below that threshold, so some pages zoomed in on focus while pages
+   using 16px+ fields didn't — inconsistent per-page zoom behavior.
+   Forcing 16px site-wide on every input/select/textarea (only where
+   the viewport is actually mobile-sized) removes the trigger
+   everywhere at once, without touching desktop styling or any
+   page's regular (pinch/ctrl) zoom, which stays untouched. */
+@media (max-width: 900px){
+  input, select, textarea{ font-size: 16px !important; }
+}
+
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }

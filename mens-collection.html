@@ -147,7 +147,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   ];
 
   const loadStatus = document.getElementById("loadStatus");
-  const SHOP_PRODUCTS = await loadMensProductsFromDB();
+  const MAX_FRONTEND_PRICE = 10000;
+  const ALL_PRODUCTS = await loadMensProductsFromDB();
+  // Keep every product in the DB fetch; only send ≤ ₹10,000 pieces to the grid.
+  const SHOP_PRODUCTS = ALL_PRODUCTS.filter(
+    (p) => (parseInt(String(p.price).replace(/[^\d]/g, ""), 10) || 0) <= MAX_FRONTEND_PRICE
+  );
 
   if (loadStatus) {
     loadStatus.textContent = SHOP_PRODUCTS.length
