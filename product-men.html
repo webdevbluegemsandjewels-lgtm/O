@@ -45,8 +45,8 @@
     touch-action: pan-y;
   }
   .product-gallery-main img{ width:100%; height:100%; object-fit:cover; }
-  /* Mobile only (see max-width:900px block) — desktop still navigates
-     via the thumbnail row below, same as before. */
+  /* Hidden by default; shown on mobile (max-width:900px block below)
+     and on desktop (min-width:901px block below). */
   .gallery-nav{
     display:none;
     position:absolute; top:50%; transform:translateY(-50%);
@@ -66,6 +66,48 @@
   }
   .product-gallery-thumbs img:hover,
   .product-gallery-thumbs img.active{ opacity:1; border-color: var(--gold); }
+
+  .gallery-share-btn{
+    display:none;
+    position:absolute; top:.7rem; right:.7rem; z-index:3;
+    width:38px; height:38px; border-radius:50%;
+    align-items:center; justify-content:center;
+    background:#fff; border:1px solid var(--line);
+    cursor:pointer;
+  }
+  .gallery-share-btn svg{ width:17px; height:17px; stroke: var(--ink); }
+  .gallery-share-btn:hover{ border-color: var(--gold); }
+
+  .gallery-thumbs-wrap{ position: relative; }
+  .thumb-scroll-btn{
+    display:none;
+    width: 74px; height: 22px;
+    align-items:center; justify-content:center;
+    background:#fff; border:1px solid var(--line); cursor:pointer;
+    color: var(--ink-soft);
+  }
+  .thumb-scroll-btn:hover{ border-color: var(--gold); color: var(--ink); }
+  .thumb-scroll-btn svg{ width:13px; height:13px; stroke: currentColor; }
+
+  /* Desktop-only Amazon-style gallery: thumbnails in a vertical rail
+     to the left of the main image, plus a share icon and prev/next
+     arrows on the image. Mobile (<=900px) keeps the existing stacked
+     layout untouched. */
+  @media (min-width: 901px){
+    .product-gallery{ flex-direction: row; }
+    .gallery-thumbs-wrap{
+      order: -1; flex-shrink: 0;
+      display:flex; flex-direction:column; gap:.4rem;
+    }
+    .product-gallery-thumbs{
+      flex-direction: column; flex-wrap: nowrap;
+      width: 74px; max-height: 450px; overflow-y: auto; scrollbar-width: none;
+    }
+    .product-gallery-thumbs::-webkit-scrollbar{ display:none; }
+    .thumb-scroll-btn{ display:flex; }
+    .gallery-share-btn{ display:flex; }
+    .gallery-nav{ display:flex; }
+  }
 
   .product-detail .eyebrow{ margin-bottom:.4rem; }
   .product-detail h1{ font-size: clamp(1.9rem, 3vw, 2.6rem); margin-bottom: .6rem; line-height:1.1; }
@@ -172,6 +214,29 @@
        above so everything just stacks in plain DOM order, exactly
        like before any of this grid-cell work existed. */
     .product-gallery, .product-detail, .spec-breakup-row{ grid-column: auto; grid-row: auto; }
+
+    /* "You may also like" — horizontal scroll of small cards instead
+       of the stacked full-width grid (only this section; the shop
+       grids elsewhere keep their own mobile column layout). */
+    #relatedGrid{
+      display: flex;
+      grid-template-columns: none;
+      gap: .9rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      padding-bottom: .4rem;
+      margin: 0 calc(var(--gutter) * -1);
+      padding-inline: var(--gutter);
+    }
+    #relatedGrid .product-card{
+      flex: 0 0 auto;
+      width: 42vw;
+      max-width: 168px;
+      scroll-snap-align: start;
+    }
+    #relatedGrid .product-name{ font-size: .88rem; }
+    #relatedGrid .price-now{ font-size: .95rem; }
   }
 </style>
 </head>
@@ -223,8 +288,19 @@
           <img id="mainImage" src="" alt="" />
           <button type="button" class="gallery-nav gallery-nav-prev" id="galleryPrev" aria-label="Previous image">&#10094;</button>
           <button type="button" class="gallery-nav gallery-nav-next" id="galleryNext" aria-label="Next image">&#10095;</button>
+          <button type="button" class="gallery-share-btn" id="galleryShareBtn" aria-label="Share this product">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>
+          </button>
         </div>
-        <div class="product-gallery-thumbs" id="galleryThumbs"></div>
+        <div class="gallery-thumbs-wrap">
+          <button type="button" class="thumb-scroll-btn" id="thumbsScrollUp" aria-label="Scroll thumbnails up">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+          </button>
+          <div class="product-gallery-thumbs" id="galleryThumbs"></div>
+          <button type="button" class="thumb-scroll-btn" id="thumbsScrollDown" aria-label="Scroll thumbnails down">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
       </div>
 
       <div class="product-detail">
@@ -455,8 +531,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     showImage(Number(img.dataset.index));
   });
 
-  // Arrow buttons + touch swipe — mobile only (see .gallery-nav's
-  // max-width:900px rule; desktop keeps using the thumbnail row).
+  const THUMB_SCROLL_STEP = 82; // one thumb (74px) + its gap (.4rem/.7rem)
+  document.getElementById("thumbsScrollUp").addEventListener("click", () => {
+    thumbsEl.scrollBy({ top: -THUMB_SCROLL_STEP, behavior: "smooth" });
+  });
+  document.getElementById("thumbsScrollDown").addEventListener("click", () => {
+    thumbsEl.scrollBy({ top: THUMB_SCROLL_STEP, behavior: "smooth" });
+  });
+
+  const galleryShareBtn = document.getElementById("galleryShareBtn");
+  galleryShareBtn.addEventListener("click", async () => {
+    const shareData = { title: product.name, url: window.location.href };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (_) { /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        galleryShareBtn.setAttribute("aria-label", "Link copied");
+        setTimeout(() => galleryShareBtn.setAttribute("aria-label", "Share this product"), 1500);
+      } catch (_) { /* clipboard unavailable */ }
+    }
+  });
+
+  // Arrow buttons (shown on both mobile and desktop, see .gallery-nav's
+  // max-width:900px and min-width:901px rules) + touch swipe on mobile.
   // Swipe left (finger moves right-to-left) advances to the next
   // image, matching the arrow-next direction.
   const galleryMain = mainImage.closest(".product-gallery-main");
