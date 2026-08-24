@@ -30,13 +30,14 @@ function normalizeBucketKey(path) {
   if (head === "assets") return `Assets/${tail}`;
   if (head === "dgc") return `Dgc/${tail}`;
   if (head === "index") return `Index/${tail}`;
+  if (head === "pwp") return `Pwp/${tail}`;
   return cleanPath;
 }
 
 function toBucketUrl(path) {
   if (!path || /^https?:\/\//i.test(path) || path.startsWith("data:")) return path;
   const cleanPath = normalizeBucketKey(path);
-  if (!/^(products|assets|dgc|index)\//i.test(cleanPath)) return path;
+  if (!/^(products|assets|dgc|index|pwp)\//i.test(cleanPath)) return path;
   return `${SUPABASE_PUBLIC_BASE}/${cleanPath}`;
 }
 
