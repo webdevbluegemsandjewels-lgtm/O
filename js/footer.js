@@ -121,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <a href="#">Sitemap</a>
         </div>
       </div>
+      <div class="footer-credit">Developed by Aman Dubal | WebDev@BGJ</div>
     </div>
   `;
 });

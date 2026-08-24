@@ -1077,6 +1077,13 @@ section{ padding: 3rem 0; }
   font-size:.76rem; color: var(--ink-soft);
 }
 .footer-bottom .legal-links{ display:flex; gap: 1.4rem; }
+.footer-credit{
+  padding: 0 0 1.2rem;
+  text-align: center;
+  font-size: .72rem;
+  color: var(--ink-soft);
+  opacity: .8;
+}
 
 .popular-searches{ padding: 1.6rem 0; border-top: 1px solid var(--line-light); display:flex; flex-direction:column; gap:1.2rem; }
 .popular-block h5{ font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
