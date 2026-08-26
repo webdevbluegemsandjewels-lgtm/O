@@ -21,6 +21,10 @@
       <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Log in or sign up">
         <button type="button" class="auth-modal-close" aria-label="Close">&times;</button>
 
+        <div class="auth-modal-crest" aria-hidden="true">&#9670;</div>
+        <h2 class="auth-modal-heading" data-role="modal-heading">Welcome Back</h2>
+        <p class="auth-modal-subtitle" data-role="modal-subtitle">Sign in to track orders, save favourites, and check out faster.</p>
+
         <div class="auth-modal-tabs">
           <button type="button" class="auth-modal-tab active" data-tab="login">Log In</button>
           <button type="button" class="auth-modal-tab" data-tab="signup">Sign Up</button>
@@ -35,7 +39,7 @@
         </button>
         <div class="auth-divider">or</div>
 
-        <p style="font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); text-align:center; margin-bottom:1.1rem;">Continue with email</p>
+        <p style="font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--arch-brown,#3A2A1C); opacity:.55; text-align:center; margin-bottom:1.3rem;">Continue with email</p>
 
         <form data-role="login-form">
           <div class="auth-field">
@@ -116,6 +120,8 @@
             Didn't get it? <a href="#" data-role="otp-resend" style="color:var(--gold); text-decoration:underline;">Resend code</a>
           </p>
         </div>
+
+        <button type="button" class="auth-modal-cancel" data-role="cancel-btn">Cancel</button>
       </div>
     `;
     document.body.appendChild(wrap);
@@ -133,6 +139,17 @@
     modal.querySelector('[data-role="signup-form"]').style.display = tab === "signup" ? "block" : "none";
     modal.querySelector('[data-role="forgot-section"]').style.display = "none";
     modal.querySelector('[data-role="otp-section"]').style.display = "none";
+    const heading = modal.querySelector('[data-role="modal-heading"]');
+    const subtitle = modal.querySelector('[data-role="modal-subtitle"]');
+    if (heading && subtitle) {
+      if (tab === "signup") {
+        heading.textContent = "Join OrenkaFine";
+        subtitle.textContent = "Create an account to save your favourites and check out faster next time.";
+      } else {
+        heading.textContent = "Welcome Back";
+        subtitle.textContent = "Sign in to track orders, save favourites, and check out faster.";
+      }
+    }
     hideMessages(modal);
   }
 
@@ -206,6 +223,7 @@
     switchTab(modal, initialTab === "signup" ? "signup" : "login");
 
     wrap.querySelector(".auth-modal-close").addEventListener("click", () => close(null));
+    wrap.querySelector('[data-role="cancel-btn"]').addEventListener("click", () => close(null));
     wrap.addEventListener("click", (e) => {
       if (e.target === wrap) close(null); // backdrop click
     });
