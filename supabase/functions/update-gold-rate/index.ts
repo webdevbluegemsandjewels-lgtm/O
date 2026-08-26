@@ -1,7 +1,7 @@
 // OrenkaFine — live gold rate updater
 //
 // NOT DEPLOYED / NOT SCHEDULED YET. This is prepared for later —
-// right now public.gold_rates.rate_24kt_per_gram is just a manually
+// right now public.gold_rates.rate_24kt_per_10g is just a manually
 // looked-up snapshot set by supabase_schema.sql. This function is
 // the code for making that live; wiring it up is a separate step:
 //
@@ -52,11 +52,12 @@ serve(async () => {
 
     const usdPerGram = usdPerOunce / GRAMS_PER_TROY_OUNCE;
     const inrPerGram = usdPerGram * USD_INR_RATE;
+    const inrPer10g = inrPerGram * 10;
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     const { error } = await supabase
       .from("gold_rates")
-      .upsert({ id: 1, rate_24kt_per_gram: inrPerGram, updated_at: new Date().toISOString() });
+      .upsert({ id: 1, rate_24kt_per_10g: inrPer10g, updated_at: new Date().toISOString() });
 
     if (error) {
       console.error("Failed to update gold_rates:", error);
@@ -64,7 +65,7 @@ serve(async () => {
     }
 
     return new Response(
-      JSON.stringify({ updated: true, usd_per_ounce: usdPerOunce, usd_inr_rate: USD_INR_RATE, rate_24kt_per_gram: inrPerGram }),
+      JSON.stringify({ updated: true, usd_per_ounce: usdPerOunce, usd_inr_rate: USD_INR_RATE, rate_24kt_per_10g: inrPer10g }),
       { status: 200 }
     );
   } catch (err) {

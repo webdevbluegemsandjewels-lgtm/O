@@ -601,7 +601,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ---------- Gold rate (for real market-based karat pricing) ----------
   const { data: goldRateRow } = await supabaseClient.from("gold_rates").select("*").eq("id", 1).maybeSingle();
-  const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_gram) : null;
+  const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_10g) / 10 : null;
+
+  // ---------- Diamond variant options (per-product diamond quality/carat combos) ----------
+  // Backed by public.product_variants — each row is one (quality, carat)
+  // option calculate_product_price() can price exactly. Products not yet
+  // migrated to product_variants just get an empty array here and fall
+  // back to the legacy diamondOptionsReal/DIAMOND_QUALITY_MULTIPLIER path
+  // further down, unchanged.
+  const { data: diamondVariantRows } = product.has_diamond
+    ? await supabaseClient.from("product_variants").select("*").eq("product_id", product.id)
+    : { data: [] };
+  const diamondVariants = diamondVariantRows || [];
+
+  // ---------- Size variant options (real per-size gold weight) ----------
+  // Backed by public.product_sizes when a product has real per-size
+  // weight data (e.g. a bracelet that gets heavier at bigger sizes).
+  // Products without any rows here fall back to the existing
+  // sizeWeightMultiplier() approximation further down, unchanged.
+  const { data: productSizeRows } = await supabaseClient.from("product_sizes").select("*").eq("product_id", product.id);
+  const productSizes = productSizeRows || [];
+  function currentSize() {
+    return productSizes.find((s) => s.size === selectedAttrs.size) || null;
+  }
 
   const KARAT_PURITY = { "18kt": 0.75, "14kt": 14 / 24, "9kt": 9 / 24 };
   const KARAT_LABELS = { "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
@@ -745,7 +767,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     sizeFallback = [];
   }
 
-  const sizeOptionsToShow = sizeOptions.length ? sizeOptions : sizeFallback;
+  const sizeOptionsFromTable = productSizes.map((s) => s.size);
+  const sizeOptionsToShow = sizeOptionsFromTable.length ? sizeOptionsFromTable : (sizeOptions.length ? sizeOptions : sizeFallback);
   const sizeSection = document.getElementById("sizeSection");
   const sizeRow = document.getElementById("sizeRow");
   if (!selectedAttrs.size && sizeOptionsToShow.length) selectedAttrs.size = sizeOptionsToShow[0];
@@ -798,7 +821,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (product.has_diamond) {
     document.getElementById("diamondSection").style.display = "block";
     const diamondRow = document.getElementById("diamondRow");
-    const diamondOptionsToShow = diamondOptionsReal.length ? diamondOptionsReal : ["GH-VS-SI", "F-G-VVS-VS"];
+    const diamondOptionsFromVariants = [...new Set(diamondVariants.map((v) => v.diamond_quality).filter(Boolean))];
+    const diamondOptionsToShow = diamondOptionsFromVariants.length
+      ? diamondOptionsFromVariants
+      : (diamondOptionsReal.length ? diamondOptionsReal : ["GH-VS-SI", "F-G-VVS-VS"]);
     if (!selectedAttrs.diamond || !diamondOptionsToShow.includes(selectedAttrs.diamond)) {
       selectedAttrs.diamond = diamondOptionsToShow[0];
     }
@@ -837,7 +863,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const CONTACT_PHONE = "+912055550142"; // same number used by "Call for Enquiry" in the Trial Cart menu
 
-  function refreshDisplayedPrice() {
+  // Real bottom-up pricing (Gold + Diamond + Making, then GST), computed
+  // server-side by calculate_product_price() so the formula lives in one
+  // place instead of duplicated across pages. Falls back to the existing
+  // legacy computeAdjustedPrice()/diamondMultiplier() path — UNCHANGED —
+  // whenever the RPC can't calculate (no gold_weight_grams on this
+  // product, or gold_rates/pricing_settings missing), which is exactly
+  // today's behavior for any product not yet migrated to the new tables.
+  async function getPriceResult() {
+    const basePrice = Number(activeVariant.price) || 0;
+
+    const selectedVariant = diamondVariants.find((v) => v.diamond_quality === selectedAttrs.diamond) || null;
+    const selectedSize = currentSize();
+
+    const { data: calc } = await supabaseClient.rpc("calculate_product_price", {
+      p_product_id: product.id,
+      p_karat: selectedKarat,
+      p_variant_id: selectedVariant ? selectedVariant.id : null,
+      p_size_id: selectedSize ? selectedSize.id : null,
+    });
+
+    if (calc && calc[0] && calc[0].is_calculated) {
+      return { price: Number(calc[0].final_price), isExact: true, breakdown: calc[0] };
+    }
+
+    const weight = selectedSize
+      ? Number(selectedSize.gold_weight_grams)
+      : (activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null);
+    const legacy = computeAdjustedPrice(basePrice, weight, selectedKarat);
+    return { price: legacy.price * diamondMultiplier(), isExact: legacy.isExact, breakdown: null };
+  }
+
+  async function refreshDisplayedPrice() {
     const basePrice = Number(activeVariant.price) || 0;
     const addBtn = document.getElementById("addToCartBtn");
     const qtyRow = document.querySelector(".qty-add-row");
@@ -870,10 +927,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     pointsEl.style.display = "";
 
     const baseOldPrice = activeVariant.old_price ? Number(activeVariant.old_price) : null;
-    const weight = activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null;
+    const selectedSize = currentSize();
+    const weight = selectedSize
+      ? Number(selectedSize.gold_weight_grams)
+      : (activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null);
 
-    const result = computeAdjustedPrice(basePrice, weight, selectedKarat);
-    const displayPrice = result.price * diamondMultiplier();
+    const result = await getPriceResult();
+    const displayPrice = result.price;
 
     document.getElementById("priceNow").textContent = `₹${Math.round(displayPrice).toLocaleString("en-IN")}`;
 
@@ -889,13 +949,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveEl.style.display = "none";
     }
 
-    document.getElementById("priceApproxNote").style.display =
-      (selectedKarat !== "18kt" || sizeWeightMultiplier() !== 1 || diamondMultiplier() !== 1) ? "block" : "none";
+    // Bottom-up prices (result.breakdown set) are genuinely exact for
+    // every selection, so the "approximate" note only applies to the
+    // legacy path — same condition it always used there.
+    document.getElementById("priceApproxNote").style.display = result.breakdown
+      ? "none"
+      : ((selectedKarat !== "18kt" || sizeWeightMultiplier() !== 1 || diamondMultiplier() !== 1) ? "block" : "none");
 
     pointsEl.textContent =
       `🎁 Purchase this item and get ${Math.round(displayPrice / 10).toLocaleString("en-IN")} Points`;
 
-    updateSpecBreakup(displayPrice, weight);
+    updateSpecBreakup(displayPrice, weight, result.breakdown);
   }
 
   // ---------- Product Details / Diamond Details / Metal Details / Price Break Up ----------
@@ -905,7 +969,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // displayed price. Rows/columns with no data on this product are
   // hidden rather than shown as "₹0" or blank.
   const specRow = document.getElementById("specBreakupRow");
-  function updateSpecBreakup(displayPrice, weightGrams) {
+  function updateSpecBreakup(displayPrice, weightGrams, breakdown) {
     if (!product.product_code) {
       specRow.style.display = "none";
       return;
@@ -939,17 +1003,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("specNetWeight").style.display = weightGrams ? "block" : "none";
     if (weightGrams) document.getElementById("specNetWeight").innerHTML = `Net Weight (approx): <strong>${weightGrams.toFixed(2)} g</strong>`;
 
-    const fmt = (n) => `₹${Math.round(n).toLocaleString("en-IN")}`;
-    document.getElementById("specGold").innerHTML = `Gold: <strong>${fmt(displayPrice * (product.gold_share_pct || 0) / 100)}</strong>`;
-    const diamondPriceEl = document.getElementById("specDiamondPrice");
-    if (product.has_diamond && product.diamond_share_pct) {
-      diamondPriceEl.style.display = "block";
-      diamondPriceEl.innerHTML = `Diamond: <strong>${fmt(displayPrice * product.diamond_share_pct / 100)}</strong>`;
+    const fmt = (n) => `₹${Math.round(Number(n)).toLocaleString("en-IN")}`;
+
+    if (breakdown) {
+      // Real bottom-up figures from calculate_product_price() — these
+      // are the actual costs that summed (plus GST) to displayPrice,
+      // not an illustrative percentage split.
+      document.getElementById("specGold").innerHTML = `Gold: <strong>${fmt(breakdown.gold_cost)}</strong>`;
+      const diamondPriceEl = document.getElementById("specDiamondPrice");
+      if (product.has_diamond && Number(breakdown.diamond_cost) > 0) {
+        diamondPriceEl.style.display = "block";
+        diamondPriceEl.innerHTML = `Diamond: <strong>${fmt(breakdown.diamond_cost)}</strong>`;
+      } else {
+        diamondPriceEl.style.display = "none";
+      }
+      document.getElementById("specMaking").innerHTML = `Making: <strong>${fmt(breakdown.making_charge)}</strong>`;
+      document.getElementById("specGst").innerHTML = `GST: <strong>${fmt(breakdown.gst)}</strong>`;
     } else {
-      diamondPriceEl.style.display = "none";
+      // Legacy illustrative percentage split (unchanged).
+      document.getElementById("specGold").innerHTML = `Gold: <strong>${fmt(displayPrice * (product.gold_share_pct || 0) / 100)}</strong>`;
+      const diamondPriceEl = document.getElementById("specDiamondPrice");
+      if (product.has_diamond && product.diamond_share_pct) {
+        diamondPriceEl.style.display = "block";
+        diamondPriceEl.innerHTML = `Diamond: <strong>${fmt(displayPrice * product.diamond_share_pct / 100)}</strong>`;
+      } else {
+        diamondPriceEl.style.display = "none";
+      }
+      document.getElementById("specMaking").innerHTML = `Making: <strong>${fmt(displayPrice * (product.making_share_pct || 0) / 100)}</strong>`;
+      document.getElementById("specGst").innerHTML = `GST: <strong>${fmt(displayPrice * (product.gst_share_pct || 0) / 100)}</strong>`;
     }
-    document.getElementById("specMaking").innerHTML = `Making: <strong>${fmt(displayPrice * (product.making_share_pct || 0) / 100)}</strong>`;
-    document.getElementById("specGst").innerHTML = `GST: <strong>${fmt(displayPrice * (product.gst_share_pct || 0) / 100)}</strong>`;
   }
 
   refreshDisplayedPrice();
@@ -999,10 +1081,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     qtyInput.value = v;
   });
 
-  function currentDisplayedPrice() {
-    const basePrice = Number(activeVariant.price) || 0;
-    const weight = activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null;
-    return computeAdjustedPrice(basePrice, weight, selectedKarat).price * diamondMultiplier();
+  async function currentDisplayedPrice() {
+    return (await getPriceResult()).price;
   }
 
   // ---------- Trial Cart dropdown ----------
@@ -1021,7 +1101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       slug: activeVariant.slug,
       name: `${activeVariant.name} (Trial)`,
       image: activeVariant.image || images[0] || "",
-      price: currentDisplayedPrice(),
+      price: await currentDisplayedPrice(),
       color: selectedColor,
       size: selectedAttrs.size,
       metalType: KARAT_LABELS[selectedKarat],
@@ -1050,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       slug: activeVariant.slug,
       name: activeVariant.name,
       image: activeVariant.image || images[0] || "",
-      price: currentDisplayedPrice(),
+      price: await currentDisplayedPrice(),
       color: selectedColor,
       size: selectedAttrs.size,
       metalType: KARAT_LABELS[selectedKarat],

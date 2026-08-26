@@ -371,9 +371,14 @@ alter table public.products add column has_diamond boolean generated always as (
 
 alter table public.products add column if not exists gold_weight_grams numeric;
 
+-- Stored as ₹ per 10 grams (rate_24kt_per_10g), matching how Indian
+-- gold rates are always quoted — no manual /10 conversion needed
+-- before entering a value here. calculate_product_price() and the
+-- product.html/product-men.html legacy pricing path divide by 10
+-- internally wherever a per-gram figure is actually needed.
 create table if not exists public.gold_rates (
   id int primary key,
-  rate_24kt_per_gram numeric not null,
+  rate_24kt_per_10g numeric not null,
   updated_at timestamptz not null default now()
 );
 
@@ -384,7 +389,7 @@ create policy "Gold rates are viewable by everyone"
   on public.gold_rates for select
   using (true);
 
--- Real 24kt gold rate as of today (₹14,656/gram, Delhi retail,
+-- Real 24kt gold rate as of today (₹1,46,560 / 10g, Delhi retail,
 -- per public gold-rate sites — this is a manually looked-up
 -- snapshot, not a live feed). Update this by hand periodically for
 -- now; supabase/functions/update-gold-rate/index.ts has the code
@@ -393,10 +398,10 @@ create policy "Gold rates are viewable by everyone"
 -- before activating it.
 -- Uses "do update" (not "do nothing") so re-running this file
 -- always refreshes the row to whatever value is here.
-insert into public.gold_rates (id, rate_24kt_per_gram)
-values (1, 14656)
+insert into public.gold_rates (id, rate_24kt_per_10g)
+values (1, 146560)
 on conflict (id) do update set
-  rate_24kt_per_gram = excluded.rate_24kt_per_gram,
+  rate_24kt_per_10g = excluded.rate_24kt_per_10g,
   updated_at = now();
 
 -- Added: 2026-07-23 — ❔ VERIFY (likely run alongside the sections above,
@@ -529,3 +534,463 @@ alter table public.products add column if not exists gender text;
 -- =========================================================
 update public.products set old_price = null where old_price is not null;
 update public.mens_products set old_price = null where old_price is not null;
+
+-- Added: 2026-08-26 — drop unused/dead columns from public.products
+-- =========================================================
+-- Every column below was checked against the live frontend (js/*.js,
+-- every product/collections/checkout .html) and none of them are read
+-- anywhere:
+--   image_url, secondary_image_url  — dead duplicates; the site only
+--     ever reads `image` / `secondary_image` (see
+--     js/products-db.js mapDbProductToCard).
+--   house       — unrelated to `state.house` in collections.html,
+--                  which is actually derived from `brand`, not this
+--                  column.
+--   subcategory — never read; `category` is the only taxonomy field
+--                  the frontend filters/displays by.
+--   currency    — never read from a product row; the only `currency`
+--                  in the codebase comes from the Razorpay order
+--                  response in checkout.html, unrelated to this column.
+--   source_url  — scraper provenance only, not displayed or queried
+--                  anywhere in the storefront.
+--   updated_at  — unused on products (the `updated_at` usages in
+--                  js/cart.js are on the unrelated cart_items table).
+--   woo_id      — dead; only `woo_parent_id` is actually used (product
+--                  variant lookups in product.html/product-men.html).
+--   sku         — never read anywhere.
+--   variant_diamond_carat — dead duplicate of `diamond_weight_ct`,
+--                  which is the field product.html/product-men.html
+--                  actually display and price against.
+-- mens_products never had most of these (see supabase/mens_schema.sql)
+-- and isn't touched here — only public.products needed the cleanup.
+-- =========================================================
+alter table public.products drop column if exists image_url;
+alter table public.products drop column if exists secondary_image_url;
+alter table public.products drop column if exists house;
+alter table public.products drop column if exists subcategory;
+alter table public.products drop column if exists currency;
+alter table public.products drop column if exists source_url;
+alter table public.products drop column if exists updated_at;
+alter table public.products drop column if exists woo_id;
+alter table public.products drop column if exists sku;
+alter table public.products drop column if exists variant_diamond_carat;
+
+-- Added: 2026-08-26 — ⚠ NOT YET RUN — run this now
+-- =========================================================
+-- Bottom-up jewelry pricing: diamond_rates, pricing_settings,
+-- product_variants, calculate_product_price()
+--
+-- Real formula: GoldCost + DiamondCost + MakingCharge = Subtotal,
+-- then GST = 3% x Subtotal, FinalPrice = Subtotal + GST.
+--
+-- GoldCost uses hallmark fineness (9K=.375, 14K=.585, 18K=.750) x
+-- one 24K rate already in gold_rates. DiamondCost needs a rate per
+-- carat by quality (diamond_rates) and a per-product diamond
+-- weight/quality — but that can vary per product, and a single
+-- product can offer more than one diamond quality/carat option, so
+-- product_variants holds one row per (product, diamond quality)
+-- combination instead of a single diamond_weight_ct/
+-- variant_diamond_quality pair on products.
+--
+-- calculate_product_price() is the ONE place this formula lives
+-- (instead of duplicated across product.html, product-men.html,
+-- cart JS, and card grids). It returns is_calculated = false
+-- (all amounts null) whenever gold_weight_grams, gold_rates, or
+-- pricing_settings aren't available for a product — the frontend's
+-- existing legacy pricing path (computeAdjustedPrice /
+-- diamondMultiplier in product.html) is untouched and keeps
+-- handling that case exactly as it does today. GST is deliberately
+-- NOT added to that legacy path — historical products.price values
+-- may already include GST, so stacking another 3% on top would
+-- double-charge.
+--
+-- Scope: public.products only (the Foro catalog). mens_products is
+-- deferred — it has its own separate schema and no row-level
+-- variant structure to hang product_variants off yet.
+-- =========================================================
+
+-- Indian gold rates are always quoted "₹X per 10 grams", not per
+-- gram — rate_24kt_per_gram forced a manual /10 conversion before
+-- every insert/update. Renaming to rate_24kt_per_10g so the value
+-- can be entered exactly as quoted; calculate_product_price() and
+-- the product.html/product-men.html legacy pricing path both divide
+-- by 10 internally now. Multiplying the existing value by 10 here
+-- converts the current per-gram seed to the equivalent per-10g
+-- value, so the real rate stays the same — only its unit changes.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'gold_rates' and column_name = 'rate_24kt_per_gram'
+  ) and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'gold_rates' and column_name = 'rate_24kt_per_10g'
+  ) then
+    alter table public.gold_rates rename column rate_24kt_per_gram to rate_24kt_per_10g;
+    update public.gold_rates set rate_24kt_per_10g = rate_24kt_per_10g * 10;
+  end if;
+end $$;
+
+create table if not exists public.diamond_rates (
+  quality text primary key,
+  rate_per_ct numeric not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.diamond_rates enable row level security;
+
+drop policy if exists "Diamond rates are viewable by everyone" on public.diamond_rates;
+create policy "Diamond rates are viewable by everyone"
+  on public.diamond_rates for select
+  using (true);
+
+insert into public.diamond_rates (quality, rate_per_ct)
+values
+  ('GH-VS-SI', 75000),
+  ('F-G-VVS-VS', 95000)
+on conflict (quality) do update set
+  rate_per_ct = excluded.rate_per_ct,
+  updated_at = now();
+
+create table if not exists public.pricing_settings (
+  id int primary key,
+  making_charge_per_gram numeric not null,
+  gst_percent numeric not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.pricing_settings enable row level security;
+
+drop policy if exists "Pricing settings are viewable by everyone" on public.pricing_settings;
+create policy "Pricing settings are viewable by everyone"
+  on public.pricing_settings for select
+  using (true);
+
+insert into public.pricing_settings (id, making_charge_per_gram, gst_percent)
+values (1, 3000, 3)
+on conflict (id) do update set
+  making_charge_per_gram = excluded.making_charge_per_gram,
+  gst_percent = excluded.gst_percent,
+  updated_at = now();
+
+-- One row per (product, diamond quality) option. diamond_count is
+-- display-only (number of stones), not used in the price formula.
+create table if not exists public.product_variants (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  diamond_quality text references public.diamond_rates(quality),
+  diamond_weight_ct numeric,
+  diamond_count integer,
+  is_default boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists product_variants_product_id_idx on public.product_variants(product_id);
+create unique index if not exists product_variants_product_quality_uidx on public.product_variants(product_id, diamond_quality);
+
+alter table public.product_variants enable row level security;
+
+drop policy if exists "Product variants are viewable by everyone" on public.product_variants;
+create policy "Product variants are viewable by everyone"
+  on public.product_variants for select
+  using (true);
+
+-- Backfill: give every existing product that already has
+-- diamond_weight_ct/variant_diamond_quality set a default
+-- product_variants row, so nothing currently working breaks.
+insert into public.product_variants (product_id, diamond_quality, diamond_weight_ct, is_default)
+select id, variant_diamond_quality, diamond_weight_ct, true
+from public.products
+where diamond_weight_ct is not null
+  and variant_diamond_quality is not null
+  and not exists (
+    select 1 from public.product_variants pv where pv.product_id = products.id
+  );
+
+-- Dropped and recreated (rather than "create or replace") because
+-- this adds a new p_size_id parameter — Postgres treats a changed
+-- argument list as a different function, so replacing in place
+-- would leave the old 3-arg version lying around as a separate
+-- overload instead of actually being replaced.
+drop function if exists public.calculate_product_price(uuid, text, uuid);
+
+create or replace function public.calculate_product_price(
+  p_product_id uuid,
+  p_karat text default '18kt',
+  p_variant_id uuid default null,
+  p_size_id uuid default null
+)
+returns table (
+  gold_cost numeric,
+  diamond_cost numeric,
+  making_charge numeric,
+  gst numeric,
+  subtotal numeric,
+  final_price numeric,
+  is_calculated boolean
+)
+language plpgsql
+stable
+security definer set search_path = public
+as $$
+declare
+  v_weight numeric;
+  v_diamond_ct numeric;
+  v_diamond_quality text;
+  v_gold_rate numeric;
+  v_purity numeric;
+  v_diamond_rate numeric;
+  v_making_rate numeric;
+  v_gst_pct numeric;
+begin
+  if p_size_id is not null then
+    select ps.gold_weight_grams into v_weight
+    from public.product_sizes ps
+    where ps.id = p_size_id and ps.product_id = p_product_id;
+  else
+    select p.gold_weight_grams into v_weight
+    from public.products p where p.id = p_product_id;
+  end if;
+
+  if p_variant_id is not null then
+    select pv.diamond_weight_ct, pv.diamond_quality into v_diamond_ct, v_diamond_quality
+    from public.product_variants pv
+    where pv.id = p_variant_id and pv.product_id = p_product_id;
+  else
+    select p.diamond_weight_ct, p.variant_diamond_quality into v_diamond_ct, v_diamond_quality
+    from public.products p where p.id = p_product_id;
+  end if;
+
+  if v_weight is null then
+    return query select null::numeric, null::numeric, null::numeric, null::numeric, null::numeric, null::numeric, false;
+    return;
+  end if;
+
+  select gr.rate_24kt_per_10g into v_gold_rate from public.gold_rates gr where gr.id = 1;
+  select ps.making_charge_per_gram, ps.gst_percent into v_making_rate, v_gst_pct
+  from public.pricing_settings ps where ps.id = 1;
+
+  if v_gold_rate is null or v_making_rate is null or v_gst_pct is null then
+    return query select null::numeric, null::numeric, null::numeric, null::numeric, null::numeric, null::numeric, false;
+    return;
+  end if;
+
+  v_purity := case p_karat
+    when '9kt' then 0.375
+    when '14kt' then 0.585
+    else 0.750
+  end;
+
+  v_diamond_rate := 0;
+  if v_diamond_quality is not null then
+    select coalesce(dr.rate_per_ct, 0) into v_diamond_rate
+    from public.diamond_rates dr where dr.quality = v_diamond_quality;
+  end if;
+
+  gold_cost := v_weight * v_purity * (v_gold_rate / 10);
+  diamond_cost := coalesce(v_diamond_ct, 0) * v_diamond_rate;
+  making_charge := v_weight * v_making_rate;
+  subtotal := gold_cost + diamond_cost + making_charge;
+  gst := subtotal * (v_gst_pct / 100);
+  final_price := subtotal + gst;
+  is_calculated := true;
+  return next;
+end;
+$$;
+
+grant execute on function public.calculate_product_price(uuid, text, uuid, uuid) to anon, authenticated;
+
+-- Added: 2026-08-26 — ⚠ NOT YET RUN — run this now
+-- =========================================================
+-- Launch specs for the 4 named products: gold weight, colors, and
+-- both diamond-quality variants (GH-VS-SI / F-G-VVS-VS), matching:
+--
+--   Product                              Gold   Count  Total ct
+--   Diamond Shree Gold Bracelet          2.00g    5     0.05 ct
+--   Diamond Damru Gold Stud Earrings     1.00g    2     0.02 ct
+--   Diamond Trishul Gold Stud Earrings   1.00g    1     0.04 ct
+--   Diamond Om Gold Stud Earrings        1.00g    1     0.03 ct
+--
+-- Both quality options for a given product share the same total
+-- diamond weight/count (per the spec table above) — only the ₹/ct
+-- rate differs between them. Matched by exact product name; adjust
+-- the names below if they don't match what's actually in the DB.
+-- =========================================================
+
+-- Re-declared here (idempotent) in case this section gets run on
+-- its own before the product_variants table's own "create unique
+-- index if not exists" line above ever ran — the upsert below
+-- needs it to exist no matter which parts of this file already ran.
+create unique index if not exists product_variants_product_quality_uidx on public.product_variants(product_id, diamond_quality);
+
+update public.products set
+  gold_weight_grams = 2.00,
+  colors = array['Rose Gold','Yellow Gold','White Gold'],
+  variant_diamond_quality = 'GH-VS-SI',
+  diamond_weight_ct = 0.05
+where name = 'Diamond Shree Gold Bracelet';
+
+update public.products set
+  gold_weight_grams = 1.00,
+  colors = array['Rose Gold','Yellow Gold','White Gold'],
+  variant_diamond_quality = 'GH-VS-SI',
+  diamond_weight_ct = 0.02
+where name = 'Diamond Damru Gold Stud Earrings';
+
+update public.products set
+  gold_weight_grams = 1.00,
+  colors = array['Rose Gold','Yellow Gold','White Gold'],
+  variant_diamond_quality = 'GH-VS-SI',
+  diamond_weight_ct = 0.04
+where name = 'Diamond Trishul Gold Stud Earrings';
+
+update public.products set
+  gold_weight_grams = 1.00,
+  colors = array['Rose Gold','Yellow Gold','White Gold'],
+  variant_diamond_quality = 'GH-VS-SI',
+  diamond_weight_ct = 0.03
+where name = 'Diamond Om Gold Stud Earrings';
+
+insert into public.product_variants (product_id, diamond_quality, diamond_weight_ct, diamond_count, is_default)
+select p.id, v.quality, v.ct, v.diamond_count, (v.quality = 'GH-VS-SI')
+from public.products p
+join (
+  values
+    ('Diamond Shree Gold Bracelet', 'GH-VS-SI', 0.05::numeric, 5),
+    ('Diamond Shree Gold Bracelet', 'F-G-VVS-VS', 0.05::numeric, 5),
+    ('Diamond Damru Gold Stud Earrings', 'GH-VS-SI', 0.02::numeric, 2),
+    ('Diamond Damru Gold Stud Earrings', 'F-G-VVS-VS', 0.02::numeric, 2),
+    ('Diamond Trishul Gold Stud Earrings', 'GH-VS-SI', 0.04::numeric, 1),
+    ('Diamond Trishul Gold Stud Earrings', 'F-G-VVS-VS', 0.04::numeric, 1),
+    ('Diamond Om Gold Stud Earrings', 'GH-VS-SI', 0.03::numeric, 1),
+    ('Diamond Om Gold Stud Earrings', 'F-G-VVS-VS', 0.03::numeric, 1)
+) as v(product_name, quality, ct, diamond_count)
+  on v.product_name = p.name
+on conflict (product_id, diamond_quality) do update set
+  diamond_weight_ct = excluded.diamond_weight_ct,
+  diamond_count = excluded.diamond_count,
+  is_default = excluded.is_default;
+
+-- Added: 2026-08-26 — ⚠ NOT YET RUN — run this now
+-- =========================================================
+-- product_sizes — RUN THIS: table + Diamond Shree Gold Bracelet's
+-- real per-size gold weight, sizes 6 / 6.5 / 7, +5% weight per 0.5
+-- size step off the 2.00g base at size 6 (matches
+-- products.gold_weight_grams set above):
+--   6    -> 2.00g  (base)
+--   6.5  -> 2.10g  (+5%)
+--   7    -> 2.20g  (+10%, i.e. +5% again over 6.5)
+--
+-- One row per (product, size) — a real gold weight for that exact
+-- size, instead of the generic ±2%-per-step estimate product.html
+-- falls back to when no real per-size data exists.
+-- =========================================================
+
+create table if not exists public.product_sizes (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  size text not null,
+  gold_weight_grams numeric not null,
+  is_default boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists product_sizes_product_id_idx on public.product_sizes(product_id);
+create unique index if not exists product_sizes_product_size_uidx on public.product_sizes(product_id, size);
+
+alter table public.product_sizes enable row level security;
+
+drop policy if exists "Product sizes are viewable by everyone" on public.product_sizes;
+create policy "Product sizes are viewable by everyone"
+  on public.product_sizes for select
+  using (true);
+
+insert into public.product_sizes (product_id, size, gold_weight_grams, is_default)
+select p.id, v.size, v.weight, (v.size = '6')
+from public.products p
+join (
+  values
+    ('6', 2.00::numeric),
+    ('6.5', 2.10::numeric),
+    ('7', 2.20::numeric)
+) as v(size, weight)
+  on true
+where p.name = 'Diamond Shree Gold Bracelet'
+on conflict (product_id, size) do update set
+  gold_weight_grams = excluded.gold_weight_grams,
+  is_default = excluded.is_default;
+
+-- Added: 2026-08-26 — ⚠ NOT YET RUN — run this now
+-- =========================================================
+-- Storefront-wide visibility: only these 4 products (plus Digital
+-- Gift Cards) should show up anywhere on the site.
+--
+-- Deliberately done via is_active = false rather than deleting
+-- rows — the existing "Active products are viewable by everyone"
+-- RLS policy on public.products (added 2026-07-23, see above)
+-- already restricts every page's product query to is_active = true,
+-- so this alone hides everything else site-wide with zero frontend
+-- changes needed. It's also fully reversible: nothing is deleted,
+-- so re-activating any of these later is just flipping is_active
+-- back to true for that row.
+--
+-- Scope: public.products only. mens_products (product-men.html /
+-- mens-collection.html) is untouched — its catalog keeps showing
+-- whatever's currently active there. Gift Card rows (category =
+-- 'Gift Card') are explicitly excluded from deactivation so
+-- gift-card.html keeps working.
+-- =========================================================
+
+update public.products
+set is_active = false
+where (category is distinct from 'Gift Card')
+  and name not in (
+    'Diamond Shree Gold Bracelet',
+    'Diamond Damru Gold Stud Earrings',
+    'Diamond Trishul Gold Stud Earrings',
+    'Diamond Om Gold Stud Earrings'
+  );
+
+update public.products
+set is_active = true
+where name in (
+    'Diamond Shree Gold Bracelet',
+    'Diamond Damru Gold Stud Earrings',
+    'Diamond Trishul Gold Stud Earrings',
+    'Diamond Om Gold Stud Earrings'
+  );
+
+-- Added: 2026-08-26 — ⚠ NOT YET RUN — run this now
+-- =========================================================
+-- Snapshot the real bottom-up price into products.price for these 4
+-- products, using 18kt + each product's default diamond variant
+-- (is_default = true, i.e. GH-VS-SI) as the baseline.
+--
+-- Card/grid views (collections.html, index.html, via
+-- js/products-db.js mapDbProductToCard) read products.price
+-- directly — they don't run the live gold+diamond+making+GST
+-- formula the way product.html does, so without this the cards
+-- would still show the old scraped price while the product page
+-- shows the real one. This is a snapshot, not a live link: re-run
+-- this block whenever gold_rates/diamond_rates/pricing_settings
+-- change, to keep the cards in sync. Only updates when
+-- calculate_product_price() actually returns a value — never
+-- overwrites price with null if data's still missing for a product.
+-- =========================================================
+
+update public.products p
+set price = sub.final_price
+from (
+  select pv.product_id, c.final_price
+  from public.product_variants pv,
+       lateral calculate_product_price(pv.product_id, '18kt', pv.id) c
+  where pv.is_default = true
+    and c.is_calculated = true
+) sub
+where sub.product_id = p.id
+  and p.name in (
+    'Diamond Shree Gold Bracelet',
+    'Diamond Damru Gold Stud Earrings',
+    'Diamond Trishul Gold Stud Earrings',
+    'Diamond Om Gold Stud Earrings'
+  );

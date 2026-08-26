@@ -602,7 +602,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ---------- Gold rate (for real market-based karat pricing) ----------
   const { data: goldRateRow } = await supabaseClient.from("gold_rates").select("*").eq("id", 1).maybeSingle();
-  const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_gram) : null;
+  const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_10g) / 10 : null;
 
   const KARAT_PURITY = { "18kt": 0.75, "14kt": 14 / 24, "9kt": 9 / 24 };
   const KARAT_LABELS = { "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
