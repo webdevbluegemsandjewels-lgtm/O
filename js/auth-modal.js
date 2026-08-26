@@ -39,7 +39,7 @@
         </button>
         <div class="auth-divider">or</div>
 
-        <p style="font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--arch-brown,#3A2A1C); opacity:.55; text-align:center; margin-bottom:1.3rem;">Continue with email</p>
+        <p style="font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--arch-brown,#3A2A1C); opacity:.55; text-align:center; margin-bottom:1.1rem;">Continue with email</p>
 
         <form data-role="login-form">
           <div class="auth-field">
@@ -50,18 +50,18 @@
             <label>Password</label>
             <input type="password" required autocomplete="current-password" data-role="login-password" />
           </div>
-          <p style="text-align:right; margin:-.6rem 0 1rem;"><a href="#" data-role="forgot-link" style="font-size:.82rem; color:var(--gold); text-decoration:underline;">Forgot password?</a></p>
+          <p style="text-align:right; margin:-.4rem 0 .7rem;"><a href="#" data-role="forgot-link" style="font-size:.7rem; color:var(--gold); text-decoration:underline;">Forgot password?</a></p>
           <button type="submit" class="btn btn-gold auth-submit" data-role="login-submit">Log In</button>
         </form>
 
         <div data-role="forgot-section" style="display:none;">
-          <p style="margin-bottom:1rem; font-size:.9rem; color:var(--ink-soft); line-height:1.6;">Enter your account email and we'll send you a link to reset your password.</p>
+          <p style="margin-bottom:.7rem; font-size:.76rem; color:var(--ink-soft); line-height:1.5;">Enter your account email and we'll send you a link to reset your password.</p>
           <div class="auth-field">
             <label>Email</label>
             <input type="email" required autocomplete="email" data-role="forgot-email" />
           </div>
           <button type="button" class="btn btn-gold auth-submit" data-role="forgot-submit">Send Reset Link</button>
-          <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
+          <p style="text-align:center; margin-top:.7rem; font-size:.72rem;">
             <a href="#" data-role="forgot-back" style="color:var(--gold); text-decoration:underline;">Back to log in</a>
           </p>
         </div>
@@ -110,13 +110,13 @@
         </form>
 
         <div data-role="otp-section" style="display:none;">
-          <p data-role="otp-message" style="margin-bottom:1rem; font-size:.9rem; color:var(--ink-soft); line-height:1.6;"></p>
+          <p data-role="otp-message" style="margin-bottom:.7rem; font-size:.76rem; color:var(--ink-soft); line-height:1.5;"></p>
           <div class="auth-field">
             <label>Verification code</label>
             <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="one-time-code" data-role="otp-code" />
           </div>
           <button type="button" class="btn btn-gold auth-submit" data-role="otp-verify">Verify</button>
-          <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
+          <p style="text-align:center; margin-top:.7rem; font-size:.72rem;">
             Didn't get it? <a href="#" data-role="otp-resend" style="color:var(--gold); text-decoration:underline;">Resend code</a>
           </p>
         </div>
@@ -448,9 +448,9 @@
     wrap.innerHTML = `
       <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Add your phone number">
         <button type="button" class="auth-modal-close" aria-label="Close">&times;</button>
-        <p style="font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); text-align:center; margin-bottom:.6rem;">One last thing</p>
-        <h2 style="text-align:center; margin-bottom:.6rem;">Add your phone number</h2>
-        <p style="text-align:center; font-size:.9rem; color:var(--ink-soft); line-height:1.6; margin-bottom:1.4rem;">Google doesn't share this with us — we'll use it to reach you about your orders.</p>
+        <p style="font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); text-align:center; margin-bottom:.4rem;">One last thing</p>
+        <h2 class="auth-modal-heading" style="margin-bottom:.4rem;">Add your phone number</h2>
+        <p style="text-align:center; font-size:.76rem; color:var(--ink-soft); line-height:1.5; margin-bottom:.9rem;">Google doesn't share this with us — we'll use it to reach you about your orders.</p>
         <p class="auth-error" data-role="phone-error" style="display:none;"></p>
         <form data-role="phone-form">
           <div class="auth-field">
@@ -459,7 +459,7 @@
           </div>
           <button type="submit" class="btn btn-gold auth-submit" data-role="phone-submit">Save</button>
         </form>
-        <p style="text-align:center; margin-top:1rem; font-size:.85rem;">
+        <p style="text-align:center; margin-top:.7rem; font-size:.72rem;">
           <a href="#" data-role="phone-skip" style="color:var(--gold); text-decoration:underline;">Maybe later</a>
         </p>
       </div>
