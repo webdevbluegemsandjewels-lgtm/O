@@ -199,7 +199,9 @@ button{ font-family: inherit; cursor:pointer; }
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
-.video-showcase video{
+.video-showcase video,
+.video-showcase > a{
+  display:block;
   width:100%;
   height:100%;
   object-fit:cover;
@@ -209,6 +211,10 @@ button{ font-family: inherit; cursor:pointer; }
   box-shadow: 0 40px 90px rgba(0,0,0,.15);
   filter: saturate(1.02) brightness(.92);
 }
+.video-showcase > a video{
+  width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;
+  box-shadow:none; filter:none;
+}
 @media (max-width: 760px){
   .video-showcase{
     grid-template-columns: repeat(4, minmax(140px, 1fr));
@@ -217,7 +223,8 @@ button{ font-family: inherit; cursor:pointer; }
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
   }
-  .video-showcase video{
+  .video-showcase video,
+  .video-showcase > a{
     min-height: 180px;
     scroll-snap-align: start;
   }
@@ -1593,7 +1600,8 @@ section{ padding: 3rem 0; }
   .btn{ width: 100%; justify-content: center; }
   .product-grid{ grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
   .video-showcase{ grid-template-columns: repeat(4, minmax(160px, 1fr)); overflow-x: auto; padding-bottom: .75rem; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
-  .video-showcase video{ min-height: 180px; scroll-snap-align: start; }
+  .video-showcase video,
+  .video-showcase > a{ min-height: 180px; scroll-snap-align: start; }
   .cat-band{ grid-template-columns: repeat(5, 1fr); }
   .collection-showcase .collection-cards{ grid-template-columns: 1fr; }
   .brands-split{ grid-template-columns: 1fr; gap: 1rem; }
