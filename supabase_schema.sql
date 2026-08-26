@@ -515,3 +515,17 @@ alter table public.cart_items add column if not exists unit_price numeric;
 -- =========================================================
 
 alter table public.products add column if not exists gender text;
+
+-- Added: 2026-08-26 — clear out discounted (old_price) values
+-- =========================================================
+-- Removes every existing old_price value on both catalogs. These were
+-- seeded/imported data, not confirmed real discounts — the storefront
+-- (js/products-db.js mapDbProductToCard) auto-derives the "old price"
+-- strike-through and discount % straight from this column whenever
+-- it's non-null, so clearing it here removes every discount badge
+-- site-wide without any frontend changes. The old_price column itself
+-- is kept (not dropped) — set it manually, per product, only for
+-- items that actually have a real discount going forward.
+-- =========================================================
+update public.products set old_price = null where old_price is not null;
+update public.mens_products set old_price = null where old_price is not null;

@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ];
 
   const loadStatus = document.getElementById("loadStatus");
-  const MAX_FRONTEND_PRICE = 10000;
+  const MAX_FRONTEND_PRICE = 20000;
   const DB_PRODUCTS = await loadProductsFromDB();
   // Keep every product in the DB fetch; only send ≤ ₹10,000 pieces to the grid.
   const SHOP_PRODUCTS = DB_PRODUCTS.filter(
