@@ -34,13 +34,14 @@ function normalizeBucketKey(path) {
   if (head === "ourstory") return `OurStory/${tail}`;
   if (head === "founder") return `Founder/${tail}`;
   if (head === "male") return `Male/${tail}`;
+  if (head === "contact") return `Contact/${tail}`;
   return cleanPath;
 }
 
 function toBucketUrl(path) {
   if (!path || /^https?:\/\//i.test(path) || path.startsWith("data:")) return path;
   const cleanPath = normalizeBucketKey(path);
-  if (!/^(products|assets|dgc|index|pwp|ourstory|founder|male)\//i.test(cleanPath)) return path;
+  if (!/^(products|assets|dgc|index|pwp|ourstory|founder|male|contact)\//i.test(cleanPath)) return path;
   return `${SUPABASE_PUBLIC_BASE}/${cleanPath}`;
 }
 
