@@ -38,10 +38,15 @@
     }
   }
   .catwalk-video{
-    grid-area: image;
-    width: 100%;
-    max-width: 100%;
-    justify-self: stretch;
+    grid-area: image !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 360px !important;
+    max-height: none !important;
+    aspect-ratio: 16 / 9 !important;
+    object-fit: contain !important;
+    justify-self: center !important;
+    align-self: start !important;
     background:#fff;
     border-radius:10px;
     border:1px solid var(--line);
@@ -107,9 +112,7 @@
       <p class="eyebrow">Our philosophy</p>
       <h2 class="about-split-title">The world is my catwalk</h2>
     </div>
-    <video class="catwalk-video" autoplay muted loop playsinline preload="metadata">
-      <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/TheHouse/wimc.mp4" type="video/mp4" />
-    </video>
+    <img class="catwalk-video" src="TheHouse/cat.png" alt="The world is my catwalk" loading="lazy" />
     <div class="about-split-body">
       <p>OrenkaFine was founded on a simple idea: fine Jewellery should be worn, not saved for occasions. Our founder began sketching pieces at café tables across Europe, gathering color and form from wherever life took her.</p>
       <p>Today the house designs two distinct lines from the same studio — OrenkaFine Jewellery, our fine gold collection, and OrenkaFine Moda, our fashion-forward everyday pieces — united by the same hand-finished craftsmanship.</p>
@@ -123,9 +126,7 @@
       <p class="eyebrow">Craftsmanship</p>
       <h2 class="about-split-title">Made to be layered, mixed, and lived in</h2>
     </div>
-    <video class="catwalk-video" autoplay muted loop playsinline preload="metadata">
-      <source src="https://xjepiecjsomrallliifj.supabase.co/storage/v1/object/public/Images/TheHouse/cms.mp4" type="video/mp4" />
-    </video>
+    <img class="catwalk-video" src="TheHouse/craft.png" alt="Made to be layered, mixed, and lived in" loading="lazy" />
     <div class="about-split-body">
       <p>Every setting is finished by hand in small batches. We work in gold, diamond and considered gemstones — amethyst, emerald, London blue topaz — chosen for how they catch the light against skin.</p>
       <p>We design in families, not single pieces, so a ring, a stack of bangles and a pair of earrings from the same collection always feel like they belong together.</p>
