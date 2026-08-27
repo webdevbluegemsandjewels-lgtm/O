@@ -104,11 +104,12 @@ set gst_share_pct = coalesce(gst_share_pct, 3)
 where gender = 'Men'
   and gst_share_pct is null;
 
+-- Added: 2026-08-27 — width_mm/thickness_mm are real physical
+-- measurements, not something safe to guess with random(). See the
+-- matching note in seed_product_specs.sql.
 update public.products
 set
   product_code = coalesce(product_code, 'GM' || lpad(floor(random() * 900 + 100)::int::text, 3, '0')),
-  width_mm = coalesce(width_mm, round((1.5 + random() * 4.5)::numeric, 1)),
-  thickness_mm = coalesce(thickness_mm, round((1.0 + random() * 1.8)::numeric, 1)),
   diamond_weight_ct = case
     when has_diamond then coalesce(diamond_weight_ct, round((0.05 + random() * 0.85)::numeric, 2))
     else null

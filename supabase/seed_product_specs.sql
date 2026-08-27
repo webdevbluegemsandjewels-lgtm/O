@@ -7,8 +7,10 @@
 -- Columns added (all nullable — the panel just hides a row if a
 -- product's value is null):
 --   product_code       text     e.g. "FE342" (shown as "Product Code")
---   width_mm            numeric  e.g. 2.9     (shown as "Width")
---   thickness_mm        numeric  e.g. 1.5     (shown as "Thickness")
+--   width_mm            numeric  real measurement, entered by hand — not
+--                                 seeded here (see 2026-08-27 note below)
+--   thickness_mm        numeric  real measurement, entered by hand — not
+--                                 seeded here (see 2026-08-27 note below)
 --   diamond_weight_ct   numeric  e.g. 0.21    (only set when has_diamond)
 --   gold_share_pct      numeric  percentage of price attributed to gold
 --   diamond_share_pct   numeric  percentage of price attributed to diamond (0 when no diamond)
@@ -35,11 +37,15 @@ update public.products
 set gst_share_pct = coalesce(gst_share_pct, 3)
 where gst_share_pct is null;
 
+-- Added: 2026-08-27 — width_mm/thickness_mm are real physical
+-- measurements, not something safe to guess with random() the way
+-- product_code or the *_share_pct illustrative splits are. They were
+-- randomly seeded here once, then cleared back to null across the
+-- board (see 2026-08-27_clear_random_specs.sql) once that was
+-- noticed. Re-running this file must not refill them.
 update public.products
 set
   product_code = coalesce(product_code, 'FE' || lpad(floor(random() * 900 + 100)::int::text, 3, '0')),
-  width_mm = coalesce(width_mm, round((1.5 + random() * 4.5)::numeric, 1)),
-  thickness_mm = coalesce(thickness_mm, round((1.0 + random() * 1.8)::numeric, 1)),
   diamond_weight_ct = case
     when has_diamond then coalesce(diamond_weight_ct, round((0.05 + random() * 0.85)::numeric, 2))
     else null

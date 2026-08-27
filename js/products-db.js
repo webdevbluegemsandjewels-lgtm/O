@@ -4,18 +4,24 @@
    (image, secondaryImage, oldPrice, cat, etc.)
    ========================================================= */
 
-function mapDbProductToCard(row, detailPage) {
-  const hasPrice = Number(row.price) > 0;
+function mapDbProductToCard(row, detailPage, livePrice) {
+  // livePrice (from get_live_product_prices(), see
+  // supabase/2026-08-27_live_card_prices.sql) reflects the current
+  // gold rate + pricing_settings, same formula product.html uses —
+  // falls back to the row's stored price when not available (e.g.
+  // gold_weight_grams not set on this product, or the RPC failed).
+  const effectivePrice = livePrice != null ? livePrice : Number(row.price);
+  const hasPrice = effectivePrice > 0;
   return {
     id: row.id,
     slug: row.slug,
     name: row.name,
     brand: row.brand || "OrenkaFine jewellery",
     cat: row.category,
-    price: hasPrice ? `₹${Number(row.price).toLocaleString("en-IN")}` : "Contact Us",
+    price: hasPrice ? `₹${Math.round(effectivePrice).toLocaleString("en-IN")}` : "Contact Us",
     oldPrice: hasPrice && row.old_price ? `₹${Number(row.old_price).toLocaleString("en-IN")}` : null,
     discount: hasPrice && row.old_price
-      ? `${Math.round((1 - row.price / row.old_price) * 100)}%`
+      ? `${Math.round((1 - effectivePrice / row.old_price) * 100)}%`
       : null,
     image: row.image,
     secondaryImage: row.secondary_image || row.image,
@@ -45,12 +51,32 @@ function mapDbProductToCard(row, detailPage) {
   };
 }
 
+// Live prices (get_live_product_prices(), see
+// supabase/2026-08-27_live_card_prices.sql) for every active product
+// in one call, keyed by product_id. Best-effort: an empty map here
+// just means every card falls back to its stored products.price, same
+// as before this existed (e.g. the RPC isn't deployed yet on this
+// Supabase project).
+async function loadLivePriceMap() {
+  const map = {};
+  const { data, error } = await supabaseClient.rpc("get_live_product_prices");
+  if (error) {
+    console.warn("Live product prices unavailable, using stored prices:", error.message);
+    return map;
+  }
+  (data || []).forEach((row) => {
+    map[row.product_id] = Number(row.final_price);
+  });
+  return map;
+}
+
 // Fetches ALL active products once. For a very large catalog you'd want
 // pagination, but this is fine for a few hundred to a couple thousand rows.
 async function loadProductsFromDB() {
   const pageSize = 1000;
   let all = [];
   let from = 0;
+  const livePrices = await loadLivePriceMap();
 
   while (true) {
     const { data, error } = await supabaseClient
@@ -65,7 +91,7 @@ async function loadProductsFromDB() {
     }
     if (!data || data.length === 0) break;
 
-    all = all.concat(data.map((row) => mapDbProductToCard(row)));
+    all = all.concat(data.map((row) => mapDbProductToCard(row, undefined, livePrices[row.id])));
     if (data.length < pageSize) break;
     from += pageSize;
   }

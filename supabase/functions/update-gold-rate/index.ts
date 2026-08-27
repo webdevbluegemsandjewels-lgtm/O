@@ -1,9 +1,6 @@
 // OrenkaFine — live gold rate updater
 //
-// NOT DEPLOYED / NOT SCHEDULED YET. This is prepared for later —
-// right now public.gold_rates.rate_24kt_per_10g is just a manually
-// looked-up snapshot set by supabase_schema.sql. This function is
-// the code for making that live; wiring it up is a separate step:
+// Deployed. Not yet scheduled — see step 2 below.
 //
 //   1. Deploy it: supabase functions deploy update-gold-rate
 //      (or Supabase Dashboard → Edge Functions → deploy from this file).
@@ -18,16 +15,32 @@
 //          );
 //        $$);
 //
-// Gold spot price source: https://api.gold-api.com/price/XAU — a
-// free, no-API-key endpoint, verified working. Returns USD per
-// troy ounce for XAU (gold).
+// Rate source: Arihant Spot's live bullion ticker —
+//   https://bcast.arihantspot.in/VOTSBroadcastStreaming/Services/xml/GetLiveRateByTemplateID/arihant
+// Public, no API key. Found by reading arihantspot.in/LiveRates.html's
+// client-side config (js/LiveRates3.js), not a documented/versioned
+// API — its shape or availability could change without notice, which
+// is why a bad/missing response below skips the DB write entirely
+// rather than storing a garbage rate.
 //
-// USD→INR source: https://api.frankfurter.app/latest?from=USD&to=INR
-// — free, no key, ECB reference rates (updated on ECB business days,
-// not literally every hour, but live and no longer a hardcoded guess).
-// Falls back to FALLBACK_USD_INR_RATE only if that request fails.
+// Response is plain text, one row per line, tab-separated, with a
+// leading tab before the id (so splitting on "\t" gives an empty
+// first field):
+//   "" \t id \t name \t bid \t price \t high \t low
+// We pull the "GOLD 999 WITH GST" row's price column, e.g.:
+//   	2728	GOLD 999 WITH GST 	-	163103	168070	161213
+// That price is already a ₹-per-10-gram figure (same convention as
+// gold_rates.rate_24kt_per_10g already uses) — stored as-is, no
+// conversion.
 //
-// Required Edge Function secrets when you do deploy this:
+// GST note: this feed value already has GST baked in by the
+// exchange, and calculate_product_price() *also* adds its own 3% GST
+// on top of gold+diamond+making. That double GST layer is
+// deliberate — an explicit choice made when wiring this up, not a
+// bug to "fix" by switching to a non-GST row or touching
+// calculate_product_price().
+//
+// Required Edge Function secrets:
 //   SUPABASE_URL              — auto-injected by Supabase, no action needed
 //   SUPABASE_SERVICE_ROLE_KEY — auto-injected by Supabase, no action needed
 
@@ -37,45 +50,43 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-// Used only if the live frankfurter.app lookup below fails.
-const FALLBACK_USD_INR_RATE = 88;
+const RATE_FEED_URL = "https://bcast.arihantspot.in/VOTSBroadcastStreaming/Services/xml/GetLiveRateByTemplateID/arihant";
+const TARGET_ROW_NAME = "GOLD 999 WITH GST";
 
-const GRAMS_PER_TROY_OUNCE = 31.1034768;
-
-async function getUsdInrRate(): Promise<number> {
-  try {
-    const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=INR");
-    if (!res.ok) return FALLBACK_USD_INR_RATE;
-    const data = await res.json();
-    const rate = Number(data?.rates?.INR);
-    return rate || FALLBACK_USD_INR_RATE;
-  } catch {
-    return FALLBACK_USD_INR_RATE;
+function parseRatePerTenGrams(feedText: string): number | null {
+  const lines = feedText.split("\n");
+  for (const line of lines) {
+    const cols = line.split("\t").map((c) => c.trim());
+    // "" (leading tab), id, name, bid, price, high, low
+    if (cols.length < 5) continue;
+    if (cols[2] !== TARGET_ROW_NAME) continue;
+    const price = Number(cols[4]);
+    return Number.isFinite(price) && price > 0 ? price : null;
   }
+  return null;
 }
 
 serve(async () => {
   try {
-    const goldRes = await fetch("https://api.gold-api.com/price/XAU");
-    if (!goldRes.ok) {
-      const text = await goldRes.text();
-      return new Response(JSON.stringify({ error: "gold-api.com request failed", detail: text }), { status: 502 });
+    const feedRes = await fetch(RATE_FEED_URL);
+    if (!feedRes.ok) {
+      const text = await feedRes.text();
+      return new Response(JSON.stringify({ error: "Arihant Spot feed request failed", detail: text }), { status: 502 });
     }
-    const goldData = await goldRes.json();
-    const usdPerOunce = Number(goldData.price);
-    if (!usdPerOunce) {
-      return new Response(JSON.stringify({ error: "gold-api.com returned no usable price", raw: goldData }), { status: 502 });
-    }
+    const feedText = await feedRes.text();
+    const rate24ktPer10g = parseRatePerTenGrams(feedText);
 
-    const usdInrRate = await getUsdInrRate();
-    const usdPerGram = usdPerOunce / GRAMS_PER_TROY_OUNCE;
-    const inrPerGram = usdPerGram * usdInrRate;
-    const inrPer10g = inrPerGram * 10;
+    if (rate24ktPer10g === null) {
+      return new Response(
+        JSON.stringify({ error: `"${TARGET_ROW_NAME}" row not found or unparsable in feed`, raw: feedText }),
+        { status: 502 }
+      );
+    }
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     const { error } = await supabase
       .from("gold_rates")
-      .upsert({ id: 1, rate_24kt_per_10g: inrPer10g, updated_at: new Date().toISOString() });
+      .upsert({ id: 1, rate_24kt_per_10g: rate24ktPer10g, updated_at: new Date().toISOString() });
 
     if (error) {
       console.error("Failed to update gold_rates:", error);
@@ -83,7 +94,7 @@ serve(async () => {
     }
 
     return new Response(
-      JSON.stringify({ updated: true, usd_per_ounce: usdPerOunce, usd_inr_rate: usdInrRate, rate_24kt_per_10g: inrPer10g }),
+      JSON.stringify({ updated: true, source_row: TARGET_ROW_NAME, rate_24kt_per_10g: rate24ktPer10g }),
       { status: 200 }
     );
   } catch (err) {
