@@ -5,23 +5,31 @@
 // looked-up snapshot set by supabase_schema.sql. This function is
 // the code for making that live; wiring it up is a separate step:
 //
-//   1. Deploy it (Supabase Dashboard → Edge Functions, or CLI).
-//   2. Set a real USD_INR_RATE secret (or replace the conversion
-//      below with a real forex API call — deliberately left as a
-//      flat rate for now since a forex source hasn't been chosen).
-//   3. Schedule it (Supabase → Database → Cron Jobs, e.g. hourly)
-//      calling this function's URL, or trigger it manually.
+//   1. Deploy it: supabase functions deploy update-gold-rate
+//      (or Supabase Dashboard → Edge Functions → deploy from this file).
+//   2. Schedule it hourly: Supabase Dashboard → Database → Cron Jobs
+//      → New cron job → run every hour → HTTP request to this
+//      function's URL (Authorization: Bearer <anon or service key>).
+//      Or, from SQL Editor, pg_cron + pg_net:
+//        select cron.schedule('update-gold-rate-hourly', '0 * * * *', $$
+//          select net.http_post(
+//            url := 'https://<project-ref>.supabase.co/functions/v1/update-gold-rate',
+//            headers := jsonb_build_object('Authorization', 'Bearer <service-role-key>')
+//          );
+//        $$);
 //
 // Gold spot price source: https://api.gold-api.com/price/XAU — a
 // free, no-API-key endpoint, verified working. Returns USD per
-// troy ounce for XAU (gold). No key/signup needed, so nothing to
-// configure for that part.
+// troy ounce for XAU (gold).
+//
+// USD→INR source: https://api.frankfurter.app/latest?from=USD&to=INR
+// — free, no key, ECB reference rates (updated on ECB business days,
+// not literally every hour, but live and no longer a hardcoded guess).
+// Falls back to FALLBACK_USD_INR_RATE only if that request fails.
 //
 // Required Edge Function secrets when you do deploy this:
 //   SUPABASE_URL              — auto-injected by Supabase, no action needed
 //   SUPABASE_SERVICE_ROLE_KEY — auto-injected by Supabase, no action needed
-//   USD_INR_RATE               — optional; without it, falls back to the
-//                                 hardcoded approximate rate below
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -29,13 +37,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-// Approximate fallback only — replace with a real live USD→INR feed
-// (e.g. exchangerate-api.com, frankfurter.app) before relying on
-// this for real pricing. Update by hand in the meantime if it drifts.
+// Used only if the live frankfurter.app lookup below fails.
 const FALLBACK_USD_INR_RATE = 88;
-const USD_INR_RATE = Number(Deno.env.get("USD_INR_RATE")) || FALLBACK_USD_INR_RATE;
 
 const GRAMS_PER_TROY_OUNCE = 31.1034768;
+
+async function getUsdInrRate(): Promise<number> {
+  try {
+    const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=INR");
+    if (!res.ok) return FALLBACK_USD_INR_RATE;
+    const data = await res.json();
+    const rate = Number(data?.rates?.INR);
+    return rate || FALLBACK_USD_INR_RATE;
+  } catch {
+    return FALLBACK_USD_INR_RATE;
+  }
+}
 
 serve(async () => {
   try {
@@ -50,8 +67,9 @@ serve(async () => {
       return new Response(JSON.stringify({ error: "gold-api.com returned no usable price", raw: goldData }), { status: 502 });
     }
 
+    const usdInrRate = await getUsdInrRate();
     const usdPerGram = usdPerOunce / GRAMS_PER_TROY_OUNCE;
-    const inrPerGram = usdPerGram * USD_INR_RATE;
+    const inrPerGram = usdPerGram * usdInrRate;
     const inrPer10g = inrPerGram * 10;
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
@@ -65,7 +83,7 @@ serve(async () => {
     }
 
     return new Response(
-      JSON.stringify({ updated: true, usd_per_ounce: usdPerOunce, usd_inr_rate: USD_INR_RATE, rate_24kt_per_10g: inrPer10g }),
+      JSON.stringify({ updated: true, usd_per_ounce: usdPerOunce, usd_inr_rate: usdInrRate, rate_24kt_per_10g: inrPer10g }),
       { status: 200 }
     );
   } catch (err) {
