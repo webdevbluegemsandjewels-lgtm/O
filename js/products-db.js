@@ -27,7 +27,7 @@ function mapDbProductToCard(row, detailPage, livePrice) {
     secondaryImage: row.secondary_image || row.image,
     tag: row.tag || "",
     rating: row.rating || null,
-    goldType: row.gold_type || "18 karat gold",
+    goldType: row.gold_type || "9 karat gold",
     material: row.material || null, // Baguette/Diamond/Emerald/etc. category, not gold karat — see supabase_schema.sql
     colors: row.colors || [],
     description: row.description || "",

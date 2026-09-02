@@ -93,8 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
     toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
-  /* Newsletter form (demo only, no backend) */
-  document.querySelectorAll(".newsletter-form, .contact-form").forEach((form) => {
+  /* Newsletter form (demo only, no backend) — contact.html's own form
+     has a real backend now, wired up in contact.html itself, so it's
+     excluded here. */
+  document.querySelectorAll(".newsletter-form").forEach((form) => {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const btn = form.querySelector("button[type=submit]");
@@ -315,7 +317,6 @@ function productCardHTML(p) {
       <div class="product-info">
         <div class="price-row">${priceHTML}</div>
         <h3 class="product-name">${p.name} ${ratingHTML}</h3>
-        <p class="product-cat">${p.goldType || p.cat}</p>
         <div class="swatch-row">${swatches}</div>
       </div>
       ${closeTag}

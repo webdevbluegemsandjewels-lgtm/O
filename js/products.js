@@ -146,7 +146,7 @@ PRODUCTS.forEach((p, i) => {
 	p.colors = allColors.slice(0, colorCount);
 
 	// Gold karat/purity label (shown on the card, not the Material category filter)
-	p.goldType = "18 karat gold";
+	p.goldType = "9 karat gold";
 
 	// Rating (only some products show it)
 	p.rating = i % 4 === 0 ? (4.2 + (i % 8) * 0.1).toFixed(1) : null;

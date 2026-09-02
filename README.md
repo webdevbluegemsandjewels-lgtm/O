@@ -107,6 +107,7 @@ OrenkaFine/
 - `supabase/functions/signup-otp/index.ts`: Edge Function that sends and verifies a 6-digit signup OTP via Resend, backed by a short-lived `signup_otp_codes` table
 - `supabase/functions/create-razorpay-order/index.ts` and `supabase/functions/verify-razorpay-payment/index.ts`: Edge Functions backing the Razorpay checkout flow (see "Important repo notes" below for deployment status)
 - `supabase/functions/update-gold-rate/index.ts`: Edge Function intended to refresh the live gold rate (see "Important repo notes")
+- `supabase/functions/send-enquiry/index.ts`: Edge Function backing the contact.html form — saves to `public.enquiries` and emails info@orenkafine.com via Resend
 - `s3Client.js`: Node-side S3 client configuration for a Supabase Storage S3 endpoint
 - `storage.js`: helper utilities to list, fetch, and upload files in the configured bucket
 
@@ -166,6 +167,16 @@ Required secrets for `signup-otp`:
 - `OTP_SECRET`
 
 The function comments also note that JWT verification should be turned off for `welcome-email`, since it's a webhook-driven endpoint.
+
+### 5. Contact form / enquiries
+
+Run `supabase/2026-09-02_enquiries.sql` in the Supabase SQL Editor, then deploy `supabase/functions/send-enquiry/index.ts`.
+
+Required secrets for `send-enquiry`:
+
+- `RESEND_API_KEY`
+- `ENQUIRY_FROM_EMAIL`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
 ### 5. Optional Node storage helper
 

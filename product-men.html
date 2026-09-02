@@ -380,7 +380,7 @@
         <div class="trust-row">
           <span>✓ BIS hallmarked gold, certified diamonds</span>
           <span>✓ Fast &amp; secure shipping, fully insured</span>
-          <span>✓ 15-day returns &middot; lifetime exchange &amp; buyback</span>
+          <span>✓ 10-day returns &middot; lifetime exchange &amp; buyback</span>
         </div>
       </div>
 
@@ -828,10 +828,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Only shown for actual gold pieces (see hasGoldInText) — a silver
   // item showing "18 Kt Gold" / "14 Kt Gold" options would be wrong.
   document.getElementById("metalSection").style.display = hasGoldInText ? "" : "none";
-  let selectedKarat = "18kt";
+  let selectedKarat = "9kt";
   if (product.variant_metal_type) {
     const m = product.variant_metal_type.toLowerCase();
-    if (m.includes("14")) selectedKarat = "14kt";
+    if (m.includes("18")) selectedKarat = "18kt";
+    else if (m.includes("14")) selectedKarat = "14kt";
     else if (m.includes("9")) selectedKarat = "9kt";
   }
   const metalRow = document.getElementById("metalRow");
@@ -890,7 +891,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const oldEl = document.getElementById("priceOld");
     const saveEl = document.getElementById("priceSave");
-    if (baseOldPrice && baseOldPrice > basePrice && selectedKarat === "18kt" && diamondMultiplier() === 1 && sizeWeightMultiplier() === 1) {
+    if (baseOldPrice && baseOldPrice > basePrice && selectedKarat === "9kt" && diamondMultiplier() === 1 && sizeWeightMultiplier() === 1) {
       oldEl.textContent = `₹${baseOldPrice.toLocaleString("en-IN")}`;
       oldEl.style.display = "inline";
       saveEl.textContent = `SAVE ${Math.round(((baseOldPrice - basePrice) / baseOldPrice) * 100)}%`;
@@ -901,7 +902,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     document.getElementById("priceApproxNote").style.display =
-      (selectedKarat !== "18kt" || sizeWeightMultiplier() !== 1 || diamondMultiplier() !== 1) ? "block" : "none";
+      (selectedKarat !== "9kt" || sizeWeightMultiplier() !== 1 || diamondMultiplier() !== 1) ? "block" : "none";
 
     pointsEl.textContent =
       `🎁 Purchase this item and get ${Math.round(displayPrice / 10).toLocaleString("en-IN")} Points`;

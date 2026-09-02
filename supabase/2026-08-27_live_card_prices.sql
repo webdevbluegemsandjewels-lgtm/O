@@ -29,7 +29,7 @@ as $$
   from public.products p
   left join public.product_variants pv on pv.product_id = p.id and pv.is_default = true
   left join public.product_sizes ps on ps.product_id = p.id and ps.is_default = true
-  cross join lateral public.calculate_product_price(p.id, '18kt', pv.id, ps.id) c
+  cross join lateral public.calculate_product_price(p.id, '9kt', pv.id, ps.id) c
   where p.is_active = true
     and c.is_calculated = true;
 $$;

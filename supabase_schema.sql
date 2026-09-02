@@ -995,7 +995,7 @@ set price = sub.final_price
 from (
   select pv.product_id, c.final_price
   from public.product_variants pv,
-       lateral calculate_product_price(pv.product_id, '18kt', pv.id) c
+       lateral calculate_product_price(pv.product_id, '9kt', pv.id) c
   where pv.is_default = true
     and c.is_calculated = true
 ) sub
