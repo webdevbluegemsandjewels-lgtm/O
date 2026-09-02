@@ -95,11 +95,11 @@
 
         <h5 class="guide-subhead">Our Jewellery Certification Partners</h5>
         <div class="guide-cert-row">
-          <div class="guide-cert-badge">IGI</div>
+          <div class="guide-cert-badge">DGLA</div>
           <div class="guide-cert-badge">GIA</div>
           <div class="guide-cert-badge">SGL</div>
         </div>
-        <p>All our Solitaires are natural and graded as per GIA (Gemological Institute of America) standards or IGI (International Gemological Institution).</p>
+        <p>All our Solitaires are natural and graded as per GIA (Gemological Institute of America) standards or DGLA (Diamond Grading Laboratories of America).</p>
         <p>We have the best source for diamonds and all our diamonds are sorted and graded for their consistency, and the final product is certified by a third-party laboratory like SGL for its authenticity.</p>
       `,
     },

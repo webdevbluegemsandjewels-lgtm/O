@@ -154,9 +154,9 @@ begin
   end if;
 
   v_purity := case p_karat
-    when '9kt' then 0.375
-    when '14kt' then 0.585
-    else 0.750
+    when '9kt' then 0.42
+    when '14kt' then 0.61
+    else 0.77
   end;
 
   v_diamond_rate := 0;

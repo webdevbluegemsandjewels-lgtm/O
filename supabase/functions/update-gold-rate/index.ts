@@ -29,9 +29,9 @@
 //   "" \t id \t name \t bid \t price \t high \t low
 // We pull the "GOLD 999 WITH GST" row's price column, e.g.:
 //   	2728	GOLD 999 WITH GST 	-	163103	168070	161213
-// That price is already a ₹-per-10-gram figure (same convention as
-// gold_rates.rate_24kt_per_10g already uses) — stored as-is, no
-// conversion.
+// That price is already a ₹-per-10-gram figure (matches
+// gold_rates.rate_24kt_per_10g directly) — stored as-is below, no
+// conversion needed.
 //
 // GST note: this feed value already has GST baked in by the
 // exchange, and calculate_product_price() *also* adds its own 3% GST
@@ -53,6 +53,8 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const RATE_FEED_URL = "https://bcast.arihantspot.in/VOTSBroadcastStreaming/Services/xml/GetLiveRateByTemplateID/arihant";
 const TARGET_ROW_NAME = "GOLD 999 WITH GST";
 
+// Returns the feed's raw price, already ₹ per 10g — matches the
+// gold_rates.rate_24kt_per_10g convention directly.
 function parseRatePerTenGrams(feedText: string): number | null {
   const lines = feedText.split("\n");
   for (const line of lines) {
@@ -94,7 +96,11 @@ serve(async () => {
     }
 
     return new Response(
-      JSON.stringify({ updated: true, source_row: TARGET_ROW_NAME, rate_24kt_per_10g: rate24ktPer10g }),
+      JSON.stringify({
+        updated: true,
+        source_row: TARGET_ROW_NAME,
+        rate_24kt_per_10g: rate24ktPer10g,
+      }),
       { status: 200 }
     );
   } catch (err) {
