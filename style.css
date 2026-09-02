@@ -2036,11 +2036,11 @@ body.guide-modal-open{ overflow: hidden; }
 .spec-breakup-row{
   /* grid-row:2 is explicit (desktop >900px) so it can never be
      disturbed by auto-placement — row1 is gallery+detail side by
-     side (see product.html/product-men.html's own <style> block,
-     which explicitly pins gallery=row1/col1, detail=row1/col2), this
-     is row2, full width. Reset back to auto in each page's own
-     max-width:900px block, where the grid drops to a single column
-     and everything just stacks in DOM order again. */
+     side (see product.html's own <style> block, which explicitly
+     pins gallery=row1/col1, detail=row1/col2), this is row2, full
+     width. Reset back to auto in that page's own max-width:900px
+     block, where the grid drops to a single column and everything
+     just stacks in DOM order again. */
   grid-column: 1 / -1;
   grid-row: 2;
   display: flex; gap: 1.4rem;

@@ -22,15 +22,9 @@
   function loadSearchableProducts() {
     if (!productsPromise) {
       const cols = "id, slug, name, brand, category, price, image";
-      productsPromise = Promise.all([
-        supabaseClient.from("products").select(cols).eq("is_active", true),
-        supabaseClient.from("mens_products").select(cols).eq("is_active", true),
-      ]).then(([womens, mens]) => {
+      productsPromise = supabaseClient.from("products").select(cols).eq("is_active", true).then((womens) => {
         if (womens.error) console.error("Search: failed to load products:", womens.error.message);
-        if (mens.error) console.error("Search: failed to load men's products:", mens.error.message);
-        const womensRows = (womens.data || []).map((p) => ({ ...p, detailPage: "product.html" }));
-        const mensRows = (mens.data || []).map((p) => ({ ...p, detailPage: "product-men.html" }));
-        return womensRows.concat(mensRows);
+        return (womens.data || []).map((p) => ({ ...p, detailPage: "product.html" }));
       });
     }
     return productsPromise;

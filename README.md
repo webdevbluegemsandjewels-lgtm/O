@@ -36,10 +36,8 @@ OrenkaFine/
 ├── index.html
 ├── login.html
 ├── loyalty-program.html
-├── mens-collection.html
 ├── order.html
 ├── our-journey.html
-├── product-men.html
 ├── product.html
 ├── purchase-with-peace.html
 ├── reset-password.html
@@ -73,8 +71,7 @@ OrenkaFine/
 
 - `index.html`: homepage with hero, featured products, collection highlights, and shared header/footer behavior
 - `collections.html`: collection listing page; loads the product grid and then replaces it with Supabase-backed products when available
-- `mens-collection.html`: men's collection listing, parallel to `collections.html`
-- `product.html` / `product-men.html`: single-product pages with add-to-cart and authenticated review flow
+- `product.html`: single-product page with add-to-cart and authenticated review flow
 - `cart.html`: client-side cart view powered by localStorage
 - `cart-item.html`: read-only detail view for a single bag item's specifications
 - `checkout.html`: shipping form and Razorpay checkout handoff; requires authenticated user plus backend Edge Functions
@@ -220,7 +217,8 @@ These are worth knowing before you try to run everything end to end:
 - `checkout.html` calls Supabase Edge Functions named `create-razorpay-order` and `verify-razorpay-payment` — the code for both now exists at `supabase/functions/create-razorpay-order/` and `supabase/functions/verify-razorpay-payment/`, but neither is **deployed** yet, and both need `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` secrets set before they'll work (unlike `welcome-email`, leave "Enforce JWT Verification" **ON** for these two — checkout.html calls them with a real signed-in user's token).
 - `supabase/functions/update-gold-rate/index.ts` exists but is **not deployed or scheduled**. Until it (or something like it) is wired up, `public.gold_rates.rate_24kt_per_10g` (₹ per 10 grams, matching how Indian gold rates are quoted) is a manually looked-up snapshot set by `supabase_schema.sql`, not a live feed — update it by hand periodically, or deploy the function per its header comment.
 - `index.html` and `cart-item.html` reference `js/hero-db.js`, but that file is not present in the `js/` folder.
-- `collections.html`, `mens-collection.html`, and `product.html`/`product-men.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.
+- `collections.html` and `product.html` are set up to prefer database-backed products through `js/products-db.js`, while `js/products.js` still provides a large static fallback catalog.
+- The Men's Collection (`mens-collection.html`, `product-men.html`) was removed from the site (nav links, footer search, site search) as of 2026-09-02. The `public.mens_products` table and its migration files (`supabase/mens_schema.sql`, `seed_mens_filters.sql`, etc.) were left in place, not dropped.
 - Product and brand naming are mixed between `OrenkaFine` and `Orenkafine`.
 - The README that was previously in this repo described an older, smaller structure and did not match the current files.
 

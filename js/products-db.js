@@ -31,13 +31,7 @@ function mapDbProductToCard(row, detailPage, livePrice) {
     material: row.material || null, // Baguette/Diamond/Emerald/etc. category, not gold karat — see supabase_schema.sql
     colors: row.colors || [],
     description: row.description || "",
-    // Card links to product.html unless overridden — mens_products
-    // rows link to product-men.html instead (see loadMensProductsFromDB).
     detailPage: detailPage || "product.html",
-    // Men's-only filter facets (see supabase/seed_mens_filters.sql) —
-    // undefined on women's `products` rows, which don't have these
-    // columns; the || defaults keep mens-collection.html's filtering
-    // code simple regardless of which table a card came from.
     style: row.style || null,
     metal: row.metal || null,
     stoneColor: row.stone_color || null,
@@ -92,36 +86,6 @@ async function loadProductsFromDB() {
     if (!data || data.length === 0) break;
 
     all = all.concat(data.map((row) => mapDbProductToCard(row, undefined, livePrices[row.id])));
-    if (data.length < pageSize) break;
-    from += pageSize;
-  }
-
-  return all;
-}
-
-// Same shape/pagination as loadProductsFromDB(), but reads the
-// dedicated men's catalog table (see supabase/mens_schema.sql) and
-// tags every card so it links to product-men.html instead of
-// product.html.
-async function loadMensProductsFromDB() {
-  const pageSize = 1000;
-  let all = [];
-  let from = 0;
-
-  while (true) {
-    const { data, error } = await supabaseClient
-      .from("mens_products")
-      .select("*")
-      .eq("is_active", true)
-      .range(from, from + pageSize - 1);
-
-    if (error) {
-      console.error("Failed to load men's products:", error.message);
-      break;
-    }
-    if (!data || data.length === 0) break;
-
-    all = all.concat(data.map((row) => mapDbProductToCard(row, "product-men.html")));
     if (data.length < pageSize) break;
     from += pageSize;
   }
