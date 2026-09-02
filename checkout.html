@@ -130,7 +130,9 @@
 <script src="js/footer.js"></script>
 <script src="js/guide-modals.js"></script>
 <script>
-// IMPORTANT: replace with your deployed Edge Function project URL
+// Derived from the same SUPABASE_URL js/supabaseClient.js already
+// uses — nothing to edit here once create-razorpay-order and
+// verify-razorpay-payment are deployed to that same project.
 const FUNCTIONS_BASE = SUPABASE_URL + "/functions/v1";
 
 document.addEventListener("DOMContentLoaded", async () => {
