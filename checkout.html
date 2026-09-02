@@ -235,11 +235,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           });
           const verifyData = await verifyRes.json();
 
-          if (verifyData.verified) { 
+          if (verifyData.verified) {
             await window.OrenkaFineCart.clearCart();
             window.location.href = `order.html?order_id=${orderData.order_id}`;
           } else {
-            errorEl.textContent = "Payment could not be verified. Please contact support.";
+            console.error("verify-razorpay-payment response:", verifyRes.status, verifyData);
+            errorEl.textContent = verifyData.error
+              ? `Payment could not be verified: ${verifyData.error}`
+              : "Payment could not be verified. Please contact support.";
             errorEl.style.display = "block";
             payBtn.disabled = false;
             payBtn.textContent = "Pay Now";
