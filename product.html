@@ -760,7 +760,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const isRing = categoryLower === "rings";
   const isBangleProduct = categoryLower === "bracelets" && /bangle/i.test(product.name || "");
   const isBraceletProduct = categoryLower === "bracelets" && !isBangleProduct;
-  const isNecklaceProduct = categoryLower === "necklaces" || categoryLower === "charms & pendants";
+  // Pendants ("Charms & Pendants") deliberately excluded — unlike a
+  // necklace's chain length, a pendant has no size dimension at all.
+  // Falls into the `!isRing` branch below, which sets sizeFallback to
+  // [] so no Size section renders.
+  const isNecklaceProduct = categoryLower === "necklaces";
 
   let sizeGuideType = "size";
   let sizeGuideLabel = "Ring Size Guide";

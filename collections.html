@@ -432,6 +432,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       const btn = e.target.closest(".filter-menu-item[data-cat]");
       if (!btn) return;
       state.category = btn.dataset.cat;
+      // categoryBase() requires both category AND house to match, so
+      // switching category alone can land on a House that has zero
+      // products in it (e.g. Charms & Pendants only exists under Fine
+      // Jewellery) and look like the category is empty/broken. If the
+      // currently selected house has no products in the new category,
+      // jump to whichever house actually has some.
+      if (!SHOP_PRODUCTS.some((p) => p.cat === state.category && p.brand === state.house)) {
+        const fallbackHouse = HOUSE_OPTIONS.find((house) =>
+          SHOP_PRODUCTS.some((p) => p.cat === state.category && p.brand === house)
+        );
+        if (fallbackHouse) state.house = fallbackHouse;
+      }
       state.colors.clear(); state.materials.clear();
       renderTopMenus(); syncPriceBounds(); renderFilterLists(); render();
       closeMenus();
