@@ -604,8 +604,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { data: goldRateRow } = await supabaseClient.from("gold_rates").select("*").eq("id", 1).maybeSingle();
   const goldRate24kt = goldRateRow ? Number(goldRateRow.rate_24kt_per_10g) / 10 : null;
 
-  const KARAT_PURITY = { "18kt": 0.75, "14kt": 14 / 24, "9kt": 9 / 24 };
+  const KARAT_PURITY = { "18kt": 0.77, "14kt": 0.61, "9kt": 0.42 };
   const KARAT_LABELS = { "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
+
+  // A lower-karat piece of the same design weighs less than its 18kt
+  // version (alloyed metals are lighter than gold), so switching Metal
+  // Type scales the actual gram weight down before pricing, on top of
+  // the purity-fraction change above. gold_weight_grams on the product
+  // row is recorded at 18kt, so 18kt itself is a no-op.
+  const KARAT_WEIGHT_MULTIPLIER = { "18kt": 1, "14kt": 0.85, "9kt": 0.75 };
 
   // Diamonds don't have a simple live "price per gram" feed the way
   // gold does, so Diamond Quality uses a fixed approximate markup
@@ -636,7 +643,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function goldValueAt(karatKey, weightGrams) {
     if (!weightGrams || !goldRate24kt) return null;
-    return weightGrams * KARAT_PURITY[karatKey] * goldRate24kt;
+    return weightGrams * KARAT_WEIGHT_MULTIPLIER[karatKey] * KARAT_PURITY[karatKey] * goldRate24kt;
   }
 
   // Most real scraped products don't have gold_weight_grams set (the
@@ -660,7 +667,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return { price: Math.max(0, nonGoldPortion + selectedGoldValue), isExact: true };
     }
 
-    const karatRatio = KARAT_PURITY[karatKey] / KARAT_PURITY["18kt"];
+    const karatRatio =
+      (KARAT_PURITY[karatKey] * KARAT_WEIGHT_MULTIPLIER[karatKey]) /
+      (KARAT_PURITY["18kt"] * KARAT_WEIGHT_MULTIPLIER["18kt"]);
     const goldShare = basePrice * ASSUMED_GOLD_SHARE_OF_PRICE * sizeWeightMultiplier();
     const nonGoldShare = basePrice * (1 - ASSUMED_GOLD_SHARE_OF_PRICE);
     return { price: Math.max(0, nonGoldShare + goldShare * karatRatio), isExact: false };
@@ -871,10 +880,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     pointsEl.style.display = "";
 
     const baseOldPrice = activeVariant.old_price ? Number(activeVariant.old_price) : null;
-    const weight = activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null;
+    const weightAt18kt = activeVariant.gold_weight_grams ? Number(activeVariant.gold_weight_grams) * sizeWeightMultiplier() : null;
 
-    const result = computeAdjustedPrice(basePrice, weight, selectedKarat);
+    const result = computeAdjustedPrice(basePrice, weightAt18kt, selectedKarat);
     const displayPrice = result.price * diamondMultiplier();
+    const weight = weightAt18kt !== null ? weightAt18kt * KARAT_WEIGHT_MULTIPLIER[selectedKarat] : null;
 
     document.getElementById("priceNow").textContent = `₹${Math.round(displayPrice).toLocaleString("en-IN")}`;
 

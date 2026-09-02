@@ -781,6 +781,16 @@ begin
     else 0.77
   end;
 
+  -- A lower-karat piece of the same design weighs less than its 18kt
+  -- version (alloyed metals are lighter than gold), so scale the
+  -- actual gram weight down before pricing. gold_weight_grams is
+  -- recorded at 18kt, so 18kt is a no-op.
+  v_weight := v_weight * case p_karat
+    when '9kt' then 0.75
+    when '14kt' then 0.85
+    else 1
+  end;
+
   v_diamond_rate := 0;
   if v_diamond_quality is not null then
     select coalesce(dr.rate_per_ct, 0) into v_diamond_rate
