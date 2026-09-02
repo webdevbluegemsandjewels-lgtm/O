@@ -119,7 +119,6 @@ declare
   v_purity numeric;
   v_diamond_rate numeric;
   v_making_rate numeric;
-  v_making_min numeric;
   v_gst_pct numeric;
 begin
   if p_size_id is not null and exists (
@@ -148,7 +147,7 @@ begin
   end if;
 
   select gr.rate_24kt_per_10g into v_gold_rate from public.gold_rates gr where gr.id = 1;
-  select ps.making_charge_per_gram, ps.making_charge_minimum, ps.gst_percent into v_making_rate, v_making_min, v_gst_pct
+  select ps.making_charge_per_gram, ps.gst_percent into v_making_rate, v_gst_pct
   from public.pricing_settings ps where ps.id = 1;
 
   if v_gold_rate is null or v_making_rate is null or v_gst_pct is null then
@@ -176,7 +175,7 @@ begin
 
   gold_cost := v_weight * v_purity * (v_gold_rate / 10);
   diamond_cost := coalesce(v_diamond_ct, 0) * v_diamond_rate;
-  making_charge := greatest(v_weight * v_making_rate, v_making_min);
+  making_charge := v_making_rate;
   subtotal := gold_cost + diamond_cost + making_charge;
   gst := subtotal * (v_gst_pct / 100);
   final_price := subtotal + gst;

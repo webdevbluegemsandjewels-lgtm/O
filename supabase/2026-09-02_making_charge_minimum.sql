@@ -1,19 +1,15 @@
 -- Added: 2026-09-02 — run this once in Supabase Dashboard → SQL Editor
 -- =========================================================
--- Making charge floor: total making_charge for a product must never
--- come out below ₹3,500, even when the karat weight-scaling (9kt/14kt
--- weigh less than the recorded 18kt weight) would otherwise push
--- weight * making_charge_per_gram under that. Adds a configurable
--- making_charge_minimum column instead of hardcoding 3500 in the
--- function, and updates calculate_product_price() to floor on it.
+-- Making charge is a flat ₹3,500 for every product, regardless of
+-- gold weight or karat — not weight * rate. calculate_product_price()
+-- now just uses pricing_settings.making_charge_per_gram as that flat
+-- figure directly (column name kept as-is to avoid a schema rename;
+-- it's read as a flat charge, not a per-gram rate).
 -- Safe to re-run.
 -- =========================================================
 
-alter table public.pricing_settings
-  add column if not exists making_charge_minimum numeric not null default 3500;
-
 update public.pricing_settings
-set making_charge_minimum = 3500,
+set making_charge_per_gram = 3500,
     updated_at = now()
 where id = 1;
 
@@ -44,7 +40,6 @@ declare
   v_purity numeric;
   v_diamond_rate numeric;
   v_making_rate numeric;
-  v_making_min numeric;
   v_gst_pct numeric;
 begin
   if p_size_id is not null and exists (
@@ -73,7 +68,7 @@ begin
   end if;
 
   select gr.rate_24kt_per_10g into v_gold_rate from public.gold_rates gr where gr.id = 1;
-  select ps.making_charge_per_gram, ps.making_charge_minimum, ps.gst_percent into v_making_rate, v_making_min, v_gst_pct
+  select ps.making_charge_per_gram, ps.gst_percent into v_making_rate, v_gst_pct
   from public.pricing_settings ps where ps.id = 1;
 
   if v_gold_rate is null or v_making_rate is null or v_gst_pct is null then
@@ -101,7 +96,7 @@ begin
 
   gold_cost := v_weight * v_purity * (v_gold_rate / 10);
   diamond_cost := coalesce(v_diamond_ct, 0) * v_diamond_rate;
-  making_charge := greatest(v_weight * v_making_rate, v_making_min);
+  making_charge := v_making_rate;
   subtotal := gold_cost + diamond_cost + making_charge;
   gst := subtotal * (v_gst_pct / 100);
   final_price := subtotal + gst;
