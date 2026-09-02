@@ -783,13 +783,13 @@ begin
     else 0.77
   end;
 
-  -- A lower-karat piece of the same design weighs less than its 18kt
-  -- version (alloyed metals are lighter than gold), so scale the
-  -- actual gram weight down before pricing. gold_weight_grams is
-  -- recorded at 18kt, so 18kt is a no-op.
+  -- A lower-karat piece of the same design weighs less (alloyed metals
+  -- are lighter than gold) — gold_weight_grams is recorded at 9kt, so
+  -- scale the actual gram weight up for 14kt/18kt before pricing.
+  -- 9kt is a no-op.
   v_weight := v_weight * case p_karat
-    when '9kt' then 0.75
-    when '14kt' then 0.85
+    when '18kt' then 4.0 / 3.0
+    when '14kt' then 17.0 / 15.0
     else 1
   end;
 
@@ -801,7 +801,7 @@ begin
 
   gold_cost := v_weight * v_purity * (v_gold_rate / 10);
   diamond_cost := coalesce(v_diamond_ct, 0) * v_diamond_rate;
-  making_charge := v_making_rate;
+  making_charge := greatest(v_weight * v_making_rate, v_making_rate);
   subtotal := gold_cost + diamond_cost + making_charge;
   gst := subtotal * (v_gst_pct / 100);
   final_price := subtotal + gst;

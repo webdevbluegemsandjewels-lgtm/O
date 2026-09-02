@@ -162,8 +162,8 @@ begin
   end;
 
   v_weight := v_weight * case p_karat
-    when '9kt' then 0.75
-    when '14kt' then 0.85
+    when '18kt' then 4.0 / 3.0
+    when '14kt' then 17.0 / 15.0
     else 1
   end;
 
@@ -175,7 +175,7 @@ begin
 
   gold_cost := v_weight * v_purity * (v_gold_rate / 10);
   diamond_cost := coalesce(v_diamond_ct, 0) * v_diamond_rate;
-  making_charge := v_making_rate;
+  making_charge := greatest(v_weight * v_making_rate, v_making_rate);
   subtotal := gold_cost + diamond_cost + making_charge;
   gst := subtotal * (v_gst_pct / 100);
   final_price := subtotal + gst;

@@ -607,12 +607,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const KARAT_PURITY = { "18kt": 0.77, "14kt": 0.61, "9kt": 0.42 };
   const KARAT_LABELS = { "18kt": "18 Kt Gold", "14kt": "14 Kt Gold", "9kt": "9 Kt Gold" };
 
-  // A lower-karat piece of the same design weighs less than its 18kt
-  // version (alloyed metals are lighter than gold), so switching Metal
-  // Type scales the actual gram weight down before pricing, on top of
-  // the purity-fraction change above. gold_weight_grams on the product
-  // row is recorded at 18kt, so 18kt itself is a no-op.
-  const KARAT_WEIGHT_MULTIPLIER = { "18kt": 1, "14kt": 0.85, "9kt": 0.75 };
+  // A lower-karat piece of the same design weighs less (alloyed metals
+  // are lighter than gold) — gold_weight_grams on the product row is
+  // recorded at 9kt, so switching Metal Type up to 14kt/18kt scales
+  // the actual gram weight up before pricing, on top of the
+  // purity-fraction change above. 9kt itself is a no-op.
+  const KARAT_WEIGHT_MULTIPLIER = { "9kt": 1, "14kt": 17 / 15, "18kt": 4 / 3 };
 
   // Diamonds don't have a simple live "price per gram" feed the way
   // gold does, so Diamond Quality uses a fixed approximate markup
