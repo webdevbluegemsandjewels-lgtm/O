@@ -8,5 +8,7 @@ Disallow: /cart.html
 Disallow: /cart-item.html
 Disallow: /checkout.html
 Disallow: /order.html
+Disallow: /my-orders.html
+Disallow: /crm-dashboard.html
 
 Sitemap: https://orenkafine.com/sitemap.xml

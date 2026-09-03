@@ -175,7 +175,17 @@ Required secrets for `send-enquiry`:
 - `ENQUIRY_FROM_EMAIL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
-### 5. Optional Node storage helper
+### 5. CRM dashboard (staff only)
+
+`crm-dashboard.html` is an internal, unlisted page (not linked from the site, blocked in `robots.txt`) that lists every order for staff. It's gated by a shared admin name/password checked inside `supabase/functions/crm-orders/index.ts` — deploy it with `supabase functions deploy crm-orders`, then set:
+
+- `ADMIN` — admin username
+- `AD_PASSWORD` — admin password
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+as Edge Function secrets (`supabase secrets set ADMIN=... AD_PASSWORD=...`), not in a local `.env` file — the function reads them server-side only.
+
+### 6. Optional Node storage helper
 
 If you use `s3Client.js` and `storage.js`, create a `.env` file with values for:
 
