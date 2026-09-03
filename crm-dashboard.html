@@ -228,17 +228,6 @@
   const statusClass = { paid: "status-paid", pending: "status-pending", failed: "status-failed", cancelled: "status-cancelled" };
   const statusLabel = { paid: "Paid", pending: "Pending", failed: "Failed", cancelled: "Cancelled" };
 
-  // Maps the site's two diamond_quality codes (see product.html
-  // DIAMOND_QUALITY_MULTIPLIER) to their full color/clarity names.
-  const DIAMOND_QUALITY_NAMES = {
-    "GH-VS-SI": "G–H Colour (Near Colourless), VS–SI Clarity (Very Slightly – Slightly Included)",
-    "F-G-VVS-VS": "F–G Colour (Colourless – Near Colourless), VVS–VS Clarity (Very Very Slightly – Very Slightly Included)",
-  };
-  function diamondQualityLabel(code) {
-    if (!code) return "";
-    return DIAMOND_QUALITY_NAMES[code] || code;
-  }
-
   function credentials() {
     return {
       username: sessionStorage.getItem("crm_admin_user") || "",
@@ -361,7 +350,7 @@
           </div>
           ${i.diamond_quality ? `
           <div class="spec-row full">
-            <span class="pair"><span class="lbl">Diamond Grade</span><span class="val" style="text-align:right; font-weight:500; font-size:.72rem;">${escapeHtml(diamondQualityLabel(i.diamond_quality))}</span></span>
+            <span class="pair"><span class="lbl">Diamond Type &amp; Quality</span><span class="val">${escapeHtml(i.diamond_quality)}</span></span>
           </div>` : ""}
           <div class="spec-row">
             <span class="pair"><span class="lbl">Colour stone</span><span class="val">—</span></span>
