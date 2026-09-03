@@ -185,6 +185,10 @@ Required secrets for `send-enquiry`:
 
 as Edge Function secrets (`supabase secrets set ADMIN=... AD_PASSWORD=...`), not in a local `.env` file — the function reads them server-side only.
 
+Before deploying, run these migrations once in the Supabase SQL Editor:
+- `supabase/2026-09-03_orders_admin_notes.sql` — adds `orders.admin_notes` (the Edit action's remark field)
+- `supabase/2026-09-03_crm_order_views.sql` — adds `public.crm_order_views`, which tracks whether staff have clicked into or downloaded an order, powering the dashboard's "Viewed" column and "New (Unviewed) Only" filter
+
 ### 6. Optional Node storage helper
 
 If you use `s3Client.js` and `storage.js`, create a `.env` file with values for:

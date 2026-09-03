@@ -137,6 +137,10 @@
 
   <div class="filter-row">
     <input type="text" id="searchFilter" placeholder="Search by order no, customer name or product…" />
+    <select class="status-select" id="viewedFilter">
+      <option value="all">All Orders</option>
+      <option value="unviewed">New (Unviewed) Only</option>
+    </select>
     <button class="download-btn" id="downloadBtn">Download CSV</button>
   </div>
 
@@ -150,11 +154,12 @@
           <th>Status</th>
           <th>Date</th>
           <th>Amount</th>
+          <th>Viewed</th>
           <th></th>
         </tr>
       </thead>
       <tbody id="ordersBody">
-        <tr class="empty-row"><td colspan="7">Loading orders…</td></tr>
+        <tr class="empty-row"><td colspan="8">Loading orders…</td></tr>
       </tbody>
     </table>
   </div>
@@ -258,7 +263,7 @@
 
     const body = document.getElementById("ordersBody");
     if (!pageItems.length) {
-      body.innerHTML = `<tr class="empty-row"><td colspan="7">No orders found.</td></tr>`;
+      body.innerHTML = `<tr class="empty-row"><td colspan="8">No orders found.</td></tr>`;
     } else {
       body.innerHTML = pageItems.map((o) => {
         const productSummary = (o.items || []).map((i) => i.name).join(", ") || "—";
@@ -272,6 +277,7 @@
             <td><span class="status-pill ${cls}">${label}</span></td>
             <td>${new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
             <td>${money(o.total)}</td>
+            <td><span class="status-pill ${o.viewed ? "status-paid" : "status-pending"}">${o.viewed ? "Viewed" : "New"}</span></td>
             <td class="details-link">Details &rarr;</td>
           </tr>
         `;
@@ -306,6 +312,8 @@
     document.getElementById("detailPanel").style.display = "block";
     document.getElementById("detailOrderId").textContent = `#${order.id.slice(0, 8).toUpperCase()}`;
     document.getElementById("detailClientName").textContent = order.customer.name || "—";
+
+    markViewed(orderId);
 
     renderProductBox(order);
 
@@ -437,6 +445,7 @@
   function downloadActiveOrder() {
     const order = orders.find((o) => o.id === activeOrderId);
     if (!order) return;
+    markViewed(order.id);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -518,6 +527,7 @@
     const order = orders.find((o) => o.id === activeOrderId);
     const box = document.getElementById("productDetailBox");
     if (!order || !box) return;
+    markViewed(order.id);
 
     const pdfBtn = document.getElementById("productPdfBtn");
     pdfBtn.disabled = true;
@@ -556,17 +566,50 @@
     }
   }
 
+  function computeFilteredOrders() {
+    const q = document.getElementById("searchFilter").value.trim().toLowerCase();
+    const viewedFilter = document.getElementById("viewedFilter").value;
+
+    let filtered = orders;
+    if (viewedFilter === "unviewed") {
+      filtered = filtered.filter((o) => !o.viewed);
+    }
+    if (q) {
+      filtered = filtered.filter((o) => {
+        const productNames = (o.items || []).map((i) => i.name).join(" ").toLowerCase();
+        return o.id.toLowerCase().includes(q)
+          || (o.customer.name || "").toLowerCase().includes(q)
+          || productNames.includes(q);
+      });
+    }
+    return filtered;
+  }
+
+  // Bound to the search box / viewed-filter dropdown — a new filter
+  // value always jumps back to page 1.
   function applyFilter() {
     currentPage = 1;
-    const q = document.getElementById("searchFilter").value.trim().toLowerCase();
-    if (!q) { renderTable(orders); return; }
-    const filtered = orders.filter((o) => {
-      const productNames = (o.items || []).map((i) => i.name).join(" ").toLowerCase();
-      return o.id.toLowerCase().includes(q)
-        || (o.customer.name || "").toLowerCase().includes(q)
-        || productNames.includes(q);
-    });
-    renderTable(filtered);
+    renderTable(computeFilteredOrders());
+  }
+
+  // Re-renders with the current filters after a background state
+  // change (e.g. marking an order viewed) — keeps whatever page the
+  // staff member is already on instead of yanking them back to page 1.
+  function refreshTable() {
+    renderTable(computeFilteredOrders());
+  }
+
+  async function markViewed(orderId) {
+    const order = orders.find((o) => o.id === orderId);
+    if (!order || order.viewed) return;
+    order.viewed = true;
+    refreshTable();
+    try {
+      const { username, password } = credentials();
+      await crmRequest({ username, password, action: "mark_viewed", order_id: orderId });
+    } catch (err) {
+      console.error("Could not mark order as viewed:", err);
+    }
   }
 
   function downloadCsv() {
@@ -629,6 +672,7 @@
   });
 
   document.getElementById("searchFilter").addEventListener("input", applyFilter);
+  document.getElementById("viewedFilter").addEventListener("change", applyFilter);
   document.getElementById("downloadBtn").addEventListener("click", downloadCsv);
 
   document.getElementById("prevPageBtn").addEventListener("click", () => {

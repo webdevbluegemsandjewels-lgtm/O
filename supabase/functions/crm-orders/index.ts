@@ -16,12 +16,18 @@
 //   SUPABASE_URL                 — project URL
 //
 // Requires supabase/2026-09-03_orders_admin_notes.sql to have been run
-// (adds orders.admin_notes, used by the "update" action's remark field).
+// (adds orders.admin_notes, used by the "update" action's remark field),
+// and supabase/2026-09-03_crm_order_views.sql (adds
+// public.crm_order_views, used by the "mark_viewed" action / the
+// "viewed" field on each listed order).
 //
 // Request body: { username, password, action?, order_id?, status?, admin_notes? }
-//   action "list" (default) — returns { orders: [...] }
+//   action "list" (default) — returns { orders: [...] }, each with a
+//                              "viewed" boolean from crm_order_views
 //   action "update"         — updates status and/or admin_notes on order_id
 //   action "delete"         — deletes order_id (and its order_items rows)
+//   action "mark_viewed"    — marks order_id as viewed (row click or a
+//                              download counts as viewing it)
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -54,6 +60,12 @@ async function listOrders() {
   if (ordersErr) return json({ error: ordersErr.message }, 500);
 
   const orderIds = (orders || []).map((o) => o.id);
+
+  const { data: views } = await admin
+    .from("crm_order_views")
+    .select("order_id, viewed")
+    .in("order_id", orderIds);
+  const viewedSet = new Set((views || []).filter((v) => v.viewed).map((v) => v.order_id));
 
   const [{ data: womensItems }, { data: mensItems }] = await Promise.all([
     admin
@@ -96,6 +108,7 @@ async function listOrders() {
     status: o.status,
     total: o.total,
     admin_notes: o.admin_notes || "",
+    viewed: viewedSet.has(o.id),
     razorpay_order_id: o.razorpay_order_id,
     razorpay_payment_id: o.razorpay_payment_id,
     customer: {
@@ -126,6 +139,27 @@ async function updateOrder(orderId: string, status: unknown, adminNotes: unknown
   if (Object.keys(updates).length === 0) return json({ error: "Nothing to update" }, 400);
 
   const { error } = await admin.from("orders").update(updates).eq("id", orderId);
+  if (error) return json({ error: error.message }, 500);
+
+  return json({ ok: true });
+}
+
+async function markViewed(orderId: string, username: string) {
+  if (!orderId) return json({ error: "order_id is required" }, 400);
+
+  const { data: existing } = await admin
+    .from("crm_order_views")
+    .select("view_count")
+    .eq("order_id", orderId)
+    .maybeSingle();
+
+  const { error } = await admin.from("crm_order_views").upsert({
+    order_id: orderId,
+    viewed: true,
+    viewed_by: username,
+    viewed_at: new Date().toISOString(),
+    view_count: (existing?.view_count || 0) + 1,
+  });
   if (error) return json({ error: error.message }, 500);
 
   return json({ ok: true });
@@ -176,6 +210,9 @@ serve(async (req) => {
     }
     if (action === "delete") {
       return await deleteOrder(body?.order_id);
+    }
+    if (action === "mark_viewed") {
+      return await markViewed(body?.order_id, username);
     }
     return await listOrders();
   } catch (error) {
