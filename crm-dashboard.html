@@ -85,9 +85,9 @@
 
   .product-card{ display:grid; grid-template-columns:120px 1fr; border:1px solid var(--ink); border-radius:6px; overflow:hidden; margin-bottom:1rem; }
   .product-card + .product-card{ margin-top:1rem; }
-  .product-card .img-cell{ grid-row:1 / -1; border-right:1px solid var(--ink); display:flex; align-items:center; justify-content:center; padding:.5rem; background:#f7f4ec; }
-  .product-card .img-cell img{ max-width:100%; max-height:110px; object-fit:cover; border-radius:4px; }
-  .product-card .img-cell .no-img{ font-size:.68rem; color:var(--ink-soft); text-align:center; }
+  .product-card .img-cell{ grid-row:1 / -1; border-right:1px solid var(--ink); background:#f7f4ec; align-self:stretch; }
+  .product-card .img-cell img{ display:block; width:100%; height:100%; min-height:130px; object-fit:cover; }
+  .product-card .img-cell .no-img{ height:100%; min-height:130px; display:flex; align-items:center; justify-content:center; font-size:.68rem; color:var(--ink-soft); text-align:center; }
   .product-card .spec-rows{ display:flex; flex-direction:column; }
   .product-card .spec-row{ display:flex; border-bottom:1px solid var(--line); font-size:.78rem; }
   .product-card .spec-row:last-child{ border-bottom:none; }
@@ -228,6 +228,17 @@
   const statusClass = { paid: "status-paid", pending: "status-pending", failed: "status-failed", cancelled: "status-cancelled" };
   const statusLabel = { paid: "Paid", pending: "Pending", failed: "Failed", cancelled: "Cancelled" };
 
+  // Maps the site's two diamond_quality codes (see product.html
+  // DIAMOND_QUALITY_MULTIPLIER) to their full color/clarity names.
+  const DIAMOND_QUALITY_NAMES = {
+    "GH-VS-SI": "G–H Colour (Near Colourless), VS–SI Clarity (Very Slightly – Slightly Included)",
+    "F-G-VVS-VS": "F–G Colour (Colourless – Near Colourless), VVS–VS Clarity (Very Very Slightly – Very Slightly Included)",
+  };
+  function diamondQualityLabel(code) {
+    if (!code) return "";
+    return DIAMOND_QUALITY_NAMES[code] || code;
+  }
+
   function credentials() {
     return {
       username: sessionStorage.getItem("crm_admin_user") || "",
@@ -339,12 +350,19 @@
             <span class="pair"><span class="lbl">Gold Wt</span><span class="val">${i.gold_weight_grams != null ? i.gold_weight_grams + "g" : "—"}</span></span>
           </div>
           <div class="spec-row full">
+            <span class="pair"><span class="lbl">Gold Karat</span><span class="val">${escapeHtml(i.metal_type || "—")}</span></span>
+          </div>
+          <div class="spec-row full">
             <span class="pair"><span class="lbl">Gross Wt</span><span class="val">—</span></span>
           </div>
           <div class="spec-row">
             <span class="pair"><span class="lbl">Diamonds</span><span class="val">—</span></span>
             <span class="pair"><span class="lbl"></span><span class="val">${i.diamond_weight_ct != null ? i.diamond_weight_ct + " ct" : "—"}</span></span>
           </div>
+          ${i.diamond_quality ? `
+          <div class="spec-row full">
+            <span class="pair"><span class="lbl">Diamond Grade</span><span class="val" style="text-align:right; font-weight:500; font-size:.72rem;">${escapeHtml(diamondQualityLabel(i.diamond_quality))}</span></span>
+          </div>` : ""}
           <div class="spec-row">
             <span class="pair"><span class="lbl">Colour stone</span><span class="val">—</span></span>
             <span class="pair"><span class="lbl"></span><span class="val">—</span></span>
