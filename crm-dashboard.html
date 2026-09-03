@@ -71,7 +71,7 @@
   .action-btn.edit-btn{ color:var(--gold); border-color:rgba(169,130,76,.4); }
   .action-btn.delete-btn{ color:var(--danger); border-color:rgba(169,67,47,.35); }
 
-  .client-name-bar{ background:#f7f4ec; border:1px solid var(--line); border-radius:8px; padding:.6rem 1rem; font-size:.85rem; margin-bottom:1rem; }
+  .client-name-bar{ background:#f7f4ec; border:1px solid var(--line); border-radius:6px; padding:.55rem .9rem; font-size:.82rem; margin-bottom:1rem; text-align:center; }
 
   .detail-grid{ display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:1.2rem; }
   .detail-box{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.3rem 1.4rem; }
@@ -83,11 +83,19 @@
   .amount-line{ display:flex; justify-content:space-between; font-size:.9rem; padding:.5rem 0; }
   .amount-line.total{ font-weight:700; font-size:1.05rem; border-top:1px solid var(--line); margin-top:.4rem; padding-top:.8rem; }
 
-  .spec-table{ width:100%; border-collapse:collapse; font-size:.76rem; margin-bottom:1rem; }
-  .spec-table th{ text-align:left; padding:.45rem .4rem; border-bottom:1px solid var(--line); color:var(--ink-soft); font-weight:600; white-space:nowrap; }
-  .spec-table td{ padding:.5rem .4rem; border-bottom:1px solid var(--line); vertical-align:middle; }
-  .spec-table img{ width:38px; height:38px; object-fit:cover; border-radius:6px; display:block; }
-  .spec-table tbody tr:last-child td{ border-bottom:none; }
+  .product-card{ display:grid; grid-template-columns:120px 1fr; border:1px solid var(--ink); border-radius:6px; overflow:hidden; margin-bottom:1rem; }
+  .product-card + .product-card{ margin-top:1rem; }
+  .product-card .img-cell{ grid-row:1 / -1; border-right:1px solid var(--ink); display:flex; align-items:center; justify-content:center; padding:.5rem; background:#f7f4ec; }
+  .product-card .img-cell img{ max-width:100%; max-height:110px; object-fit:cover; border-radius:4px; }
+  .product-card .img-cell .no-img{ font-size:.68rem; color:var(--ink-soft); text-align:center; }
+  .product-card .spec-rows{ display:flex; flex-direction:column; }
+  .product-card .spec-row{ display:flex; border-bottom:1px solid var(--line); font-size:.78rem; }
+  .product-card .spec-row:last-child{ border-bottom:none; }
+  .product-card .spec-row .pair{ flex:1; display:flex; justify-content:space-between; gap:.5rem; padding:.4rem .6rem; }
+  .product-card .spec-row .pair + .pair{ border-left:1px solid var(--line); }
+  .product-card .spec-row .pair .lbl{ color:var(--ink-soft); }
+  .product-card .spec-row .pair .val{ color:var(--ink); font-weight:600; text-align:right; }
+  .product-card .spec-row.full .pair{ flex:1 1 100%; }
 
   .remark-box{ font-size:.82rem; color:var(--ink-soft); }
   .remark-box textarea{ width:100%; min-height:56px; border:1.5px solid #cfc7b6; border-radius:8px; padding:.6rem; font-family:inherit; font-size:.82rem; resize:vertical; }
@@ -169,14 +177,13 @@
       </div>
     </div>
 
-    <div class="client-name-bar">Client Name : <b id="detailClientName"></b></div>
-
     <div class="detail-grid">
       <div class="detail-box" id="productDetailBox">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
           <h3 style="margin:0;">Product Details</h3>
           <button class="action-btn" id="productPdfBtn" data-html2canvas-ignore="true">Download as PDF</button>
         </div>
+        <div class="client-name-bar">Client Name :- <b id="detailClientName"></b></div>
         <div id="detailProducts"></div>
         <div class="remark-box" id="remarkBox"></div>
       </div>
@@ -318,31 +325,36 @@
   }
 
   function renderProductBox(order) {
-    const table = (order.items || []).length ? `
-      <table class="spec-table">
-        <thead>
-          <tr>
-            <th>Product Image</th><th>Product</th><th>Qty</th><th>Size</th>
-            <th>Gold Wt</th><th>Gross Wt</th><th>Diamonds</th><th>Colour Stone</th><th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${order.items.map((i) => `
-            <tr>
-              <td>${i.image ? `<img src="${escapeHtml(i.image)}" alt="">` : "—"}</td>
-              <td>${escapeHtml(i.name)}</td>
-              <td>${i.quantity}</td>
-              <td>${escapeHtml(i.size || "—")}</td>
-              <td>${i.gold_weight_grams != null ? i.gold_weight_grams + "g" : "—"}</td>
-              <td>—</td>
-              <td>${i.diamond_weight_ct != null ? i.diamond_weight_ct + " ct" : "—"}</td>
-              <td>—</td>
-              <td>${money(i.unit_price)}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    ` : `<p style="color:var(--ink-soft); font-size:.85rem;">No items found.</p>`;
+    const table = (order.items || []).length ? order.items.map((i) => `
+      <div class="product-card">
+        <div class="img-cell">
+          ${i.image ? `<img src="${escapeHtml(i.image)}" alt="${escapeHtml(i.name)}">` : `<span class="no-img">Product Image</span>`}
+        </div>
+        <div class="spec-rows">
+          <div class="spec-row">
+            <span class="pair"><span class="lbl">QTY</span><span class="val">${i.quantity}</span></span>
+            <span class="pair"><span class="lbl">Size</span><span class="val">${escapeHtml(i.size || "—")}</span></span>
+          </div>
+          <div class="spec-row full">
+            <span class="pair"><span class="lbl">Gold Wt</span><span class="val">${i.gold_weight_grams != null ? i.gold_weight_grams + "g" : "—"}</span></span>
+          </div>
+          <div class="spec-row full">
+            <span class="pair"><span class="lbl">Gross Wt</span><span class="val">—</span></span>
+          </div>
+          <div class="spec-row">
+            <span class="pair"><span class="lbl">Diamonds</span><span class="val">—</span></span>
+            <span class="pair"><span class="lbl"></span><span class="val">${i.diamond_weight_ct != null ? i.diamond_weight_ct + " ct" : "—"}</span></span>
+          </div>
+          <div class="spec-row">
+            <span class="pair"><span class="lbl">Colour stone</span><span class="val">—</span></span>
+            <span class="pair"><span class="lbl"></span><span class="val">—</span></span>
+          </div>
+          <div class="spec-row full">
+            <span class="pair"><span class="lbl">Price</span><span class="val">${money(i.unit_price)}</span></span>
+          </div>
+        </div>
+      </div>
+    `).join("") : `<p style="color:var(--ink-soft); font-size:.85rem;">No items found.</p>`;
 
     const remarkHtml = editMode
       ? `<label style="display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:.4rem;">Special Remark</label>
