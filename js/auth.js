@@ -155,9 +155,13 @@ function renderAccountAvatar(el, user) {
  */
 async function syncAccountUI() {
   const el = document.querySelector("[data-account-link]");
-  if (!el) return;
+  const myOrdersLink = document.querySelector("[data-my-orders-link]");
+  if (!el && !myOrdersLink) return;
 
   const user = await getCurrentUser();
+  if (myOrdersLink) myOrdersLink.style.display = user ? "" : "none";
+  if (!el) return;
+
   if (user) {
     el.setAttribute("href", "account.html");
     el.setAttribute("aria-label", "Your account");
