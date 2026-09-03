@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
     --ink:#16140f; --ink-soft:#6b6659; --line:#e4ded0; --gold:#a9824c;
@@ -55,9 +58,22 @@
   .details-link{ color:var(--gold); font-weight:600; white-space:nowrap; }
   .empty-row td{ text-align:center; color:var(--ink-soft); padding:2.4rem 1rem; }
 
+  .pagination-row{ display:flex; align-items:center; justify-content:space-between; margin:-.7rem 0 1.6rem; font-size:.82rem; color:var(--ink-soft); }
+  .page-btn{ background:#fff; border:1px solid var(--line); border-radius:8px; padding:.45rem .9rem; font-size:.8rem; cursor:pointer; color:var(--ink); font-weight:600; }
+  .page-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .page-buttons{ display:flex; gap:.6rem; }
+
   .detail-panel{ display:none; }
-  .detail-title{ font-size:.95rem; margin:0 0 .9rem; color:var(--ink-soft); }
-  .detail-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.2rem; }
+  .detail-topbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.8rem; margin-bottom:1rem; }
+  .detail-topbar .order-tag{ font-weight:700; font-size:1.05rem; }
+  .detail-topbar .actions{ display:flex; gap:.6rem; }
+  .action-btn{ border-radius:8px; padding:.45rem .95rem; font-size:.78rem; font-weight:600; cursor:pointer; border:1px solid var(--line); background:#fff; }
+  .action-btn.edit-btn{ color:var(--gold); border-color:rgba(169,130,76,.4); }
+  .action-btn.delete-btn{ color:var(--danger); border-color:rgba(169,67,47,.35); }
+
+  .client-name-bar{ background:#f7f4ec; border:1px solid var(--line); border-radius:8px; padding:.6rem 1rem; font-size:.85rem; margin-bottom:1rem; }
+
+  .detail-grid{ display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:1.2rem; }
   .detail-box{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.3rem 1.4rem; }
   .detail-box h3{ font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin:0 0 1rem; }
   .detail-box .item{ padding:.6rem 0; border-top:1px solid var(--line); font-size:.85rem; line-height:1.7; }
@@ -66,6 +82,17 @@
   .detail-box .item span{ color:var(--ink-soft); }
   .amount-line{ display:flex; justify-content:space-between; font-size:.9rem; padding:.5rem 0; }
   .amount-line.total{ font-weight:700; font-size:1.05rem; border-top:1px solid var(--line); margin-top:.4rem; padding-top:.8rem; }
+
+  .spec-table{ width:100%; border-collapse:collapse; font-size:.76rem; margin-bottom:1rem; }
+  .spec-table th{ text-align:left; padding:.45rem .4rem; border-bottom:1px solid var(--line); color:var(--ink-soft); font-weight:600; white-space:nowrap; }
+  .spec-table td{ padding:.5rem .4rem; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .spec-table img{ width:38px; height:38px; object-fit:cover; border-radius:6px; display:block; }
+  .spec-table tbody tr:last-child td{ border-bottom:none; }
+
+  .remark-box{ font-size:.82rem; color:var(--ink-soft); }
+  .remark-box textarea{ width:100%; min-height:56px; border:1.5px solid #cfc7b6; border-radius:8px; padding:.6rem; font-family:inherit; font-size:.82rem; resize:vertical; }
+  .status-select{ border:1.5px solid #cfc7b6; border-radius:8px; padding:.4rem .6rem; font-size:.82rem; font-family:inherit; }
+  .save-btn{ background:var(--emerald); color:#fff; border:none; border-radius:8px; padding:.45rem 1rem; font-size:.8rem; font-weight:600; cursor:pointer; margin-top:.8rem; }
 
   @media (max-width:820px){
     .detail-grid{ grid-template-columns:1fr; }
@@ -124,12 +151,34 @@
     </table>
   </div>
 
+  <div class="pagination-row" id="paginationRow" style="display:none;">
+    <span id="pageLabel"></span>
+    <div class="page-buttons">
+      <button class="page-btn" id="prevPageBtn">Prev Page</button>
+      <button class="page-btn" id="nextPageBtn">Next Page</button>
+    </div>
+  </div>
+
   <div class="detail-panel" id="detailPanel">
-    <p class="detail-title">Order <b id="detailOrderId"></b> — click a different row to switch</p>
+    <div class="detail-topbar">
+      <span class="order-tag">ORDER <b id="detailOrderId"></b></span>
+      <div class="actions">
+        <button class="action-btn" id="detailDownloadBtn">Download PDF</button>
+        <button class="action-btn edit-btn" id="detailEditBtn">Edit</button>
+        <button class="action-btn delete-btn" id="detailDeleteBtn">Delete</button>
+      </div>
+    </div>
+
+    <div class="client-name-bar">Client Name : <b id="detailClientName"></b></div>
+
     <div class="detail-grid">
-      <div class="detail-box">
-        <h3>Product Details</h3>
+      <div class="detail-box" id="productDetailBox">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+          <h3 style="margin:0;">Product Details</h3>
+          <button class="action-btn" id="productPdfBtn" data-html2canvas-ignore="true">Download as PDF</button>
+        </div>
         <div id="detailProducts"></div>
+        <div class="remark-box" id="remarkBox"></div>
       </div>
       <div class="detail-box">
         <h3>Customer Details</h3>
@@ -153,7 +202,11 @@
   const loginError = document.getElementById("loginError");
 
   let orders = [];
+  let visibleOrders = [];
   let activeOrderId = null;
+  let currentPage = 1;
+  const ROWS_PER_PAGE = 10;
+  let editMode = false;
 
   function money(n) {
     return `₹${Math.round(Number(n || 0)).toLocaleString("en-IN")}`;
@@ -168,59 +221,86 @@
   const statusClass = { paid: "status-paid", pending: "status-pending", failed: "status-failed", cancelled: "status-cancelled" };
   const statusLabel = { paid: "Paid", pending: "Pending", failed: "Failed", cancelled: "Cancelled" };
 
-  async function fetchOrders(username, password) {
-    const { data, error } = await supabaseClient.functions.invoke("crm-orders", { body: { username, password } });
-    if (error) throw new Error(error.message || "Login failed");
+  function credentials() {
+    return {
+      username: sessionStorage.getItem("crm_admin_user") || "",
+      password: sessionStorage.getItem("crm_admin_pass") || "",
+    };
+  }
+
+  async function crmRequest(body) {
+    const { data, error } = await supabaseClient.functions.invoke("crm-orders", { body });
+    if (error) throw new Error(error.message || "Request failed");
     if (data?.error) throw new Error(data.error);
+    return data;
+  }
+
+  async function fetchOrders(username, password) {
+    const data = await crmRequest({ username, password, action: "list" });
     return data.orders || [];
   }
 
   function renderTable(list) {
-    const body = document.getElementById("ordersBody");
-    if (!list.length) {
-      body.innerHTML = `<tr class="empty-row"><td colspan="7">No orders found.</td></tr>`;
-      return;
-    }
-    body.innerHTML = list.map((o) => {
-      const productSummary = (o.items || []).map((i) => i.name).join(", ") || "—";
-      const cls = statusClass[o.status] || "status-pending";
-      const label = statusLabel[o.status] || o.status;
-      return `
-        <tr data-id="${o.id}" class="${o.id === activeOrderId ? "active-row" : ""}">
-          <td>#${o.id.slice(0, 8).toUpperCase()}</td>
-          <td>${escapeHtml(o.customer.name || "—")}</td>
-          <td>${escapeHtml(productSummary)}</td>
-          <td><span class="status-pill ${cls}">${label}</span></td>
-          <td>${new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
-          <td>${money(o.total)}</td>
-          <td class="details-link">Details &rarr;</td>
-        </tr>
-      `;
-    }).join("");
+    visibleOrders = list;
+    if (currentPage < 1) currentPage = 1;
+    const totalPages = Math.max(1, Math.ceil(list.length / ROWS_PER_PAGE));
+    if (currentPage > totalPages) currentPage = totalPages;
 
-    body.querySelectorAll("tr[data-id]").forEach((row) => {
-      row.addEventListener("click", () => showDetail(row.getAttribute("data-id")));
-    });
+    const start = (currentPage - 1) * ROWS_PER_PAGE;
+    const pageItems = list.slice(start, start + ROWS_PER_PAGE);
+
+    const body = document.getElementById("ordersBody");
+    if (!pageItems.length) {
+      body.innerHTML = `<tr class="empty-row"><td colspan="7">No orders found.</td></tr>`;
+    } else {
+      body.innerHTML = pageItems.map((o) => {
+        const productSummary = (o.items || []).map((i) => i.name).join(", ") || "—";
+        const cls = statusClass[o.status] || "status-pending";
+        const label = statusLabel[o.status] || o.status;
+        return `
+          <tr data-id="${o.id}" class="${o.id === activeOrderId ? "active-row" : ""}">
+            <td>#${o.id.slice(0, 8).toUpperCase()}</td>
+            <td>${escapeHtml(o.customer.name || "—")}</td>
+            <td>${escapeHtml(productSummary)}</td>
+            <td><span class="status-pill ${cls}">${label}</span></td>
+            <td>${new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
+            <td>${money(o.total)}</td>
+            <td class="details-link">Details &rarr;</td>
+          </tr>
+        `;
+      }).join("");
+
+      body.querySelectorAll("tr[data-id]").forEach((row) => {
+        row.addEventListener("click", () => showDetail(row.getAttribute("data-id")));
+      });
+    }
+
+    const paginationRow = document.getElementById("paginationRow");
+    if (!list.length) {
+      paginationRow.style.display = "none";
+    } else {
+      paginationRow.style.display = "flex";
+      const rangeStart = start + 1;
+      const rangeEnd = Math.min(start + ROWS_PER_PAGE, list.length);
+      document.getElementById("pageLabel").textContent = `Row ${rangeStart}-${rangeEnd} of ${list.length}`;
+      document.getElementById("prevPageBtn").disabled = currentPage <= 1;
+      document.getElementById("nextPageBtn").disabled = currentPage >= totalPages;
+    }
   }
 
   function showDetail(orderId) {
     const order = orders.find((o) => o.id === orderId);
     if (!order) return;
     activeOrderId = orderId;
+    editMode = false;
 
     document.querySelectorAll("#ordersBody tr").forEach((r) => r.classList.toggle("active-row", r.getAttribute("data-id") === orderId));
 
     document.getElementById("detailPanel").style.display = "block";
     document.getElementById("detailOrderId").textContent = `#${order.id.slice(0, 8).toUpperCase()}`;
+    document.getElementById("detailClientName").textContent = order.customer.name || "—";
 
-    document.getElementById("detailProducts").innerHTML = (order.items || []).map((i) => `
-      <div class="item">
-        <b>${escapeHtml(i.name)} &times; ${i.quantity}</b>
-        <span>
-          ${[i.category, i.metal_type, i.diamond_quality, i.color, i.size ? `Size ${i.size}` : ""].filter(Boolean).map(escapeHtml).join(" &middot; ")}
-        </span>
-      </div>
-    `).join("") || `<p style="color:var(--ink-soft); font-size:.85rem;">No items found.</p>`;
+    renderProductBox(order);
 
     const c = order.customer;
     document.getElementById("detailCustomer").innerHTML = `
@@ -234,6 +314,55 @@
       </div>
     `;
 
+    renderAmountBox(order);
+  }
+
+  function renderProductBox(order) {
+    const table = (order.items || []).length ? `
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Product Image</th><th>Product</th><th>Qty</th><th>Size</th>
+            <th>Gold Wt</th><th>Gross Wt</th><th>Diamonds</th><th>Colour Stone</th><th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${order.items.map((i) => `
+            <tr>
+              <td>${i.image ? `<img src="${escapeHtml(i.image)}" alt="">` : "—"}</td>
+              <td>${escapeHtml(i.name)}</td>
+              <td>${i.quantity}</td>
+              <td>${escapeHtml(i.size || "—")}</td>
+              <td>${i.gold_weight_grams != null ? i.gold_weight_grams + "g" : "—"}</td>
+              <td>—</td>
+              <td>${i.diamond_weight_ct != null ? i.diamond_weight_ct + " ct" : "—"}</td>
+              <td>—</td>
+              <td>${money(i.unit_price)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    ` : `<p style="color:var(--ink-soft); font-size:.85rem;">No items found.</p>`;
+
+    const remarkHtml = editMode
+      ? `<label style="display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:.4rem;">Special Remark</label>
+         <textarea id="remarkInput">${escapeHtml(order.admin_notes || "")}</textarea>
+         <label style="display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin:.8rem 0 .4rem;">Status</label>
+         <select class="status-select" id="statusInput">
+           ${Object.keys(statusLabel).map((s) => `<option value="${s}" ${s === order.status ? "selected" : ""}>${statusLabel[s]}</option>`).join("")}
+         </select>
+         <br><button class="save-btn" id="saveEditBtn">Save Changes</button>`
+      : `<b style="display:block; margin-bottom:.3rem;">Special Remark</b><span>${escapeHtml(order.admin_notes || "—")}</span>`;
+
+    document.getElementById("detailProducts").innerHTML = table;
+    document.getElementById("remarkBox").innerHTML = remarkHtml;
+
+    if (editMode) {
+      document.getElementById("saveEditBtn").addEventListener("click", () => saveEdit(order.id));
+    }
+  }
+
+  function renderAmountBox(order) {
     const dispatchBy = new Date(order.created_at);
     dispatchBy.setDate(dispatchBy.getDate() + 7);
     const dispatchLabel = order.status === "paid"
@@ -248,7 +377,168 @@
     `;
   }
 
+  async function saveEdit(orderId) {
+    const saveBtn = document.getElementById("saveEditBtn");
+    const status = document.getElementById("statusInput").value;
+    const admin_notes = document.getElementById("remarkInput").value;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+    try {
+      const { username, password } = credentials();
+      await crmRequest({ username, password, action: "update", order_id: orderId, status, admin_notes });
+      const order = orders.find((o) => o.id === orderId);
+      order.status = status;
+      order.admin_notes = admin_notes;
+      editMode = false;
+      renderProductBox(order);
+      renderAmountBox(order);
+      renderTable(visibleOrders);
+    } catch (err) {
+      alert(err.message || "Could not save changes");
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Changes";
+    }
+  }
+
+  async function deleteActiveOrder() {
+    if (!activeOrderId) return;
+    if (!confirm("Delete this order permanently? This cannot be undone.")) return;
+    try {
+      const { username, password } = credentials();
+      await crmRequest({ username, password, action: "delete", order_id: activeOrderId });
+      orders = orders.filter((o) => o.id !== activeOrderId);
+      activeOrderId = null;
+      document.getElementById("detailPanel").style.display = "none";
+      applyFilter();
+    } catch (err) {
+      alert(err.message || "Could not delete order");
+    }
+  }
+
+  function downloadActiveOrder() {
+    const order = orders.find((o) => o.id === activeOrderId);
+    if (!order) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const orderTag = `#${order.id.slice(0, 8).toUpperCase()}`;
+
+    doc.setFontSize(16);
+    doc.text(`Order ${orderTag}`, 14, 18);
+    doc.setFontSize(10);
+    doc.setTextColor(110, 105, 90);
+    doc.text(
+      `${new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}  •  ${statusLabel[order.status] || order.status}`,
+      14, 25
+    );
+    doc.setTextColor(20, 20, 15);
+
+    doc.autoTable({
+      startY: 32,
+      head: [["Product", "Qty", "Size", "Gold Wt", "Diamonds", "Price"]],
+      body: (order.items || []).map((i) => [
+        i.name,
+        i.quantity,
+        i.size || "—",
+        i.gold_weight_grams != null ? i.gold_weight_grams + "g" : "—",
+        i.diamond_weight_ct != null ? i.diamond_weight_ct + " ct" : "—",
+        money(i.unit_price),
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [169, 130, 76] },
+      styles: { fontSize: 9 },
+    });
+
+    let y = doc.lastAutoTable.finalY + 10;
+    if (order.admin_notes) {
+      doc.setFontSize(10);
+      doc.text("Special Remark:", 14, y);
+      const remarkLines = doc.splitTextToSize(order.admin_notes, 180);
+      doc.text(remarkLines, 14, y + 6);
+      y += 6 + remarkLines.length * 5 + 6;
+    }
+
+    const c = order.customer;
+    doc.autoTable({
+      startY: y,
+      head: [["Customer Details", ""]],
+      body: [
+        ["Name", c.name || "—"],
+        ["Phone", c.phone || "—"],
+        ["Address", [c.address, c.city, c.state, c.pincode].filter(Boolean).join(", ") || "—"],
+      ],
+      theme: "plain",
+      styles: { fontSize: 9 },
+      columnStyles: { 0: { fontStyle: "bold", cellWidth: 30 } },
+    });
+
+    y = doc.lastAutoTable.finalY + 6;
+    const dispatchBy = new Date(order.created_at);
+    dispatchBy.setDate(dispatchBy.getDate() + 7);
+    const dispatchLabel = order.status === "paid"
+      ? (new Date() >= dispatchBy ? "Dispatched" : `Dispatches by ${dispatchBy.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`)
+      : "Awaiting payment";
+
+    doc.autoTable({
+      startY: y,
+      body: [
+        ["Payment Status", statusLabel[order.status] || order.status],
+        ["Dispatch", dispatchLabel],
+        ["Razorpay Payment ID", order.razorpay_payment_id || "—"],
+        ["Total Paid", money(order.total)],
+      ],
+      theme: "plain",
+      styles: { fontSize: 9 },
+      columnStyles: { 0: { fontStyle: "bold", cellWidth: 50 } },
+    });
+
+    doc.save(`order-${order.id.slice(0, 8)}.pdf`);
+  }
+
+  async function downloadProductDetailsPdf() {
+    const order = orders.find((o) => o.id === activeOrderId);
+    const box = document.getElementById("productDetailBox");
+    if (!order || !box) return;
+
+    const pdfBtn = document.getElementById("productPdfBtn");
+    pdfBtn.disabled = true;
+    const originalLabel = pdfBtn.textContent;
+    pdfBtn.textContent = "Preparing…";
+
+    try {
+      const canvas = await html2canvas(box, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true,
+        ignoreElements: (el) => el.hasAttribute && el.hasAttribute("data-html2canvas-ignore"),
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: canvas.width > canvas.height ? "landscape" : "portrait", unit: "pt" });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 24;
+      const maxWidth = pageWidth - margin * 2;
+      const maxHeight = pageHeight - margin * 2;
+
+      const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+      const imgWidth = canvas.width * ratio;
+      const imgHeight = canvas.height * ratio;
+
+      doc.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
+      doc.save(`product-details-${order.id.slice(0, 8)}.pdf`);
+    } catch (err) {
+      alert("Could not generate PDF: " + (err.message || err));
+    } finally {
+      pdfBtn.disabled = false;
+      pdfBtn.textContent = originalLabel;
+    }
+  }
+
   function applyFilter() {
+    currentPage = 1;
     const q = document.getElementById("searchFilter").value.trim().toLowerCase();
     if (!q) { renderTable(orders); return; }
     const filtered = orders.filter((o) => {
@@ -321,6 +611,25 @@
 
   document.getElementById("searchFilter").addEventListener("input", applyFilter);
   document.getElementById("downloadBtn").addEventListener("click", downloadCsv);
+
+  document.getElementById("prevPageBtn").addEventListener("click", () => {
+    currentPage -= 1;
+    renderTable(visibleOrders);
+  });
+  document.getElementById("nextPageBtn").addEventListener("click", () => {
+    currentPage += 1;
+    renderTable(visibleOrders);
+  });
+
+  document.getElementById("detailEditBtn").addEventListener("click", () => {
+    const order = orders.find((o) => o.id === activeOrderId);
+    if (!order) return;
+    editMode = !editMode;
+    renderProductBox(order);
+  });
+  document.getElementById("detailDeleteBtn").addEventListener("click", deleteActiveOrder);
+  document.getElementById("detailDownloadBtn").addEventListener("click", downloadActiveOrder);
+  document.getElementById("productPdfBtn").addEventListener("click", downloadProductDetailsPdf);
 
   // Auto-login within the same tab session so a page refresh doesn't
   // force re-entering the password (cleared when the tab closes).
