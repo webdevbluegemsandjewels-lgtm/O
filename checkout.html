@@ -37,6 +37,22 @@
     .checkout-layout{ grid-template-columns: 1fr; }
     .form-row{ grid-template-columns: 1fr; }
   }
+
+  .payment-notice-overlay{
+    position: fixed; inset: 0; background: rgba(22,20,15,.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 1rem;
+  }
+  .payment-notice-overlay.open{ display: flex; }
+  .payment-notice-box{
+    background: #fff; border-radius: 12px; max-width: 400px; width: 100%;
+    padding: 1.8rem; text-align: center; box-shadow: 0 20px 50px rgba(22,20,15,.25);
+  }
+  .payment-notice-box h4{ font-size: 1.15rem; margin-bottom: .7rem; }
+  .payment-notice-box p{ font-size: .88rem; color: var(--ink-soft); line-height: 1.7; margin-bottom: 1.4rem; }
+  .payment-notice-box p a{ color: var(--gold); text-decoration: underline; }
+  .payment-notice-actions{ display: flex; flex-direction: column; gap: .6rem; }
+  .payment-notice-actions .btn{ width: 100%; justify-content: center; }
 </style>
 </head>
 <body>
@@ -120,6 +136,23 @@
   </div>
 </section>
 
+<div class="payment-notice-overlay" id="paymentNoticeModal">
+  <div class="payment-notice-box">
+    <h4>Online Payment — Work in Progress</h4>
+    <p>
+      Real payment is still being set up and is currently running in test mode.
+      To place your order right now, please fill in the shipping form and reach
+      out to us at <a href="tel:+918655964188">+91 86559 64188</a>, or visit our
+      <a href="contact.html">Contact page</a> and we'll confirm your order directly.
+    </p>
+    <div class="payment-notice-actions">
+      <a href="contact.html" class="btn btn-gold">Contact Us</a>
+      <button type="button" class="btn btn-outline-dark" id="closePaymentNotice">Close</button>
+      <button type="button" id="continueTestPayment" style="background:none; border:none; font-size:.78rem; color:var(--ink-soft); text-decoration:underline; cursor:pointer; margin-top:.2rem;">Continue anyway (test payment)</button>
+    </div>
+  </div>
+</div>
+
 <footer class="site-footer" id="footer"></footer>
 <p class="footer-credit">Developed by <a href="https://www.linkedin.com/in/amandubal/" target="_blank" rel="noopener">Aman Dubal</a> | WebDev@BGJ</p>
 
@@ -165,14 +198,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const errorEl = document.getElementById("checkoutError");
   const payBtn = document.getElementById("payBtn");
+  const paymentNoticeModal = document.getElementById("paymentNoticeModal");
+  document.getElementById("closePaymentNotice").addEventListener("click", () => {
+    paymentNoticeModal.classList.remove("open");
+  });
 
-  payBtn.addEventListener("click", async () => {
+  // Real payment isn't live yet — clicking Pay Now surfaces that up
+  // front (with a way to reach us directly) instead of letting the
+  // Razorpay test-mode flow run silently as if it were a real
+  // checkout. "Continue anyway" is only there for our own testing.
+  payBtn.addEventListener("click", () => {
     const form = document.getElementById("shippingForm");
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
+    paymentNoticeModal.classList.add("open");
+  });
 
+  document.getElementById("continueTestPayment").addEventListener("click", () => {
+    paymentNoticeModal.classList.remove("open");
+    runTestPayment();
+  });
+
+  async function runTestPayment() {
     payBtn.disabled = true;
     payBtn.textContent = "Processing...";
     errorEl.style.display = "none";
@@ -265,7 +314,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       payBtn.disabled = false;
       payBtn.textContent = "Pay Now";
     }
-  });
+  }
 });
 </script>
 </body>
