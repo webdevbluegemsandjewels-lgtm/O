@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>OrenkaFine — Fine &amp; Fashion Jewellery</title>
-<meta name="description" content="OrenkaFine is a house of fine and fashion Jewellery — rings, necklaces, earrings and bracelets crafted for everyday elegance." />
+<meta name="description" content="OrenkaFine is a house of fine and fashion Jewellery — rings, earrings, bracelets, pendants and charms crafted for everyday elegance." />
 <link rel="icon" href="https://i.ibb.co/HWQvD5t/cropped-circle-image.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -149,9 +149,10 @@
     </div>
     <nav class="hero-cat-pills" aria-label="Shop by category">
       <a href="collections.html?cat=Rings">Rings</a>
-      <a href="collections.html?cat=Necklaces">Necklaces</a>
-      <a href="collections.html?cat=Bracelets">Bracelets</a>
       <a href="collections.html?cat=Earrings">Earrings</a>
+      <a href="collections.html?cat=Bracelets">Bracelets</a>
+      <a href="collections.html?cat=Pendants">Pendants</a>
+      <a href="collections.html?cat=Charms">Charms</a>
     </nav>
   </div>
 </section>
@@ -192,7 +193,7 @@
         <p class="eyebrow">Selected for you</p>
         <h2 class="section-title">OrenkaFine Selected Items</h2>
       </div>
-      <p class="section-desc">A rotating edit of rings, necklaces, earrings and bracelets our editors are wearing this season.</p>
+      <p class="section-desc">A rotating edit of rings, earrings, bracelets and pendants our editors are wearing this season.</p>
     </div>
     <div class="video-showcase">
       <a href="product.html?slug=diamond-trishul-gold-stud-earrings" aria-label="Diamond Trishul Gold Stud Earrings">
@@ -241,13 +242,13 @@
         <div class="cat-circle"><img src="products/braclet/1.png" alt="Bracelets category" /></div>
         <h4>Bracelets</h4>
       </a>
-      <a href="collections.html?cat=Ear Cuffs" class="cat-item">
-        <div class="cat-circle"><img src="products/ear-cuffs/1.png" alt="Ear cuffs category" /></div>
-        <h4>Ear Cuffs</h4>
+      <a href="collections.html?cat=Pendants" class="cat-item">
+        <div class="cat-circle"><img src="products/pendants/1.png" alt="Pendants category" /></div>
+        <h4>Pendants</h4>
       </a>
-      <a href="collections.html?cat=Necklaces" class="cat-item">
-        <div class="cat-circle"><img src="products/necklacs/1.png" alt="Necklaces category" /></div>
-        <h4>Necklaces</h4>
+      <a href="collections.html?cat=Charms" class="cat-item">
+        <div class="cat-circle"><img src="products/charms/1.png" alt="Charms category" /></div>
+        <h4>Charms</h4>
       </a>
     </div>
   </div>
@@ -356,9 +357,10 @@
   if (catBand) {
     catBand.innerHTML = CATEGORIES.map(c => `
       <div class="cat-item">
-        <a href="collections.html?cat=${encodeURIComponent(c.name)}">
+        <a href="collections.html?cat=${encodeURIComponent(c.name)}" style="position:relative;">
           <div class="cat-circle"><img src="${c.image}" alt="${c.name}" loading="lazy" /></div>
           <h4>${c.name}</h4>
+          ${c.comingSoon ? `<span style="position:absolute; top:0; right:0; background:var(--gold); color:#fff; font-size:.62rem; letter-spacing:.04em; text-transform:uppercase; padding:.2rem .5rem; border-radius:10px;">Coming Soon</span>` : ""}
         </a>
       </div>
     `).join("");

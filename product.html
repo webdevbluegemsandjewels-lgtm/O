@@ -279,8 +279,9 @@
 
     <div id="loadingState" style="padding: 4rem 0; text-align:center; color: var(--ink-soft);">Loading product…</div>
     <div id="notFoundState" style="display:none; padding: 4rem 0; text-align:center; color: var(--ink-soft);">
-      <p>We couldn't find that product.</p>
-      <a href="collections.html" class="btn btn-outline-dark" style="margin-top:1rem;">Back to Collections</a>
+      <h2 style="font-family:var(--font-display); color:var(--ink); margin-bottom:.5rem;">Coming Soon</h2>
+      <p>This piece isn't available right now — stay tuned, or explore what we do have in store.</p>
+      <a href="collections.html" class="btn btn-gold" style="margin-top:1rem;">Explore Other Products</a>
     </div>
 
     <div class="product-page-grid" id="productContent" style="display:none;">
@@ -519,11 +520,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   `).join("");
 
   let currentImageIndex = 0;
+  // Set below once the color pills exist, so showImage() can sync the
+  // selected color pill whenever the image changes via thumbnail click,
+  // the prev/next arrows, or a swipe — the reverse of picking a color
+  // to change the image.
+  let onImageIndexChange = null;
   function showImage(index) {
     if (!images.length) return;
     currentImageIndex = ((index % images.length) + images.length) % images.length;
     mainImage.src = images[currentImageIndex];
     thumbsEl.querySelectorAll("img").forEach((t, i) => t.classList.toggle("active", i === currentImageIndex));
+    if (onImageIndexChange) onImageIndexChange(currentImageIndex);
   }
 
   thumbsEl.addEventListener("click", (e) => {
@@ -746,27 +753,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     refreshDisplayedPrice();
   }
 
-  // Rings, bangles, bracelets, and necklaces/pendants should always
-  // offer a size picker — real sibling data (from the scraper) when
-  // it exists, otherwise a standard fallback range for that product
-  // type, same fallback pattern as Diamond Quality below. "Bracelets"
-  // is the only DB category for both bangles and chain bracelets, so
-  // the two are told apart by product name (rigid bangles vs
-  // adjustable chains use completely different sizing systems and
-  // guides).
+  // Rings and bracelets should always offer a size picker — real
+  // sibling data (from the scraper) when it exists, otherwise a
+  // standard fallback range for that product type, same fallback
+  // pattern as Diamond Quality below. "Bracelets" is the only DB
+  // category for both bangles and chain bracelets, so the two are
+  // told apart by product name (rigid bangles vs adjustable chains
+  // use completely different sizing systems and guides).
   const RING_SIZE_FALLBACK = ["06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16"];
   const BANGLE_SIZE_FALLBACK = ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5"];
   const BRACELET_SIZE_FALLBACK = ["06", "07", "08"];
-  const NECKLACE_SIZE_FALLBACK = ["14", "15", "16", "17", "18"];
   const categoryLower = (product.category || "").toLowerCase();
   const isRing = categoryLower === "rings";
   const isBangleProduct = categoryLower === "bracelets" && /bangle/i.test(product.name || "");
   const isBraceletProduct = categoryLower === "bracelets" && !isBangleProduct;
-  // Pendants ("Charms & Pendants") deliberately excluded — unlike a
-  // necklace's chain length, a pendant has no size dimension at all.
-  // Falls into the `!isRing` branch below, which sets sizeFallback to
-  // [] so no Size section renders.
-  const isNecklaceProduct = categoryLower === "necklaces";
+  // Pendants and Charms deliberately excluded — a pendant/charm has
+  // no size dimension at all. Falls into the `!isRing` branch below,
+  // which sets sizeFallback to [] so no Size section renders.
 
   let sizeGuideType = "size";
   let sizeGuideLabel = "Ring Size Guide";
@@ -775,8 +778,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     sizeGuideType = "bangle"; sizeGuideLabel = "Bangle Size Guide"; sizeFallback = BANGLE_SIZE_FALLBACK;
   } else if (isBraceletProduct) {
     sizeGuideType = "bracelet"; sizeGuideLabel = "Bracelet Size Guide"; sizeFallback = BRACELET_SIZE_FALLBACK;
-  } else if (isNecklaceProduct) {
-    sizeGuideType = "necklace"; sizeGuideLabel = "Necklace Size Guide"; sizeFallback = NECKLACE_SIZE_FALLBACK;
   } else if (!isRing) {
     sizeFallback = [];
   }
@@ -806,6 +807,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // ---------- Color (from the product's own `colors` column — cosmetic, not tied to price) ----------
+  // Each product's gallery is uploaded in a fixed order — 1st image
+  // is Yellow Gold, 2nd is Rose Gold, 3rd is White Gold — regardless
+  // of what order the `colors` column lists the names in. So match by
+  // keyword rather than array index when swapping the main image.
+  const COLOR_IMAGE_KEYWORDS = [
+    { key: "yellow", index: 0 },
+    { key: "rose", index: 1 },
+    { key: "white", index: 2 },
+  ];
+  function imageIndexForColor(colorName) {
+    const lc = (colorName || "").toLowerCase();
+    const match = COLOR_IMAGE_KEYWORDS.find((k) => lc.includes(k.key));
+    return match && match.index < images.length ? match.index : null;
+  }
+  function colorForImageIndex(index, colorOptions) {
+    const kw = COLOR_IMAGE_KEYWORDS.find((k) => k.index === index);
+    if (!kw) return null;
+    return colorOptions.find((c) => c.toLowerCase().includes(kw.key)) || null;
+  }
+
   const colorSection = document.getElementById("colorSection");
   const colorOptions = Array.isArray(product.colors) ? product.colors.filter(Boolean) : [];
   let selectedColor = colorOptions[0] || null;
@@ -815,11 +836,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     colorRow.innerHTML = colorOptions.map((c, i) => `
       <label class="option-pill ${i === 0 ? "active-pill" : ""}"><input type="radio" name="color" value="${c}" ${i === 0 ? "checked" : ""}> ${c}</label>
     `).join("");
+    function selectColor(color, { syncImage } = { syncImage: true }) {
+      selectedColor = color;
+      colorRow.querySelectorAll(".option-pill").forEach((p) => {
+        const isMatch = p.querySelector("input").value === color;
+        p.classList.toggle("active-pill", isMatch);
+        p.querySelector("input").checked = isMatch;
+      });
+      if (syncImage) {
+        const idx = imageIndexForColor(color);
+        if (idx !== null) showImage(idx);
+      }
+    }
     colorRow.addEventListener("change", (e) => {
       if (e.target.name !== "color") return;
-      selectedColor = e.target.value;
-      colorRow.querySelectorAll(".option-pill").forEach((p) => p.classList.toggle("active-pill", p.querySelector("input").checked));
+      selectColor(e.target.value);
     });
+    // Reverse direction: clicking a thumbnail / using the prev-next
+    // arrows / swiping updates the selected color pill to match.
+    onImageIndexChange = (index) => {
+      const color = colorForImageIndex(index, colorOptions);
+      if (color && color !== selectedColor) selectColor(color, { syncImage: false });
+    };
+    const initialIdx = imageIndexForColor(selectedColor);
+    if (initialIdx !== null) showImage(initialIdx);
   } else {
     colorSection.style.display = "none";
   }

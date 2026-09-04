@@ -37,7 +37,7 @@
       <div class="search-overlay" role="dialog" aria-modal="true" aria-label="Search products">
         <div class="search-overlay-bar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" placeholder="Search rings, necklaces, earrings…" autocomplete="off" />
+          <input type="text" id="searchInput" placeholder="Search rings, earrings, bracelets…" autocomplete="off" />
           <button type="button" class="search-overlay-close" aria-label="Close search">&times;</button>
         </div>
         <div class="search-overlay-results" id="searchResults"></div>

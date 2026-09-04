@@ -10,32 +10,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // categories) fall back to the general collections page.
   const POPULAR_SEARCHES = [
     ["Rings", "collections.html?cat=Rings"],
-    ["Necklaces", "collections.html?cat=Necklaces"],
     ["Bangles & Bracelets", "collections.html?cat=Bracelets"],
     ["Earrings", "collections.html?cat=Earrings"],
     ["Custom Solitaire Jewellery", "collections.html?cat=Rings"],
     ["Loose Diamonds", "collections.html"],
-    ["Charms & Pendants", `collections.html?cat=${encodeURIComponent("Charms & Pendants")}`],
-    ["Gold Chains", "collections.html?cat=Necklaces"],
+    ["Pendants", "collections.html?cat=Pendants"],
+    ["Charms", "collections.html?cat=Charms"],
     ["Engravable Jewellery", "collections.html"],
     ["Nose Pins", "collections.html"],
     ["Under ₹15K", "collections.html?maxPrice=15000"],
     ["Under ₹25K", "collections.html?maxPrice=25000"],
-    ["Mangalsutra", "collections.html?cat=Necklaces"],
     ["Pre-Set Solitaire Rings", "collections.html?cat=Rings"],
     ["Diamond Earrings", "collections.html?cat=Earrings"],
   ];
   const POPULAR_COLLECTIONS = [
-    ["Script Necklaces", "collections.html?cat=Necklaces"],
     ["Evil Eye Collection", "collections.html"],
     ["Bunchberry Collection", "collections.html"],
-    ["Space Letter Necklaces", "collections.html?cat=Necklaces"],
     ["Tiny Studs", "collections.html?cat=Earrings"],
-    ["Name Necklaces", "collections.html?cat=Necklaces"],
     ["Office Wear Jewellery", "collections.html"],
     ["Eternity Rings", "collections.html?cat=Rings"],
     ["Fashion Earrings", "collections.html?cat=Earrings"],
-    ["Pendant Necklaces", "collections.html?cat=Necklaces"],
+    ["Pendant Charms", "collections.html?cat=Charms"],
   ];
   const popularLinksHTML = (items) =>
     items.map(([label, href]) => `<a href="${href}">${label}</a>`).join('<span aria-hidden="true">|</span>');
@@ -56,10 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <h5>Shop</h5>
           <ul>
             <li><a href="collections.html?cat=Rings">Rings</a></li>
-            <li><a href="collections.html?cat=Necklaces">Necklaces</a></li>
             <li><a href="collections.html?cat=Earrings">Earrings</a></li>
             <li><a href="collections.html?cat=Bracelets">Bracelets</a></li>
-            <li><a href="collections.html?cat=${encodeURIComponent("Charms & Pendants")}">Pendants</a></li>
+            <li><a href="collections.html?cat=Pendants">Pendants</a></li>
+            <li><a href="collections.html?cat=Charms">Charms</a></li>
             <li><a href="gift-card.html">Gift Cards</a></li>
           </ul>
         </div>
@@ -80,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <li><a href="#" data-guide="size">Ring Size Guide</a></li>
             <li><a href="#" data-guide="diamond">Diamond Size Guide</a></li>
             <li><a href="#" data-guide="gold">Gold Size Guide</a></li>
-            <li><a href="#" data-guide="necklace">Necklace Size Guide</a></li>
             <li><a href="#" data-guide="bracelet">Bracelet Size Guide</a></li>
           </ul>
         </div>

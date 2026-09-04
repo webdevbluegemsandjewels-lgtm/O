@@ -52,32 +52,6 @@ const BRACELETS = Array.from({ length: 50 }, (_, i) => {
 	};
 });
 
-const NECKLACE_STYLES = [
-	"Aurelia", "Lariat", "Choker", "Pendant", "Layered", "Pearl Drop", "Halo", "Seraph", "Glide", "Velvet",
-	"Orbit", "Dawn", "Muse", "Twilight", "Celeste", "Nova", "Bloom", "Cascade", "Etoile", "Gleam",
-	"Harmony", "Opaline", "Solace", "Lustre", "Stella"
-];
-
-const NECKLACES = Array.from({ length: 50 }, (_, i) => {
-	const imageIndex = (i % 10) + 1;
-	const secondaryIndex = ((i + 5) % 10) + 1;
-	const style = NECKLACE_STYLES[i % NECKLACE_STYLES.length];
-	const necklaceNo = String(i + 1).padStart(2, "0");
-	const amount = 180 + (i * 10);
-
-	return {
-		name: `Necklace ${necklaceNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
-		cat: "Necklaces",
-		price: `₹${amount}`,
-		image: `products/necklacs/${imageIndex}.png`,
-		secondaryImage: `products/necklacs/${secondaryIndex}.png`,
-		tag: i < 5 ? "New" : "",
-		lookup: "",
-		description: `${style} necklace design in premium finish`
-	};
-});
-
 const EARRING_STYLES = [
 	"Stud", "Hoop", "Drop", "Cluster", "Teardrop", "Twinkle", "Halo", "Bloom", "Luxe", "Comet",
 	"Aurora", "Pearline", "Nova", "Dew", "Sway", "Orbit", "Flare", "Glint", "Muse", "Wisp",
@@ -104,33 +78,7 @@ const EARRINGS = Array.from({ length: 50 }, (_, i) => {
 	};
 });
 
-const EAR_CUFF_STYLES = [
-	"Arc", "Twist", "Luna", "Spark", "Ribbon", "Petal", "Halo", "Glow", "Nova", "Whisper",
-	"Glimmer", "Muse", "Stellar", "Chic", "Vibe", "Drape", "Sculpt", "Shine", "Bloom", "Eclipse",
-	"Aster", "Poise", "Dazzle", "Breeze", "Aura"
-];
-
-const EAR_CUFFS = Array.from({ length: 50 }, (_, i) => {
-	const imageIndex = (i % 10) + 1;
-	const secondaryIndex = ((i + 6) % 10) + 1;
-	const style = EAR_CUFF_STYLES[i % EAR_CUFF_STYLES.length];
-	const cuffNo = String(i + 1).padStart(2, "0");
-	const amount = 95 + (i * 6);
-
-	return {
-		name: `Ear Cuff ${cuffNo} ${style}`,
-		brand: i < 25 ? "OrenkaFine jewellery" : "OrenkaFine Moda",
-		cat: "Ear Cuffs",
-		price: `₹${amount}`,
-		image: `products/ear-cuffs/${imageIndex}.png`,
-		secondaryImage: `products/ear-cuffs/${secondaryIndex}.png`,
-		tag: i < 5 ? "New" : "",
-		lookup: "",
-		description: `${style} ear cuff design in premium finish`
-	};
-});
-
-PRODUCTS.push(...BRACELETS, ...NECKLACES, ...EARRINGS, ...EAR_CUFFS);
+PRODUCTS.push(...BRACELETS, ...EARRINGS);
 
 // Extra display data used by the new card + filter sidebar
 const COLOR_SWATCHES = {
@@ -165,10 +113,8 @@ PRODUCTS.forEach((p, i) => {
 
 const IMG = {
 	ringModel:      "https://images.unsplash.com/photo-1762505464397-6abf1a645981",
-	necklaceSet:    "https://images.unsplash.com/photo-1747933509433-c58152c10ee7",
 	earringsHoop:   "https://images.unsplash.com/photo-1616121341778-0dd435d03d23",
 	braceletWrist:  "https://images.unsplash.com/photo-1705575518997-82a71bcc75a2",
-	heartNecklace:  "https://images.unsplash.com/photo-1620135104013-1abdff4b1ca7",
 	dolceRing:      "https://images.unsplash.com/photo-1615146037533-0a9877176eb2",
 	eternaBridal:   "https://images.unsplash.com/photo-1768932080519-3ebd5a81d090",
 	everydayGold:   "https://images.unsplash.com/photo-1593193611972-437ce4d601c6",
@@ -184,11 +130,14 @@ const COLLECTIONS = [
 	{ id: "Everyday Gold", title: "Everyday Gold", tagline: "Everyday elegance", description: "Lightweight diamond details designed to stack, layer, and carry you from day to night.", image: img("everydayGold", 1200), href: "collections.html?collection=Everyday+Gold" },
 ];
 
+// `comingSoon: true` marks a category with no live products yet — the
+// homepage tile shows a "Coming Soon" badge, and collections.html shows
+// a "Coming Soon, explore our other products" state when it's selected.
 const CATEGORIES = [
-	{ name: "Rings", image: "Index/Products/ring.png" },
-	{ name: "Necklaces", image: "Index/Products/necklaces.png" },
+	{ name: "Rings", image: "Index/Products/ring.png", comingSoon: true },
 	{ name: "Earrings", image: "Index/Products/earring.png" },
 	{ name: "Bracelets", image: "Index/Products/bracelet.png" },
 	{ name: "Pendants", image: "Index/Products/pendant.png" },
+	{ name: "Charms", image: "Index/Products/charm.png", comingSoon: true },
 ];
 

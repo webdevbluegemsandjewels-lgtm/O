@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Collections — OrenkaFine Fine &amp; Light Weight Jewellery</title>
-  <meta name="description" content="Browse OrenkaFine's collection of rings, necklaces, earrings, bracelets and pendants across our Fine Jewellery and Moda lines." />
+  <meta name="description" content="Browse OrenkaFine's collection of rings, earrings, bracelets, pendants and charms across our Fine Jewellery and Moda lines." />
   <link rel="icon" href="https://i.ibb.co/HWQvD5t/cropped-circle-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -227,7 +227,7 @@
   <script src="js/guide-modals.js"></script>
   <script>
 document.addEventListener("DOMContentLoaded", async () => {
-  const SHOP_CATS = ["Rings", "Bracelets", "Necklaces", "Earrings", "Ear Cuffs", "Charms & Pendants"];
+  const SHOP_CATS = ["Rings", "Bracelets", "Earrings", "Pendants", "Charms"];
   const MATERIAL_FILTERS = [
     "Baguette", "Diamond", "Emerald", "Emerald Gold", "Evil Eye Gold",
     "Gold", "Marquise", "Ruby Gemstones", "Ruby Gold",
@@ -270,18 +270,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const urlCat = urlParams.get("cat");
   const urlMaxPrice = parseInt(urlParams.get("maxPrice"), 10);
-  const initialCategory =
-    (urlCat && SHOP_CATS.find((cat) => cat.toLowerCase() === urlCat.toLowerCase())) ||
-    SHOP_CATS.find((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat)) ||
-    SHOP_CATS[0];
   const HOUSE_OPTIONS = [...new Set(SHOP_PRODUCTS.map((p) => p.brand))];
   const CATEGORY_OPTIONS = SHOP_CATS.filter((cat) => SHOP_PRODUCTS.some((p) => p.cat === cat));
+
+  // Pick a default house+category combo that actually has products —
+  // picking each independently could land on a pair (e.g. Fine Jewellery
+  // + Bracelets) with zero results and show an empty page.
+  const requestedCategory = urlCat && SHOP_CATS.find((cat) => cat.toLowerCase() === urlCat.toLowerCase());
+  let initialHouse = HOUSE_OPTIONS[0];
+  let initialCategory = requestedCategory || CATEGORY_OPTIONS[0] || SHOP_CATS[0];
+
+  const hasProducts = (house, cat) => SHOP_PRODUCTS.some((p) => p.brand === house && p.cat === cat);
+  if (!hasProducts(initialHouse, initialCategory)) {
+    let found = null;
+    for (const house of HOUSE_OPTIONS) {
+      const cat = requestedCategory && hasProducts(house, requestedCategory)
+        ? requestedCategory
+        : CATEGORY_OPTIONS.find((c) => hasProducts(house, c));
+      if (cat) { found = { house, cat }; break; }
+    }
+    if (found) {
+      initialHouse = found.house;
+      initialCategory = found.cat;
+    }
+  }
+
   const state = {
     maxPrice: Number.isFinite(urlMaxPrice) && urlMaxPrice > 0 ? urlMaxPrice : 0,
     colors: new Set(),
     materials: new Set(),
     category: initialCategory,
-    house: HOUSE_OPTIONS[0],
+    house: initialHouse,
   };
   const houseDisplayName = (brand) => (brand === "OrenkaFine Jewellery" ? "Fine Jewellery" : "Light Weight Jewellery");
 
@@ -376,6 +395,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function render() {
     const base = categoryBase();
+    if (!base.length) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:4rem 1rem;">
+          <h3 style="font-family:var(--font-display); margin-bottom:.5rem;">Coming Soon</h3>
+          <p style="color:var(--ink-soft); margin-bottom:1.5rem;">We're still adding pieces to ${state.category} — check back soon, or explore our other products.</p>
+          <a href="collections.html" class="btn btn-gold">Explore Other Products</a>
+        </div>
+      `;
+      countEl.textContent = "0 results";
+      return;
+    }
     let list = base.filter((p) => {
       const price = priceNumber(p);
       if (price > state.maxPrice) return false;
@@ -436,10 +466,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       state.category = btn.dataset.cat;
       // categoryBase() requires both category AND house to match, so
       // switching category alone can land on a House that has zero
-      // products in it (e.g. Charms & Pendants only exists under Fine
-      // Jewellery) and look like the category is empty/broken. If the
-      // currently selected house has no products in the new category,
-      // jump to whichever house actually has some.
+      // products in it (e.g. Pendants only exists under Fine Jewellery)
+      // and look like the category is empty/broken. If the currently
+      // selected house has no products in the new category, jump to
+      // whichever house actually has some (if none do, render() shows
+      // the "Coming Soon" state for that category).
       if (!SHOP_PRODUCTS.some((p) => p.cat === state.category && p.brand === state.house)) {
         const fallbackHouse = HOUSE_OPTIONS.find((house) =>
           SHOP_PRODUCTS.some((p) => p.cat === state.category && p.brand === house)
