@@ -138,6 +138,6 @@ const CATEGORIES = [
 	{ name: "Earrings", image: "Index/Products/earring.png" },
 	{ name: "Bracelets", image: "Index/Products/bracelet.png" },
 	{ name: "Pendants", image: "Index/Products/pendant.png" },
-	{ name: "Charms", image: "Index/Products/charm.png", comingSoon: true },
+	{ name: "Charms", image: "Index/Products/charm.png"},
 ];
 

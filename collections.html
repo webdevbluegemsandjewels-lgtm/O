@@ -122,7 +122,7 @@
     </div>
   </section>
   <!-- Shop with sidebar filters and toolbar -->
-  <section>
+  <section id="new-arrivals">
     <div class="container">
       <div class="section-head">
         <div>
@@ -276,22 +276,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Pick a default house+category combo that actually has products —
   // picking each independently could land on a pair (e.g. Fine Jewellery
   // + Bracelets) with zero results and show an empty page.
+  //
+  // Category takes priority over house here: some real products (e.g.
+  // "Diamond Shree Gold Bracelet") are tagged with a generic brand
+  // ("OrenkaFine") that isn't either exact "OrenkaFine Jewellery" /
+  // "OrenkaFine Moda" string, so picking a house FIRST and then
+  // searching for any category under it can walk straight past a
+  // category that has real products (Bracelets) and land on a
+  // different one (Pendants) just because that generic-brand house
+  // happened to be checked first — making Bracelets look "missing"
+  // by default even though it's one click away. Keeping the category
+  // fixed and searching for a house that serves it avoids that.
   const requestedCategory = urlCat && SHOP_CATS.find((cat) => cat.toLowerCase() === urlCat.toLowerCase());
   let initialHouse = HOUSE_OPTIONS[0];
   let initialCategory = requestedCategory || CATEGORY_OPTIONS[0] || SHOP_CATS[0];
 
   const hasProducts = (house, cat) => SHOP_PRODUCTS.some((p) => p.brand === house && p.cat === cat);
   if (!hasProducts(initialHouse, initialCategory)) {
-    let found = null;
-    for (const house of HOUSE_OPTIONS) {
-      const cat = requestedCategory && hasProducts(house, requestedCategory)
-        ? requestedCategory
-        : CATEGORY_OPTIONS.find((c) => hasProducts(house, c));
-      if (cat) { found = { house, cat }; break; }
-    }
-    if (found) {
-      initialHouse = found.house;
-      initialCategory = found.cat;
+    const houseForCategory = HOUSE_OPTIONS.find((house) => hasProducts(house, initialCategory));
+    if (houseForCategory) {
+      initialHouse = houseForCategory;
+    } else {
+      // Nothing serves this category at all (e.g. a requested category
+      // that's completely empty) — fall back to the first category
+      // (in SHOP_CATS order) that has products under any house.
+      let found = null;
+      for (const cat of CATEGORY_OPTIONS) {
+        const house = HOUSE_OPTIONS.find((h) => hasProducts(h, cat));
+        if (house) { found = { house, cat }; break; }
+      }
+      if (found) {
+        initialHouse = found.house;
+        initialCategory = found.cat;
+      }
     }
   }
 
@@ -513,6 +530,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   syncPriceBounds();
   renderFilterLists();
   render();
+
+  // Anyone landing on this page — a plain visit or a category link
+  // from index.html/footer/nav ("Rings", "Earrings", etc.) — should
+  // land straight on the shop grid with its filter already applied,
+  // instead of having to scroll past the hero/gift banner by hand.
+  document.getElementById("new-arrivals").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 // Auto slide-in gift card prompt — shows once per browser session,
