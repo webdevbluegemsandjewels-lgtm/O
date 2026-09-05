@@ -1,11 +1,13 @@
 /* =========================================================
-   OrenkaFine — cookie consent banner
-   Shows once per browser (until Accept/Reject is clicked, tracked in
-   localStorage so it doesn't nag on every page load) and records the
-   choice in public.cookie_consents — user_id + name when the visitor
-   is logged in (getCurrentUser(), from js/auth.js), both null for an
-   anonymous visitor, since browsing stays open to everyone on this
-   site (see js/auth.js's header comment).
+   OrenkaFine — cookie consent gate
+   Blocks browsing (a full-page overlay under the banner catches every
+   click, and page scroll is disabled) until Accept/Reject is clicked.
+   The choice is tracked in localStorage so it doesn't reappear on
+   later page loads, and logged to public.cookie_consents — user_id +
+   name when the visitor is logged in (getCurrentUser(), from
+   js/auth.js), both null for an anonymous visitor. Not included on
+   crm-dashboard.html — that's an internal admin tool, not a page a
+   customer browses, so a cookie prompt doesn't belong there.
    ========================================================= */
 
 const COOKIE_CONSENT_KEY = "orenka_cookie_consent"; // "accepted" | "rejected"
@@ -14,9 +16,24 @@ document.addEventListener("DOMContentLoaded", () => {
   if (localStorage.getItem(COOKIE_CONSENT_KEY)) return;
   if (document.getElementById("cookieConsentBanner")) return;
 
+  const overlay = document.createElement("div");
+  overlay.id = "cookieConsentOverlay";
+  overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 1199;
+    background: rgba(22,20,15,.55);
+  `;
+  document.body.appendChild(overlay);
+
+  // Nothing behind the banner should be reachable — no scrolling the
+  // page, and no interacting with it via keyboard/tab either — until
+  // a choice is made.
+  const previousOverflow = document.documentElement.style.overflow;
+  document.documentElement.style.overflow = "hidden";
+
   const banner = document.createElement("div");
   banner.id = "cookieConsentBanner";
   banner.setAttribute("role", "dialog");
+  banner.setAttribute("aria-modal", "true");
   banner.setAttribute("aria-label", "Cookie consent");
   banner.style.cssText = `
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 1200;
@@ -28,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   banner.innerHTML = `
     <p style="margin:0; max-width:640px; line-height:1.6;">
-      We use cookies to keep your cart and account working smoothly and to understand how the site is used.
+      We use cookies to keep your cart and account working smoothly and to understand how the site is used. You need to accept or reject before continuing.
       <a href="contact.html" style="color:#e9c88b; text-decoration:underline;">Learn more</a>
     </p>
     <div style="display:flex; gap:.6rem; flex-shrink:0;">
@@ -41,6 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function recordConsent(accepted) {
     localStorage.setItem(COOKIE_CONSENT_KEY, accepted ? "accepted" : "rejected");
     banner.remove();
+    overlay.remove();
+    document.documentElement.style.overflow = previousOverflow;
 
     try {
       let userId = null;
