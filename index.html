@@ -264,42 +264,47 @@
     </div>
     <div class="unique-set-content">
       <div class="unique-set-copy">
-        <p>Explore the premium set through interactive hotspots. Tap each pin to reveal styling details, pricing and craftsmanship notes for the necklace, earrings and bracelet.</p>
+        <p>Explore the premium set through interactive hotspots. Tap each pin to reveal styling details, pricing and craftsmanship notes for the bracelet, pendant and earrings.</p>
       </div>
       <div class="image-container">
-        <img src="Assets/Set/1783932728470-019f5aac-ff07-786e-9e88-3da546966c0b.png" alt="Jewellery" />
-        <div class="hotspot necklace">
+        <img src="https://i.ibb.co/fzzvbfhw/Model.png" alt="OrenkaFine Unique Set" />
+        <!-- Hotspot position/card content are filled in live from the
+             database (name, price, image) by the script at the bottom
+             of this page — see UNIQUE_SET_SLUGS. Each stays hidden
+             until its product is found, so nothing broken shows if a
+             slug ever goes inactive. -->
+        <div class="hotspot shree" id="hotspotShree" style="display:none;">
           <span class="pulse"></span>
-          <div class="card right">
-            <div class="thumb"><img src="Assets/Set/Screenshot 2026-07-13 131202.png" alt="Necklace thumb" /></div>
+          <a class="card right" href="#" id="hotspotShreeLink">
+            <div class="thumb"><img src="" alt="" /></div>
             <div class="info">
-              <h4>Diamond Necklace</h4>
-              <p>18K Gold</p>
-              <strong>₹1,24,900</strong>
+              <h4></h4>
+              <p></p>
+              <strong></strong>
             </div>
-          </div>
+          </a>
         </div>
-        <div class="hotspot earring">
+        <div class="hotspot trunk" id="hotspotTrunk" style="display:none;">
           <span class="pulse"></span>
-          <div class="card right">
-            <div class="thumb"><img src="Assets/Set/Screenshot 2026-07-13 141748.png" alt="Earring thumb" /></div>
+          <a class="card left" href="#" id="hotspotTrunkLink">
+            <div class="thumb"><img src="" alt="" /></div>
             <div class="info">
-              <h4>Diamond Earring</h4>
-              <p>18K Gold</p>
-              <strong>₹48,900</strong>
+              <h4></h4>
+              <p></p>
+              <strong></strong>
             </div>
-          </div>
+          </a>
         </div>
-        <div class="hotspot bracelet">
+        <div class="hotspot drumru" id="hotspotDrumru" style="display:none;">
           <span class="pulse"></span>
-          <div class="card left">
-            <div class="thumb"><img src="Assets/Set/Screenshot 2026-07-13 131306.png" alt="Bracelet thumb" /></div>
+          <a class="card left" href="#" id="hotspotDrumruLink">
+            <div class="thumb"><img src="" alt="" /></div>
             <div class="info">
-              <h4>Diamond Bracelet</h4>
-              <p>18K Gold</p>
-              <strong>₹59,900</strong>
+              <h4></h4>
+              <p></p>
+              <strong></strong>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -406,6 +411,33 @@
         .join("");
       attachProductHoverSwap();
       initDraggableMarquee(recommendTrack, 50);
+    });
+  }
+
+  // Unique Set hotspots — name, price and image come live from the
+  // database instead of being hardcoded, so they always match what's
+  // actually on product.html. Each hotspot stays hidden (see the
+  // inline style:none in the markup) until its product is found, in
+  // case a slug ever goes inactive or is renamed.
+  const UNIQUE_SET_SLUGS = {
+    hotspotShree: "diamond-shree-gold-bracelet",
+    hotspotTrunk: "gold-ganesha-trunk-diamond-pendant",
+    hotspotDrumru: "diamond-damru-gold-stud-earrings",
+  };
+  if (typeof loadProductsFromDB === "function") {
+    loadProductsFromDB().then((products) => {
+      Object.entries(UNIQUE_SET_SLUGS).forEach(([hotspotId, slug]) => {
+        const hotspot = document.getElementById(hotspotId);
+        const product = products.find((p) => p.slug === slug);
+        if (!hotspot || !product) return;
+        hotspot.querySelector("a.card").href = `product.html?slug=${encodeURIComponent(product.slug)}`;
+        hotspot.querySelector(".thumb img").src = product.image;
+        hotspot.querySelector(".thumb img").alt = product.name;
+        hotspot.querySelector(".info h4").textContent = product.name;
+        hotspot.querySelector(".info p").textContent = product.goldType || "";
+        hotspot.querySelector(".info strong").textContent = product.price;
+        hotspot.style.display = "";
+      });
     });
   }
 </script>

@@ -816,19 +816,19 @@ section{ padding: 3rem 0; }
 }
 
 .unique-set .pulse{
-  width:18px;
-  height:18px;
+  width:10px;
+  height:10px;
   background: transparent;
   border-radius:50%;
   display:block;
   position:relative;
-  border:2px solid white;
+  border:1.5px solid white;
 }
 
 .unique-set .pulse::before{
   content: "";
   position:absolute;
-  inset:-6px;
+  inset:-4px;
   border:1px solid rgba(255,255,255,.8);
   border-radius:50%;
   animation: pulse 2s infinite;
@@ -854,6 +854,8 @@ section{ padding: 3rem 0; }
   visibility: hidden;
   transform: translateX(10px);
   transition: transform .25s ease, opacity .25s ease, visibility .25s ease;
+  color: inherit;
+  text-decoration: none;
 }
 
 .unique-set .hotspot:hover .card,
@@ -926,19 +928,24 @@ section{ padding: 3rem 0; }
   font-size: 1rem;
 }
 
-.unique-set .earring{
-    top: 10.9%;
-    left: 54.7%;
+/* Positions are the center of each rect from the image map, converted
+   to percentages of Model.png's REAL dimensions — 1448x1086 (checked
+   directly against the file; the originally-given 1448x1806 was
+   wrong, which is why these were off) — so they still line up if the
+   image is ever resized. */
+.unique-set .shree{
+    top: 79.15%;
+    left: 16.54%;
 }
 
-.unique-set .necklace{
-    top: 57%;      /* moved down */
-    left: 47.0%;
+.unique-set .trunk{
+    top: 81.55%;
+    left: 53.04%;
 }
 
-.unique-set .bracelet{
-    top: 90%;      /* moved down */
-    left: 42.1%;
+.unique-set .drumru{
+    top: 23.16%;
+    left: 56.33%;
 }
 
 .collection-showcase .collection-cards{
