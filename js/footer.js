@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <ul>
             <li><a href="about.html">Terms &amp; Conditions</a></li>
             <li><a href="about.html">Privacy Policy</a></li>
-            <li><a href="about.html">Warranty</a></li>
             <li><a href="about.html">Cookie Policy</a></li>
           </ul>
         </div>
