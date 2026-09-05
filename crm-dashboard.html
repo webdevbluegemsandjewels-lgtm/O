@@ -815,6 +815,24 @@
   function quoteHasGoldInText(p) {
     return /gold/i.test(`${p.name || ""} ${p.description || ""}`);
   }
+
+  // Same convention as product.html's color/image swap: a product's
+  // gallery is uploaded in a fixed order — 1st image Yellow Gold, 2nd
+  // Rose Gold, 3rd White Gold — regardless of what order the `colors`
+  // column lists the names in, so match by keyword rather than array
+  // index. Falls back to image/secondary_image when there's no gallery.
+  const QUOTE_COLOR_IMAGE_KEYWORDS = [
+    { key: "yellow", index: 0 },
+    { key: "rose", index: 1 },
+    { key: "white", index: 2 },
+  ];
+  function quoteImageForColor(p, color) {
+    const images = (p.gallery && p.gallery.length ? p.gallery : [p.image, p.secondary_image]).filter(Boolean);
+    if (!images.length) return null;
+    const lc = (color || "").toLowerCase();
+    const match = QUOTE_COLOR_IMAGE_KEYWORDS.find((k) => lc.includes(k.key));
+    return (match && match.index < images.length) ? images[match.index] : images[0];
+  }
   function quoteDiamondMultiplier() {
     return DIAMOND_QUALITY_MULTIPLIER[quoteState.diamond] || 1;
   }
@@ -981,8 +999,9 @@
     const fmt = money;
     const rows = [];
 
-    rows.push(p.image
-      ? `<img class="quote-image" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" />`
+    const displayImage = quoteImageForColor(p, quoteState.color) || p.image;
+    rows.push(displayImage
+      ? `<img class="quote-image" src="${escapeHtml(displayImage)}" alt="${escapeHtml(p.name)}" />`
       : `<div class="quote-image-placeholder">No image uploaded yet</div>`);
 
     rows.push(`<div class="quote-spec-row section-title">Product Details</div>`);
