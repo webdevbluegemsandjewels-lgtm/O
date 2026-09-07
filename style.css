@@ -816,8 +816,8 @@ section{ padding: 3rem 0; }
 }
 
 .unique-set .pulse{
-  width:10px;
-  height:10px;
+  width:15px;
+  height:15px;
   background: transparent;
   border-radius:50%;
   display:block;
