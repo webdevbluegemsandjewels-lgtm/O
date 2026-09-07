@@ -2,6 +2,9 @@
   "name": "OrenkaFine",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "node scripts/build-config.js"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.840.0",
     "dotenv": "^16.6.1"
