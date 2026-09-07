@@ -22,7 +22,7 @@
   function loadSearchableProducts() {
     if (!productsPromise) {
       const cols = "id, slug, name, brand, category, price, image";
-      productsPromise = supabaseClient.from("products").select(cols).eq("is_active", true).then((womens) => {
+      productsPromise = supabaseClient.from("products").select(cols).eq("is_active", true).eq("is_unlisted", false).then((womens) => {
         if (womens.error) console.error("Search: failed to load products:", womens.error.message);
         return (womens.data || []).map((p) => ({ ...p, detailPage: "product.html" }));
       });

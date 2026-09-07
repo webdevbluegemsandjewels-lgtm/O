@@ -77,6 +77,7 @@ async function loadProductsFromDB() {
       .from("products")
       .select("*")
       .eq("is_active", true)
+      .eq("is_unlisted", false)
       .range(from, from + pageSize - 1);
 
     if (error) {
