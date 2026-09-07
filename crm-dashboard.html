@@ -137,6 +137,18 @@
   .quote-total-row{ display:flex; justify-content:space-between; font-weight:700; font-size:1rem; border-top:1px solid var(--ink); margin-top:.6rem; padding-top:.8rem; }
   .quote-approx-note{ font-size:.75rem; color:var(--ink-soft); margin:.4rem 0 0; }
 
+  /* ---- Custom Price Calculator (manual, no product needed) ---- */
+  .calc-layout{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; align-items:start; margin-top:1.2rem; }
+  .calc-field{ margin-bottom:.9rem; }
+  .calc-field label{ display:block; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.4rem; }
+  .calc-field input, .calc-field select{
+    width:100%; border:1.5px solid #cfc7b6; border-radius:8px; padding:.55rem .7rem;
+    font-size:.88rem; font-family:inherit; background:#fff;
+  }
+  .calc-field input:focus, .calc-field select:focus{ outline:none; border-color:var(--gold); }
+  .calc-row2{ display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+  @media (max-width: 900px){ .calc-layout{ grid-template-columns:1fr; } }
+
   @media (max-width:820px){
     .quote-layout{ grid-template-columns:1fr; }
   }
@@ -284,6 +296,69 @@
           </div>
         </div>
         <div id="quoteOutput"></div>
+      </div>
+    </div>
+
+    <div class="detail-box" style="margin-top:1.2rem;">
+      <h3>Custom Price Calculator</h3>
+      <p style="font-size:.85rem; color:var(--ink-soft); margin:-.4rem 0 1rem;">
+        Enter any gold weight, karat, diamond and charges by hand to work out a price for a piece that isn't in the catalog yet — nothing here is tied to a product.
+      </p>
+      <div class="calc-layout">
+        <div>
+          <div class="calc-row2">
+            <div class="calc-field">
+              <label>Gold Weight (grams)</label>
+              <input type="number" id="calcGoldWeight" min="0" step="0.01" placeholder="e.g. 5.2" />
+            </div>
+            <div class="calc-field">
+              <label>Gold Karat</label>
+              <select id="calcKarat">
+                <option value="18kt">18 Kt Gold</option>
+                <option value="14kt">14 Kt Gold</option>
+                <option value="9kt" selected>9 Kt Gold</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calc-field">
+            <label>Diamond Quality</label>
+            <select id="calcDiamondQuality">
+              <option value="">No diamond</option>
+              <option value="GH-VS-SI">GH-VS-SI</option>
+              <option value="F-G-VVS-VS">F-G-VVS-VS</option>
+            </select>
+          </div>
+          <div class="calc-row2">
+            <div class="calc-field">
+              <label>Diamond Weight (ct)</label>
+              <input type="number" id="calcDiamondCt" min="0" step="0.01" placeholder="e.g. 0.25" />
+            </div>
+            <div class="calc-field">
+              <label>Diamond Rate (₹ / ct)</label>
+              <input type="number" id="calcDiamondRate" min="0" step="1" />
+            </div>
+          </div>
+
+          <div class="calc-row2">
+            <div class="calc-field">
+              <label>Making Charge (₹ / gram)</label>
+              <input type="number" id="calcMakingPerGram" min="0" step="1" />
+            </div>
+            <div class="calc-field">
+              <label>Making Charge Minimum (₹)</label>
+              <input type="number" id="calcMakingMin" min="0" step="1" />
+            </div>
+          </div>
+          <div class="calc-field">
+            <label>GST (%)</label>
+            <input type="number" id="calcGst" min="0" step="0.1" style="max-width:140px;" />
+          </div>
+        </div>
+
+        <div class="detail-box" style="background:#faf8f2;">
+          <div id="calcOutput"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1124,6 +1199,94 @@
       btn.disabled = false;
       btn.textContent = original;
     }
+  });
+
+  // ============ Custom Price Calculator ============
+  // Fully manual — no product involved. Uses the same bottom-up formula
+  // as calculate_product_price() (gold + diamond + making, then GST on
+  // top), but every number is a free-typed input instead of coming off
+  // a product row, so it can price a piece that isn't in the catalog
+  // yet. Gold rate/diamond rates/making/GST default to the live values
+  // from gold_rates, diamond_rates and pricing_settings, but every field
+  // stays editable in case you want to quote off-market numbers.
+  const calcDiamondRates = {};
+  let calcGoldRate24ktPerGram = null;
+
+  async function initCalcDefaults() {
+    await ensureGoldRate();
+    calcGoldRate24ktPerGram = quoteGoldRate24kt;
+
+    const [{ data: rates }, { data: settings }] = await Promise.all([
+      supabaseClient.from("diamond_rates").select("*"),
+      supabaseClient.from("pricing_settings").select("*").eq("id", 1).maybeSingle(),
+    ]);
+    (rates || []).forEach((r) => { calcDiamondRates[r.quality] = Number(r.rate_per_ct); });
+
+    if (settings) {
+      document.getElementById("calcMakingPerGram").value = settings.making_charge_per_gram;
+      document.getElementById("calcMakingMin").value = settings.making_charge_minimum;
+      document.getElementById("calcGst").value = settings.gst_percent;
+    }
+    const firstQuality = document.getElementById("calcDiamondQuality").value;
+    if (firstQuality && calcDiamondRates[firstQuality] != null) {
+      document.getElementById("calcDiamondRate").value = calcDiamondRates[firstQuality];
+    }
+    renderCalcOutput();
+  }
+
+  function renderCalcOutput() {
+    const weight = Number(document.getElementById("calcGoldWeight").value) || 0;
+    const karat = document.getElementById("calcKarat").value;
+    const diamondQuality = document.getElementById("calcDiamondQuality").value;
+    const diamondCt = Number(document.getElementById("calcDiamondCt").value) || 0;
+    const diamondRate = Number(document.getElementById("calcDiamondRate").value) || 0;
+    const makingPerGram = Number(document.getElementById("calcMakingPerGram").value) || 0;
+    const makingMin = Number(document.getElementById("calcMakingMin").value) || 0;
+    const gstPct = Number(document.getElementById("calcGst").value) || 0;
+
+    const purity = KARAT_PURITY[karat] || 0;
+    const goldCost = calcGoldRate24ktPerGram ? weight * purity * calcGoldRate24ktPerGram : 0;
+    const diamondCost = diamondQuality ? diamondCt * diamondRate : 0;
+    const makingCharge = weight > 0 ? Math.max(weight * makingPerGram, makingMin) : 0;
+    const subtotal = goldCost + diamondCost + makingCharge;
+    const gst = subtotal * (gstPct / 100);
+    const total = subtotal + gst;
+
+    const rows = [];
+    rows.push(`<div class="quote-spec-row section-title">Price Break Up</div>`);
+    rows.push(`<div class="quote-spec-row">Gold (${KARAT_LABELS[karat] || karat}, ${weight || 0}g): <strong>${money(goldCost)}</strong></div>`);
+    if (diamondQuality) {
+      rows.push(`<div class="quote-spec-row">Diamond (${diamondQuality}, ${diamondCt || 0} ct): <strong>${money(diamondCost)}</strong></div>`);
+    }
+    rows.push(`<div class="quote-spec-row">Making: <strong>${money(makingCharge)}</strong></div>`);
+    rows.push(`<div class="quote-spec-row">GST (${gstPct || 0}%): <strong>${money(gst)}</strong></div>`);
+    rows.push(`<div class="quote-total-row"><span>Total Price</span><span>${money(total)}</span></div>`);
+    if (!calcGoldRate24ktPerGram) {
+      rows.push(`<p class="quote-approx-note">No live gold rate found in gold_rates — gold cost shown as ₹0 until that's set.</p>`);
+    }
+    document.getElementById("calcOutput").innerHTML = rows.join("");
+  }
+
+  [
+    "calcGoldWeight", "calcKarat", "calcDiamondCt", "calcDiamondRate",
+    "calcMakingPerGram", "calcMakingMin", "calcGst",
+  ].forEach((id) => {
+    document.getElementById(id).addEventListener("input", renderCalcOutput);
+  });
+
+  document.getElementById("calcDiamondQuality").addEventListener("change", (e) => {
+    const quality = e.target.value;
+    if (quality && calcDiamondRates[quality] != null) {
+      document.getElementById("calcDiamondRate").value = calcDiamondRates[quality];
+    } else if (!quality) {
+      document.getElementById("calcDiamondRate").value = "";
+    }
+    renderCalcOutput();
+  });
+
+  let calcInitDone = false;
+  document.getElementById("quoteTabBtn").addEventListener("click", () => {
+    if (!calcInitDone) { calcInitDone = true; initCalcDefaults(); }
   });
 
   // Auto-login within the same tab session so a page refresh doesn't
