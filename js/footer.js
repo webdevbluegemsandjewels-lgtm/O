@@ -89,9 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="footer-col">
           <h5>Legal</h5>
           <ul>
-            <li><a href="terms.html">Terms &amp; Conditions</a></li>
+            <li><a href="#">Terms &amp; Conditions</a></li>
             <li><a href="about.html">Privacy Policy</a></li>
-            <li><a href="cookie-policy.html">Cookie Policy</a></li>
+            <li><a href="#">Cookie Policy</a></li>
           </ul>
         </div>
       </div>
