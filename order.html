@@ -19,7 +19,7 @@
   .success-banner p{ color: var(--ink); font-size:1rem; line-height:1.6; max-width: 46ch; margin: 0 auto; }
 
   .order-meta-row{
-    display:grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem;
+    display:grid; grid-template-columns: repeat(5, 1fr); gap: 1.4rem;
     background:#fff; border:1px solid var(--line); border-radius:12px;
     padding: 1.4rem 1.6rem; margin-bottom: 2.2rem; text-align:center;
   }
@@ -49,6 +49,9 @@
   @media (max-width: 760px){
     .order-meta-row{ grid-template-columns: 1fr 1fr; }
     .address-grid{ grid-template-columns: 1fr; }
+  }
+  @media (min-width: 761px) and (max-width: 1000px){
+    .order-meta-row{ grid-template-columns: repeat(3, 1fr); }
   }
 </style>
 </head>
@@ -92,12 +95,13 @@
       <div class="success-banner">
         <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="#4a7c59" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
         <h1 class="section-title" style="margin-bottom:.6rem;">Thank you for shopping with us</h1>
-        <p>Your payment has gone through and your order is confirmed. Your order will dispatch within 7 days, and we'll email you once it ships.</p>
+        <p>Your payment has gone through and your order is confirmed. Please take a note of your Payment ID below — our customer executive will call you shortly to confirm your order. Your order will dispatch within 7 days, and we'll email you once it ships.</p>
       </div>
 
       <div class="order-meta-row">
         <div><span>Order Number</span><strong id="orderNumber"></strong></div>
         <div><span>Date</span><strong id="orderDate"></strong></div>
+        <div><span>Payment ID</span><strong id="orderPaymentId">—</strong></div>
         <div><span>Total</span><strong id="orderTotal"></strong></div>
         <div><span>Payment Method</span><strong id="orderPayment">Razorpay</strong></div>
       </div>
@@ -195,6 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("orderNumber").textContent = `#${order.id.slice(0, 8).toUpperCase()}`;
   document.getElementById("orderDate").textContent = new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+  document.getElementById("orderPaymentId").textContent = order.razorpay_payment_id || "—";
   document.getElementById("orderTotal").textContent = money(order.total);
   document.getElementById("orderSubtotal").textContent = money(order.total);
   document.getElementById("orderTotalLine").textContent = money(order.total);
