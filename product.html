@@ -1210,7 +1210,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     .limit(4);
 
   if (related && related.length) {
-    const relatedCards = related.map(mapDbProductToCard);
+    // Passing mapDbProductToCard straight to .map() leaks the array
+    // index in as its 2nd arg (detailPage) — Array.map calls back with
+    // (item, index, array), and mapDbProductToCard's 2nd param happens
+    // to be detailPage. That turned every related card past the first
+    // into a link like "/1?slug=..." / "/2?slug=..." instead of
+    // "/product.html?slug=...", since index 1, 2, 3... are all truthy.
+    const relatedCards = related.map((row) => mapDbProductToCard(row));
     document.getElementById("relatedGrid").innerHTML = relatedCards.map(productCardHTML).join("");
     relatedSection.style.display = "block";
     if (typeof attachProductHoverSwap === "function") attachProductHoverSwap();
