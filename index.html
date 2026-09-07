@@ -196,22 +196,22 @@
       <p class="section-desc">A rotating edit of rings, earrings, bracelets and pendants our editors are wearing this season.</p>
     </div>
     <div class="video-showcase">
-      <a href="product.html?slug=diamond-trishul-gold-stud-earrings" aria-label="Diamond Trishul Gold Stud Earrings">
+      <a href="/product.html?slug=diamond-trishul-gold-stud-earrings" aria-label="Diamond Trishul Gold Stud Earrings">
         <video autoplay muted loop playsinline preload="metadata">
           <source src="Index/selects/s1 (1).mp4" type="video/mp4" />
         </video>
       </a>
-      <a href="product.html?slug=diamond-damru-gold-stud-earrings" aria-label="Diamond Damru Gold Stud Earrings">
+      <a href="/product.html?slug=diamond-damru-gold-stud-earrings" aria-label="Diamond Damru Gold Stud Earrings">
         <video autoplay muted loop playsinline preload="metadata">
           <source src="Index/selects/s21.mp4" type="video/mp4" />
         </video>
       </a>
-      <a href="product.html?slug=diamond-shree-gold-bracelet" aria-label="Diamond Shree Gold Bracelet">
+      <a href="/product.html?slug=diamond-shree-gold-bracelet" aria-label="Diamond Shree Gold Bracelet">
         <video autoplay muted loop playsinline preload="metadata">
           <source src="Index/selects/s3 (1).mp4" type="video/mp4" />
         </video>
       </a>
-      <a href="product.html?slug=diamond-om-gold-stud-earrings" aria-label="Diamond Om Gold Stud Earrings">
+      <a href="/product.html?slug=diamond-om-gold-stud-earrings" aria-label="Diamond Om Gold Stud Earrings">
         <video autoplay muted loop playsinline preload="metadata">
           <source src="Index/selects/s4 (1).mp4" type="video/mp4" />
         </video>
@@ -431,7 +431,7 @@
         const hotspot = document.getElementById(hotspotId);
         const product = products.find((p) => p.slug === slug);
         if (!hotspot || !product) return;
-        hotspot.querySelector("a.card").href = `product.html?slug=${encodeURIComponent(product.slug)}`;
+        hotspot.querySelector("a.card").href = `/product.html?slug=${encodeURIComponent(product.slug)}`;
         hotspot.querySelector(".thumb img").src = product.image;
         hotspot.querySelector(".thumb img").alt = product.name;
         hotspot.querySelector(".info h4").textContent = product.name;

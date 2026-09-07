@@ -301,7 +301,11 @@ function productCardHTML(p) {
 
   // Real DB-backed products have a slug -> link to the product detail page.
   // Legacy static placeholder products (no slug) stay unlinked for now.
-  const href = p.slug ? `${p.detailPage || "product.html"}?slug=${encodeURIComponent(p.slug)}` : null;
+  // Root-relative (leading "/") on purpose — a plain relative href here
+  // resolves against whatever page/route the card is rendered on, which
+  // breaks (e.g. lands on "/1?slug=...") the moment the host rewrites
+  // or redirects that page's own URL (seen on Vercel with clean URLs).
+  const href = p.slug ? `/${p.detailPage || "product.html"}?slug=${encodeURIComponent(p.slug)}` : null;
   const openTag = href ? `<a href="${href}" class="product-card-link">` : "";
   const closeTag = href ? `</a>` : "";
 

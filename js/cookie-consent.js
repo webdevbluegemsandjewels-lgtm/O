@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   banner.innerHTML = `
     <p style="margin:0; max-width:640px; line-height:1.6;">
-      We use cookies to keep your cart and account working smoothly and to understand how the site is used. You need to accept or reject before continuing.
-      <a href="contact.html" style="color:#e9c88b; text-decoration:underline;">Learn more</a>
+      Orenkafine uses cookies to run this Platform, keep your cart and account working properly, remember your preferences, and understand how the Platform is used. You need to accept or reject before continuing. For more information, please read our
+      <a href="cookie-policy.html" style="color:#e9c88b; text-decoration:underline;">Cookie Policy</a>.
     </p>
     <div style="display:flex; gap:.6rem; flex-shrink:0;">
       <button type="button" id="cookieRejectBtn" style="background:none; border:1px solid rgba(245,242,234,.4); color:#f5f2ea; border-radius:8px; padding:.55rem 1.1rem; font-size:.85rem; cursor:pointer;">Reject</button>
