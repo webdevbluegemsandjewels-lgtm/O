@@ -70,7 +70,7 @@
 
     container.innerHTML = matches.map((p) => `
       <a class="search-result-row" href="/${p.detailPage || "product.html"}?slug=${encodeURIComponent(p.slug)}">
-        <img src="${resolveImage(p.image)}" alt="" />
+        <img src="${resolveImage(p.image)}" alt="${p.name || ""}" />
         <span class="search-result-info">
           <span class="search-result-name">${p.name}</span>
           <span class="search-result-cat">${p.category || ""}</span>
