@@ -61,6 +61,13 @@
     phoneInput.addEventListener("input", () => capPhoneInput(phoneInput, phoneCode));
     phoneCode.addEventListener("change", () => capPhoneInput(phoneInput, phoneCode));
 
+    // Pincode format/length varies by country — same live-cap pattern,
+    // driven by the Country dropdown instead of the phone code.
+    const pincodeInput = modal.querySelector('[data-role="signup-pincode"]');
+    capPincodeInput(pincodeInput, country);
+    pincodeInput.addEventListener("input", () => capPincodeInput(pincodeInput, country));
+    country.addEventListener("change", () => capPincodeInput(pincodeInput, country));
+
     function populateCity(stateName) {
       const cities = GEO_INDIA_CITIES[stateName];
       if (cities && cities.length) {

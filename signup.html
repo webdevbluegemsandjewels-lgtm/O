@@ -413,6 +413,14 @@ document.addEventListener("DOMContentLoaded", () => {
   phoneInput.addEventListener("input", () => capPhoneInput(phoneInput, phoneCountryCode));
   phoneCountryCode.addEventListener("change", () => capPhoneInput(phoneInput, phoneCountryCode));
 
+  // Pincode format/length varies by country (6-digit India, 5-digit
+  // US, alphanumeric UK, etc.) — same live-cap pattern as the phone
+  // field, driven by the Country dropdown instead of the phone code.
+  const pincodeInput = document.getElementById("pincode");
+  capPincodeInput(pincodeInput, countrySelect);
+  pincodeInput.addEventListener("input", () => capPincodeInput(pincodeInput, countrySelect));
+  countrySelect.addEventListener("change", () => capPincodeInput(pincodeInput, countrySelect));
+
   function goToRedirectTarget() {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get("redirect");
