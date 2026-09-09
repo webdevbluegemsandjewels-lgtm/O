@@ -1,11 +1,11 @@
 -- Added: 2026-09-09 — run this once in Supabase Dashboard → SQL Editor
 -- =========================================================
 -- Records the "I have read and agree to the Privacy Policy and
--- Terms & Conditions" checkbox on product.html — ticked once, it
--- covers both documents, so tnc_accepted and privacy_policy_accepted
--- are always written together as true. Add to Cart / Add to Trial
--- Cart are blocked client-side until the box is checked (see
--- product.html), and this table is the server-side record of that.
+-- Terms & Conditions" checkbox on product.html — one checkbox covers
+-- both documents, so this is a single policy_accepted column (not
+-- separate tnc/privacy booleans). Add to Cart / Add to Trial Cart are
+-- blocked client-side until the box is checked (see product.html),
+-- and this table is the server-side record of that.
 --
 -- Browsing/adding to cart stays open to guests (see js/cart.js's
 -- localStorage guest cart), so most rows won't have a signed-in
@@ -14,6 +14,10 @@
 -- denormalized snapshot at the moment of ticking, not a live join to
 -- profiles, so the record stays accurate even if the account's
 -- details change later.
+--
+-- Safe to re-run: if you already ran the original version of this
+-- migration (separate tnc_accepted/privacy_policy_accepted columns),
+-- this merges them into policy_accepted and drops the old two.
 -- =========================================================
 
 create table if not exists public.policy_acceptances (
@@ -21,11 +25,25 @@ create table if not exists public.policy_acceptances (
   user_id uuid references auth.users(id) on delete set null,
   name text,
   email text,
-  tnc_accepted boolean not null default true,
-  privacy_policy_accepted boolean not null default true,
+  policy_accepted boolean not null default true,
   product_slug text,
   ticked_at timestamptz not null default now()
 );
+
+-- Merge the old two-column shape into policy_accepted, if present.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'policy_acceptances' and column_name = 'tnc_accepted'
+  ) then
+    alter table public.policy_acceptances add column if not exists policy_accepted boolean not null default true;
+    update public.policy_acceptances
+      set policy_accepted = coalesce(tnc_accepted, true) and coalesce(privacy_policy_accepted, true);
+    alter table public.policy_acceptances drop column if exists tnc_accepted;
+    alter table public.policy_acceptances drop column if exists privacy_policy_accepted;
+  end if;
+end $$;
 
 create index if not exists policy_acceptances_user_id_idx on public.policy_acceptances(user_id);
 

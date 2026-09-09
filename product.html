@@ -1188,12 +1188,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     policyConsentError.style.display = "none";
     try {
       const user = typeof getCurrentUser === "function" ? await getCurrentUser() : null;
-      await supabaseClient.from("policy_acceptances").insert({
+      const { error } = await supabaseClient.from("policy_acceptances").insert({
         user_id: user ? user.id : null,
         name: user ? (user.user_metadata && user.user_metadata.full_name) || null : null,
         email: user ? user.email : null,
+        policy_accepted: true,
         product_slug: slug || null,
       });
+      // supabase-js resolves with { error } instead of throwing on
+      // RLS/table/column errors — awaiting the call alone (no
+      // destructuring) silently swallowed every failure here before,
+      // which is why this table looked like it was never being
+      // written to even though nothing crashed.
+      if (error) console.warn("Could not record policy acceptance:", error.message);
     } catch (err) {
       console.warn("Could not record policy acceptance:", err.message || err);
     }
