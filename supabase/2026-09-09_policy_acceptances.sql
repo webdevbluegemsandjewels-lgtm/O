@@ -10,14 +10,17 @@
 -- Browsing/adding to cart stays open to guests (see js/cart.js's
 -- localStorage guest cart), so most rows won't have a signed-in
 -- user — user_id/name/email are nullable and left null for those,
--- same pattern as public.cookie_consents. name/email are a
--- denormalized snapshot at the moment of ticking, not a live join to
--- profiles, so the record stays accurate even if the account's
--- details change later.
+-- same pattern as public.cookie_consents. name/email are read from
+-- public.profiles at the moment of ticking (see product.html) — a
+-- denormalized snapshot, not a live join, so the record stays
+-- accurate even if the account's profile details change later.
 --
--- Safe to re-run: if you already ran the original version of this
--- migration (separate tnc_accepted/privacy_policy_accepted columns),
--- this merges them into policy_accepted and drops the old two.
+-- product_id (references public.products) sits alongside product_slug
+-- so the row survives a product being renamed/re-slugged.
+--
+-- Safe to re-run: if you already ran an earlier version of this
+-- migration (separate tnc_accepted/privacy_policy_accepted columns,
+-- or no product_id column yet), this brings it up to the current shape.
 -- =========================================================
 
 create table if not exists public.policy_acceptances (
@@ -26,9 +29,12 @@ create table if not exists public.policy_acceptances (
   name text,
   email text,
   policy_accepted boolean not null default true,
+  product_id uuid references public.products(id) on delete set null,
   product_slug text,
   ticked_at timestamptz not null default now()
 );
+
+alter table public.policy_acceptances add column if not exists product_id uuid references public.products(id) on delete set null;
 
 -- Merge the old two-column shape into policy_accepted, if present.
 do $$

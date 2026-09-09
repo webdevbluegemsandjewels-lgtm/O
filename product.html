@@ -1188,11 +1188,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     policyConsentError.style.display = "none";
     try {
       const user = typeof getCurrentUser === "function" ? await getCurrentUser() : null;
+      // name/email come from public.profiles (not the auth user's own
+      // metadata/email) so this matches whatever the shopper's account
+      // profile actually says — same source product.html/checkout.html
+      // trust elsewhere.
+      let name = null;
+      let email = null;
+      if (user) {
+        const { data: profile } = await supabaseClient
+          .from("profiles")
+          .select("full_name, email")
+          .eq("id", user.id)
+          .maybeSingle();
+        name = profile?.full_name || null;
+        email = profile?.email || user.email || null;
+      }
       const { error } = await supabaseClient.from("policy_acceptances").insert({
         user_id: user ? user.id : null,
-        name: user ? (user.user_metadata && user.user_metadata.full_name) || null : null,
-        email: user ? user.email : null,
+        name,
+        email,
         policy_accepted: true,
+        product_id: product.id || null,
         product_slug: slug || null,
       });
       // supabase-js resolves with { error } instead of throwing on
