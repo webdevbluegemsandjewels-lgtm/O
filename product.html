@@ -183,6 +183,15 @@
     height: 46px; font-family: inherit; font-size: 1rem;
   }
 
+  .policy-consent-row{
+    display:flex; align-items:flex-start; gap:.55rem; margin-bottom: 1rem;
+    font-size:.82rem; line-height:1.55; color: var(--ink-soft);
+  }
+  .policy-consent-row input{ margin-top:.2rem; accent-color: var(--gold); flex-shrink:0; }
+  .policy-consent-row a{ color: var(--gold); text-decoration: underline; }
+  .policy-consent-error{
+    display:none; color:#b3261e; font-size:.8rem; margin:-0.6rem 0 1rem;
+  }
   .cart-action-row{ display:flex; gap:.8rem; margin-bottom: 1.4rem; flex-wrap:wrap; }
   .add-to-cart-btn{ flex:1; min-width: 220px; justify-content:center; }
   .trial-dropdown{ position:relative; }
@@ -370,6 +379,12 @@
             <button type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
           </div>
         </div>
+
+        <label class="policy-consent-row">
+          <input type="checkbox" id="policyConsentCheck" />
+          <span>Please read the <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a> and <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a> — tick to confirm you agree before adding to cart.</span>
+        </label>
+        <p class="policy-consent-error" id="policyConsentError">Please tick the box above to confirm you've read our Privacy Policy and Terms &amp; Conditions before adding to cart.</p>
 
         <div class="cart-action-row">
           <div class="trial-dropdown">
@@ -1156,7 +1171,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   document.addEventListener("click", () => trialMenu.classList.remove("open"));
 
+  // Add to Cart / Add to Trial Cart both require the "read our Privacy
+  // Policy and Terms & Conditions" checkbox to be ticked first — shows
+  // an inline error and blocks the add instead. Recording the
+  // acceptance to policy_acceptances is best-effort (doesn't block
+  // the add if it fails).
+  const policyConsentCheck = document.getElementById("policyConsentCheck");
+  const policyConsentError = document.getElementById("policyConsentError");
+
+  async function ensurePolicyConsent() {
+    if (!policyConsentCheck.checked) {
+      policyConsentError.style.display = "block";
+      policyConsentCheck.focus();
+      return false;
+    }
+    policyConsentError.style.display = "none";
+    try {
+      const user = typeof getCurrentUser === "function" ? await getCurrentUser() : null;
+      await supabaseClient.from("policy_acceptances").insert({
+        user_id: user ? user.id : null,
+        name: user ? (user.user_metadata && user.user_metadata.full_name) || null : null,
+        email: user ? user.email : null,
+        product_slug: slug || null,
+      });
+    } catch (err) {
+      console.warn("Could not record policy acceptance:", err.message || err);
+    }
+    return true;
+  }
+
   document.getElementById("addToTrialBtn").addEventListener("click", async () => {
+    if (!(await ensurePolicyConsent())) return;
     trialMenu.classList.remove("open");
     await window.OrenkaFineCart.addItem({
       id: activeVariant.id,
@@ -1182,6 +1227,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = `tel:${CONTACT_PHONE}`;
       return;
     }
+
+    if (!(await ensurePolicyConsent())) return;
 
     const qty = parseInt(qtyInput.value, 10) || 1;
     const original = btn.textContent;
