@@ -17,29 +17,56 @@
 <link rel="stylesheet" href="style.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  .legal-page section{ padding: 1rem 0; background: #fff; }
+  .legal-page section:not(.legal-hero){ padding: 1rem 0; background: #fff; }
   .legal-hero{
-    background: var(--ink); color: var(--bone, #f5f2ea);
+    background: var(--bone, #f3eee4); color: var(--ink);
     padding: 3.2rem 0 2.4rem;
   }
-  .legal-hero .breadcrumb{ color: rgba(245,242,234,.7); font-size: .85rem; margin-bottom: .8rem; }
-  .legal-hero .breadcrumb a{ color: rgba(245,242,234,.85); }
-  .legal-hero h1{ font-size: clamp(2rem, 4vw, 2.8rem); color: #fff; margin-bottom: .4rem; }
-  .legal-hero p{ color: rgba(245,242,234,.75); font-size: .92rem; }
+  .legal-hero .breadcrumb{ color: var(--ink-soft); font-size: .85rem; margin-bottom: .8rem; }
+  .legal-hero .breadcrumb a{ color: var(--ink-soft); }
+  .legal-hero h1{ font-size: clamp(2rem, 4vw, 2.8rem); color: var(--ink); margin-bottom: .4rem; }
+  .legal-hero p{ color: var(--ink-soft); font-size: .92rem; }
 
-  .legal-wrap{ max-width: 820px; margin: 0 auto; }
+  .legal-wrap{ max-width: 1140px; margin: 0 auto; }
 
-  .legal-toc{
-    background: #f7f4ec; border: 1px solid var(--line); border-radius: 12px;
-    padding: 1.4rem 1.6rem; margin-bottom: 2.4rem;
+  .legal-shell{ display: grid; grid-template-columns: 250px 1fr; gap: 2.8rem; align-items: start; }
+
+  .legal-sidebar{
+    position: sticky; top: 96px;
+    max-height: calc(100vh - 120px); overflow-y: auto;
+    padding-right: .6rem;
   }
-  .legal-toc h2{ font-size: 1rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .9rem; }
-  .legal-toc ol{ margin: 0; padding-left: 1.2rem; columns: 2; column-gap: 2rem; font-size: .86rem; line-height: 1.9; }
-  .legal-toc ol li a{ color: var(--ink-soft); }
-  .legal-toc ol li a:hover{ color: var(--gold); }
-  @media (max-width: 640px){ .legal-toc ol{ columns: 1; } }
+  .legal-sidebar-group{ margin-bottom: 1.6rem; }
+  .legal-sidebar-group h2{
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--gold); margin-bottom: .7rem;
+  }
+  .legal-sidebar-group ul{ list-style: none; margin: 0; padding: 0; }
+  .legal-sidebar-group ul li{ margin: 0; }
+  .legal-sidebar-group ul li a{
+    display: block; padding: .34rem 0 .34rem .7rem; margin-bottom: 1px;
+    font-size: .82rem; line-height: 1.4; color: var(--ink-soft);
+    border-left: 2px solid transparent; transition: color .15s, border-color .15s;
+  }
+  .legal-sidebar-group ul li a:hover{ color: var(--ink); }
+  .legal-sidebar-group ul li a.active{
+    color: var(--gold); border-left-color: var(--gold); font-weight: 600;
+  }
+  .legal-content{ min-width: 0; }
+  @media (max-width: 900px){
+    .legal-shell{ grid-template-columns: 1fr; }
+    .legal-sidebar{
+      position: static; max-height: none; overflow-y: visible;
+      background: #f7f4ec; border: 1px solid var(--line); border-radius: 12px;
+      padding: 1.2rem 1.4rem; margin-bottom: 2rem;
+    }
+    .legal-sidebar-group ul{ columns: 2; column-gap: 1.6rem; }
+  }
+  @media (max-width: 560px){
+    .legal-sidebar-group ul{ columns: 1; }
+  }
 
-  .legal-doc{ margin-bottom: 4rem; }
+  .legal-doc{ margin-bottom: 4rem; scroll-margin-top: 90px; }
   .legal-doc-title{ font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: .3rem; }
   .legal-doc-sub{ color: var(--ink-soft); font-size: .92rem; margin-bottom: .3rem; }
   .legal-doc-meta{ color: var(--ink-soft); font-size: .82rem; margin-bottom: 1.6rem; }
@@ -119,35 +146,99 @@
 <section>
   <div class="container legal-wrap">
 
-    <div class="legal-toc">
-      <h2>On this page</h2>
-      <ol>
-        <li><a href="#tc-doc">Terms &amp; Conditions</a></li>
-        <li><a href="#tc-1">1. Introduction</a></li>
-        <li><a href="#tc-2">2. About OrenkaFine</a></li>
-        <li><a href="#tc-13">13. Orders</a></li>
-        <li><a href="#tc-19">19. Shipping &amp; Delivery</a></li>
-        <li><a href="#tc-22">22. Returns, Exchanges &amp; Refunds</a></li>
-        <li><a href="#tc-27">27. Warranty &amp; Repairs</a></li>
-        <li><a href="#tc-44">44. Grievance Redressal</a></li>
-        <li><a href="#tc-46">46. Governing Law</a></li>
-        <li><a href="#tc-55">55. Contact Information</a></li>
-        <li><a href="#gr-doc">Grievance Redressal Policy (IT Rules)</a></li>
-        <li><a href="#gr-1">1. Introduction &amp; Applicability</a></li>
-        <li><a href="#gr-3">3. Grievance Officer</a></li>
-        <li><a href="#gr-4">4. What You Can Complain About</a></li>
-        <li><a href="#gr-5">5. How to File a Grievance</a></li>
-        <li><a href="#gr-6">6. Acknowledgement &amp; Resolution Timelines</a></li>
-        <li><a href="#gr-10">10. Escalation — Grievance Appellate Committee</a></li>
-        <li><a href="#gr-14">14. Contact Information</a></li>
-      </ol>
-    </div>
+    <div class="legal-shell">
+      <nav class="legal-sidebar" id="legalSidebar" aria-label="Terms sections">
+        <div class="legal-sidebar-group">
+          <h2>Terms &amp; Conditions</h2>
+          <ul>
+            <li><a href="#tc-doc">Overview</a></li>
+            <li><a href="#tc-1">1. Introduction</a></li>
+            <li><a href="#tc-2">2. About Orenkafine</a></li>
+            <li><a href="#tc-3">3. Definitions</a></li>
+            <li><a href="#tc-4">4. Acceptance &amp; Eligibility</a></li>
+            <li><a href="#tc-5">5. Electronic Contracting</a></li>
+            <li><a href="#tc-6">6. Website Use</a></li>
+            <li><a href="#tc-7">7. Product Information</a></li>
+            <li><a href="#tc-8">8. Precious Metals &amp; Hallmarking</a></li>
+            <li><a href="#tc-9">9. Natural, Lab‑Grown &amp; Treated Stones</a></li>
+            <li><a href="#tc-10">10. Product Weight</a></li>
+            <li><a href="#tc-11">11. Prices</a></li>
+            <li><a href="#tc-12">12. Pricing Errors</a></li>
+            <li><a href="#tc-13">13. Orders</a></li>
+            <li><a href="#tc-14">14. Product Availability</a></li>
+            <li><a href="#tc-15">15. Custom &amp; Made‑to‑Order Jewellery</a></li>
+            <li><a href="#tc-16">16. Ring Sizing</a></li>
+            <li><a href="#tc-17">17. Payment</a></li>
+            <li><a href="#tc-18">18. High‑Value Transactions</a></li>
+            <li><a href="#tc-19">19. Shipping &amp; Delivery</a></li>
+            <li><a href="#tc-20">20. High‑Value Delivery Security</a></li>
+            <li><a href="#tc-21">21. Damaged or Tampered Shipments</a></li>
+            <li><a href="#tc-22">22. Returns, Exchanges &amp; Refunds</a></li>
+            <li><a href="#tc-23">23. Condition of Returned Jewellery</a></li>
+            <li><a href="#tc-24">24. Defective/Non‑Conforming Products</a></li>
+            <li><a href="#tc-25">25. Jewellery Care</a></li>
+            <li><a href="#tc-26">26. Gemstone Care</a></li>
+            <li><a href="#tc-27">27. Warranty &amp; Repairs</a></li>
+            <li><a href="#tc-28">28. Certificates &amp; Documentation</a></li>
+            <li><a href="#tc-29">29. Intellectual Property</a></li>
+            <li><a href="#tc-30">30. Trademarks &amp; Brand Material</a></li>
+            <li><a href="#tc-31">31. Customer Reviews &amp; User Content</a></li>
+            <li><a href="#tc-32">32. Third‑Party Services</a></li>
+            <li><a href="#tc-33">33. Privacy &amp; Personal Data</a></li>
+            <li><a href="#tc-34">34. Transactional Communications</a></li>
+            <li><a href="#tc-35">35. Marketing Communications</a></li>
+            <li><a href="#tc-36">36. Promotions, Discounts &amp; Coupons</a></li>
+            <li><a href="#tc-37">37. Gift Cards &amp; Store Credit</a></li>
+            <li><a href="#tc-38">38. Fraud Prevention</a></li>
+            <li><a href="#tc-39">39. Account Security</a></li>
+            <li><a href="#tc-40">40. Website Availability</a></li>
+            <li><a href="#tc-41">41. Prohibited Conduct</a></li>
+            <li><a href="#tc-42">42. Consumer Rights</a></li>
+            <li><a href="#tc-43">43. Product Liability</a></li>
+            <li><a href="#tc-44">44. Grievance Redressal</a></li>
+            <li><a href="#tc-45">45. Dispute Resolution</a></li>
+            <li><a href="#tc-46">46. Governing Law</a></li>
+            <li><a href="#tc-47">47. Force Majeure</a></li>
+            <li><a href="#tc-48">48. Indemnification</a></li>
+            <li><a href="#tc-49">49. Limitation of Liability</a></li>
+            <li><a href="#tc-50">50. Severability</a></li>
+            <li><a href="#tc-51">51. Waiver</a></li>
+            <li><a href="#tc-52">52. Assignment</a></li>
+            <li><a href="#tc-53">53. Changes to These Terms</a></li>
+            <li><a href="#tc-54">54. Entire Agreement</a></li>
+            <li><a href="#tc-55">55. Contact Information</a></li>
+            <li><a href="#tc-56">56. Customer Acknowledgement</a></li>
+          </ul>
+        </div>
+        <div class="legal-sidebar-group">
+          <h2>Grievance Redressal Policy</h2>
+          <ul>
+            <li><a href="#gr-doc">Overview</a></li>
+            <li><a href="#gr-1">1. Introduction &amp; Applicability</a></li>
+            <li><a href="#gr-2">2. Definitions</a></li>
+            <li><a href="#gr-3">3. Grievance Officer</a></li>
+            <li><a href="#gr-4">4. What You Can Complain About</a></li>
+            <li><a href="#gr-5">5. How to File a Grievance</a></li>
+            <li><a href="#gr-6">6. Acknowledgement &amp; Resolution Timelines</a></li>
+            <li><a href="#gr-7">7. Action on Valid Grievances</a></li>
+            <li><a href="#gr-8">8. Synthetically Generated Information</a></li>
+            <li><a href="#gr-9">9. Periodic User Advisory</a></li>
+            <li><a href="#gr-10">10. Escalation — Appellate Committee</a></li>
+            <li><a href="#gr-11">11. Record Keeping</a></li>
+            <li><a href="#gr-12">12. Relationship with Other Policies</a></li>
+            <li><a href="#gr-13">13. Changes to This Policy</a></li>
+            <li><a href="#gr-14">14. Contact Information</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="legal-content">
 
     <!-- =========================================================
          DOCUMENT 1 — TERMS & CONDITIONS
          ========================================================= -->
     <article class="legal-doc" id="tc-doc">
-      <h1 class="legal-doc-title">Orenkafine Terms &amp; Conditions</h1>
+      <h1 class="legal-doc-title"><a href="index.html">Orenkafine</a> Terms &amp; Conditions</h1>
       <p class="legal-doc-meta">Effective Date: 3 September 2026 &nbsp;|&nbsp; Last Updated: 4 September 2026</p>
 
       <div class="legal-note">
@@ -160,7 +251,7 @@
       <p>By accessing the Platform, creating an account, placing an order or purchasing any product from Orenkafine, you acknowledge that you have read, understood and agreed to these Terms.</p>
       <p>These Terms should be read together with Orenkafine's:</p>
       <ul>
-        <li>Privacy Policy;</li>
+        <li><a href="about.html">Privacy Policy</a>;</li>
         <li>Shipping &amp; Delivery Policy;</li>
         <li>Return &amp; Refund Policy;</li>
         <li>Cancellation Policy;</li>
@@ -174,23 +265,22 @@
       <p>For legal and regulatory purposes, Orenkafine shall operate through the legal entity identified below.</p>
       <ul>
         <li>Brand Name: Orenkafine</li>
-        <li>Legal Entity: [INSERT LEGAL ENTITY NAME]</li>
-        <li>Registered/Principal Business Address: [INSERT FULL ADDRESS]</li>
-        <li>Customer Care Email: [INSERT EMAIL]</li>
-        <li>Customer Care Phone: [INSERT PHONE NUMBER]</li>
-        <li>Grievance Officer: [INSERT NAME]</li>
-        <li>Grievance Email: [INSERT EMAIL]</li>
-        <li>GSTIN: [INSERT GSTIN, IF APPLICABLE]</li>
-        <li>CIN/LLPIN/Registration No.: [INSERT, IF APPLICABLE]</li>
+        <li>Legal Entity: BLUE GEMS &amp; JEWELS LIMITED</li>
+        <li>Registered/Principal Business Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
+        <li>Customer Care Email: Info@orenkafine.com</li>
+        <li>Customer Care Phone: +91 86559 64188</li>
+        <li>Grievance Officer: Mayur Hitendra Parmar</li>
+        <li>Grievance Email: Info@orenkafine.com</li>
+        <li>GSTIN: 27AAKCB0949A2ZW</li>
+        <li>CIN/LLPIN/Registration No.: U36911MH2021PLC366424</li>
       </ul>
 
       <h3 class="sub-clause">2.1 E‑Commerce Entity Classification and Compliance Officers</h3>
       <p>In accordance with the Consumer Protection (E‑Commerce) Rules, 2020, Orenkafine discloses its operating model and, where applicable, the officers responsible for regulatory compliance and coordination with law enforcement and consumer authorities:</p>
       <ul>
-        <li>E‑Commerce Model: [INSERT Inventory‑based (Orenkafine owns and sells the Products directly) / Marketplace‑based (Orenkafine facilitates sales by third‑party sellers) / Hybrid]</li>
-        <li>DPIIT Registration Number (if applicable): [INSERT, IF APPLICABLE]</li>
-        <li>Chief Compliance Officer: [INSERT NAME AND CONTACT DETAILS, IF APPLICABLE]</li>
-        <li>Nodal Contact Person (for 24×7 coordination with law enforcement agencies): [INSERT NAME AND CONTACT DETAILS, IF APPLICABLE]</li>
+        <li>E‑Commerce Model: Inventory‑based (Orenkafine owns and sells the Products directly)</li>
+        <li>Chief Compliance Officer: Mayur Hitendra Parmar, +91 86559 64188</li>
+        <li>Nodal Contact Person (for 24×7 coordination with law enforcement agencies): Mayur Hitendra Parmar, +91 86559 64188</li>
       </ul>
       <p>Orenkafine shall provide information sought by a government agency or a court of competent jurisdiction, for the purpose of verification of identity or prevention, detection, investigation or prosecution of offences, within the timeframe prescribed by applicable law, or within seventy‑two (72) hours of receipt of a valid order, whichever is earlier.</p>
 
@@ -562,8 +652,8 @@
         <li>Improve services;</li>
         <li>Meet legal and regulatory obligations.</li>
       </ul>
-      <p>Personal data shall be handled in accordance with Orenkafine's Privacy Policy and applicable Indian data protection laws, including the Digital Personal Data Protection Act, 2023, once and to the extent notified into force.</p>
-      <p>The Privacy Policy forms an integral part of the Platform's legal framework.</p>
+      <p>Personal data shall be handled in accordance with Orenkafine's <a href="about.html">Privacy Policy</a> and applicable Indian data protection laws, including the Digital Personal Data Protection Act, 2023, once and to the extent notified into force.</p>
+      <p>The <a href="about.html">Privacy Policy</a> forms an integral part of the Platform's legal framework.</p>
 
       <h2 class="clause" id="tc-34">34. Transactional Communications</h2>
       <p>Customers consent to receiving necessary communications relating to their Orders and use of the Platform, subject to applicable law. Such communications may include:</p>
@@ -680,11 +770,11 @@
       </ul>
       <p><strong>Grievance Officer</strong></p>
       <ul>
-        <li>Name: [INSERT NAME]</li>
+        <li>Name: Mayur Hitendra Parmar</li>
         <li>Designation: Grievance Officer</li>
-        <li>Email: [INSERT EMAIL]</li>
-        <li>Phone: [INSERT PHONE NUMBER]</li>
-        <li>Postal Address: [INSERT ADDRESS]</li>
+        <li>Email: Info@orenkafine.com</li>
+        <li>Phone: +91 86559 64188</li>
+        <li>Postal Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
       </ul>
 
       <h3 class="sub-clause">44.1 Response Timelines</h3>
@@ -706,7 +796,7 @@
 
       <h2 class="clause" id="tc-46">46. Governing Law</h2>
       <p>These Terms shall be governed by and interpreted in accordance with the laws of India.</p>
-      <p>Subject to mandatory consumer jurisdiction and other statutory forums available under applicable law, disputes may be submitted to the competent courts/authorities having jurisdiction over [INSERT CITY, STATE, INDIA].</p>
+      <p>Subject to mandatory consumer jurisdiction and other statutory forums available under applicable law, disputes may be submitted to the competent courts/authorities having jurisdiction over Mumbai City, Maharashtra, India.</p>
       <p>This clause shall not be interpreted to deprive a consumer of any mandatory statutory forum or jurisdiction available under applicable law.</p>
 
       <h2 class="clause" id="tc-47">47. Force Majeure</h2>
@@ -783,16 +873,16 @@
 
       <h2 class="clause" id="tc-55">55. Contact Information</h2>
       <ul>
-        <li>Orenkafine</li>
-        <li>Legal Entity: [INSERT LEGAL ENTITY NAME]</li>
+        <li><a href="index.html">Orenkafine</a></li>
+        <li>Legal Entity: BLUE GEMS &amp; JEWELS LIMITED</li>
         <li>Brand: Orenkafine</li>
-        <li>Registered/Principal Address: [INSERT FULL ADDRESS]</li>
-        <li>Customer Support Email: [INSERT EMAIL]</li>
-        <li>Customer Support Phone: [INSERT PHONE]</li>
-        <li>Grievance Officer: [INSERT NAME]</li>
-        <li>Grievance Email: [INSERT EMAIL]</li>
-        <li>GSTIN: [INSERT GSTIN, IF APPLICABLE]</li>
-        <li>Registration/CIN/LLPIN: [INSERT, IF APPLICABLE]</li>
+        <li>Registered/Principal Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
+        <li>Customer Support Email: Info@orenkafine.com</li>
+        <li>Customer Support Phone: +91 86559 64188</li>
+        <li>Grievance Officer: Mayur Hitendra Parmar</li>
+        <li>Grievance Email: Info@orenkafine.com</li>
+        <li>GSTIN: 27AAKCB0949A2ZW</li>
+        <li>Registration/CIN/LLPIN: U36911MH2021PLC366424</li>
       </ul>
 
       <h2 class="clause" id="tc-56">56. Customer Acknowledgement</h2>
@@ -808,7 +898,7 @@
       </ul>
 
       <div class="doc-footer">
-        ORENKAFINE — Jewellery Designed to Be Remembered.<br>
+        <a href="index.html">ORENKAFINE</a> — Jewellery Designed to Be Remembered.<br>
         &copy; 2026 Orenkafine. All Rights Reserved.
       </div>
     </article>
@@ -817,18 +907,18 @@
          DOCUMENT 2 — GRIEVANCE REDRESSAL POLICY (IT RULES)
          ========================================================= -->
     <article class="legal-doc" id="gr-doc">
-      <h1 class="legal-doc-title">Orenkafine Grievance Redressal Policy</h1>
+      <h1 class="legal-doc-title"><a href="index.html">Orenkafine</a> Grievance Redressal Policy</h1>
       <p class="legal-doc-sub">(Under the Information Technology Act, 2000 and the IT Intermediary Guidelines Rules)</p>
       <p class="legal-doc-meta">Effective Date: 4 September 2026 &nbsp;|&nbsp; Last Updated: 4 September 2026</p>
 
       <div class="legal-note">
-        <strong>Note on legal basis (as of September 2026):</strong> This Policy is issued to comply with Rule 3(2) and related provisions of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 ("IT Rules"), framed under Section 79 of the Information Technology Act, 2000, as amended by the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Amendment Rules, 2026, which came into force on 20 February 2026 and shortened several grievance and takedown timelines. This Policy addresses complaints relating to information/content hosted, displayed or transmitted on the Platform (including Customer reviews, photographs and other user‑generated content) and violations of these due‑diligence obligations. It operates alongside, and does not replace, (a) Orenkafine's consumer grievance mechanism under the Consumer Protection (E‑Commerce) Rules, 2020 (see the Terms &amp; Conditions above), and (b) Orenkafine's data‑related grievance mechanism under the Digital Personal Data Protection Act, 2023 (see the Privacy Policy).
+        <strong>Note on legal basis (as of September 2026):</strong> This Policy is issued to comply with Rule 3(2) and related provisions of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 ("IT Rules"), framed under Section 79 of the Information Technology Act, 2000, as amended by the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Amendment Rules, 2026, which came into force on 20 February 2026 and shortened several grievance and takedown timelines. This Policy addresses complaints relating to information/content hosted, displayed or transmitted on the Platform (including Customer reviews, photographs and other user‑generated content) and violations of these due‑diligence obligations. It operates alongside, and does not replace, (a) Orenkafine's consumer grievance mechanism under the Consumer Protection (E‑Commerce) Rules, 2020 (see the Terms &amp; Conditions above), and (b) Orenkafine's data‑related grievance mechanism under the Digital Personal Data Protection Act, 2023 (see the <a href="about.html">Privacy Policy</a>).
       </div>
 
       <h2 class="clause" id="gr-1">1. Introduction and Applicability</h2>
       <p>Orenkafine ("Orenkafine", "we", "us", "our") operates the Orenkafine website, mobile interface and online store (collectively, the "Platform"), which qualifies as an "intermediary" within the meaning of Section 2(1)(w) of the Information Technology Act, 2000, to the extent it hosts, stores or transmits information provided by Customers, including product reviews, ratings, photographs, comments and other user‑generated content.</p>
-      <p>In accordance with Rule 3(2) of the IT Rules, Orenkafine has established this Grievance Redressal Policy and appointed a Grievance Officer to receive and resolve complaints from users and victims regarding: (a) any content or information hosted on the Platform that is alleged to violate the IT Rules or applicable law; (b) any violation of Orenkafine's Terms &amp; Conditions, Privacy Policy or other published policies; and (c) any other matter falling within the scope of the IT Rules.</p>
-      <p>This Policy applies in addition to, and does not limit, the consumer grievance mechanism under Clause 44 of Orenkafine's Terms &amp; Conditions (for Order, payment, delivery, return and refund complaints) and the data protection grievance mechanism under Orenkafine's Privacy Policy (for complaints regarding processing of personal data).</p>
+      <p>In accordance with Rule 3(2) of the IT Rules, Orenkafine has established this Grievance Redressal Policy and appointed a Grievance Officer to receive and resolve complaints from users and victims regarding: (a) any content or information hosted on the Platform that is alleged to violate the IT Rules or applicable law; (b) any violation of Orenkafine's Terms &amp; Conditions, <a href="about.html">Privacy Policy</a> or other published policies; and (c) any other matter falling within the scope of the IT Rules.</p>
+      <p>This Policy applies in addition to, and does not limit, the consumer grievance mechanism under Clause 44 of Orenkafine's Terms &amp; Conditions (for Order, payment, delivery, return and refund complaints) and the data protection grievance mechanism under Orenkafine's <a href="about.html">Privacy Policy</a> (for complaints regarding processing of personal data).</p>
 
       <h2 class="clause" id="gr-2">2. Definitions</h2>
       <p>"Complainant" or "User" means any person, including a victim, who submits a grievance under this Policy.</p>
@@ -840,12 +930,12 @@
       <h2 class="clause" id="gr-3">3. Grievance Officer</h2>
       <p>In compliance with Rule 3(2) of the IT Rules, Orenkafine has appointed the following Grievance Officer:</p>
       <ul>
-        <li>Name: [INSERT NAME]</li>
+        <li>Name: Mayur Hitendra Parmar</li>
         <li>Designation: Grievance Officer</li>
-        <li>Email: [INSERT EMAIL]</li>
-        <li>Phone: [INSERT PHONE NUMBER]</li>
-        <li>Postal Address: [INSERT ADDRESS]</li>
-        <li>Hours of Operation: [INSERT, e.g., Monday–Saturday, 10:00 a.m.–6:00 p.m. IST, excluding public holidays]</li>
+        <li>Email: Info@orenkafine.com</li>
+        <li>Phone: +91 86559 64188</li>
+        <li>Postal Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
+        <li>Hours of Operation: Monday–Saturday, 9:30 a.m.–6:30 p.m. IST, excluding public holidays</li>
       </ul>
       <p>The Grievance Officer is responsible for receiving, acknowledging and resolving grievances raised by Users or victims in relation to content hosted on the Platform and violations of Orenkafine's published policies, in accordance with the timelines set out in Clause 6 below.</p>
       <p>Where Orenkafine's user base or nature of operations brings it within the definition of a "significant social media intermediary" or otherwise attracts enhanced obligations under the IT Rules, Orenkafine shall additionally appoint a Resident Grievance Officer, Chief Compliance Officer and Nodal Contact Person, each resident in India, and publish their details on the Platform.</p>
@@ -863,7 +953,7 @@
         <li>Threatens the unity, integrity, defence, security or sovereignty of India, friendly relations with foreign States, or public order, or incites the commission of a cognisable offence;</li>
         <li>Contains software viruses or any other malicious code;</li>
         <li>Is a Synthetically Generated Information (SGI) item that is not appropriately labelled/disclosed as required under the IT Rules, or that falsely depicts a person or a real‑world event;</li>
-        <li>Otherwise violates Orenkafine's Terms &amp; Conditions, Privacy Policy or other published policies.</li>
+        <li>Otherwise violates Orenkafine's Terms &amp; Conditions, <a href="about.html">Privacy Policy</a> or other published policies.</li>
       </ul>
       <p>You may also use this mechanism to report any order, notice or direction issued by an appropriate government agency or court that you believe Orenkafine should be made aware of, and to raise any other grievance falling within the scope of the IT Rules.</p>
 
@@ -928,7 +1018,7 @@
       <p>This Policy addresses Grievances relating to hosted content and due diligence obligations under the IT Rules. It should be read together with:</p>
       <ul>
         <li>Clause 44 (Grievance Redressal) of the Terms &amp; Conditions, for complaints regarding Orders, payments, delivery, returns, refunds and other consumer matters under the Consumer Protection Act, 2019 and Consumer Protection (E‑Commerce) Rules, 2020;</li>
-        <li>Clause 15 and Clause 17 of the Privacy Policy, for requests relating to personal data and grievances under the Digital Personal Data Protection Act, 2023.</li>
+        <li>Clause 15 and Clause 17 of the <a href="about.html">Privacy Policy</a>, for requests relating to personal data and grievances under the Digital Personal Data Protection Act, 2023.</li>
       </ul>
       <p>Where a single complaint raises matters falling under more than one of these frameworks, Orenkafine will address each aspect under the applicable framework and timeline.</p>
 
@@ -937,19 +1027,22 @@
 
       <h2 class="clause" id="gr-14">14. Contact Information</h2>
       <ul>
-        <li>Orenkafine</li>
-        <li>Legal Entity: [INSERT LEGAL ENTITY NAME]</li>
-        <li>Grievance Officer: [INSERT NAME]</li>
-        <li>Grievance Email: [INSERT EMAIL]</li>
-        <li>Grievance Phone: [INSERT PHONE NUMBER]</li>
-        <li>Postal Address: [INSERT ADDRESS]</li>
+        <li><a href="index.html">Orenkafine</a></li>
+        <li>Legal Entity: BLUE GEMS &amp; JEWELS LIMITED</li>
+        <li>Grievance Officer: Mayur Hitendra Parmar</li>
+        <li>Grievance Email: Info@orenkafine.com</li>
+        <li>Grievance Phone: +91 86559 64188</li>
+        <li>Postal Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
       </ul>
 
       <div class="doc-footer">
-        ORENKAFINE — Jewellery Designed to Be Remembered.<br>
+        <a href="index.html">ORENKAFINE</a> — Jewellery Designed to Be Remembered.<br>
         &copy; 2026 Orenkafine. All Rights Reserved.
       </div>
     </article>
+
+      </div>
+    </div>
 
   </div>
 </section>
@@ -970,5 +1063,41 @@
 <script src="js/footer.js"></script>
 <script src="js/cookie-consent.js"></script>
 <script src="js/guide-modals.js"></script>
+<script>
+// Scrollspy for the sidebar nav — highlights the link for whichever
+// section heading (or document title) is currently nearest the top of
+// the viewport as the user scrolls, so the sidebar stacks section-by-
+// section instead of a static "on this page" list.
+(function () {
+  const sidebar = document.getElementById("legalSidebar");
+  if (!sidebar) return;
+  const links = Array.from(sidebar.querySelectorAll("a[href^='#']"));
+  const targets = links
+    .map((link) => ({ link, el: document.getElementById(link.getAttribute("href").slice(1)) }))
+    .filter((t) => t.el);
+
+  let activeLink = null;
+  function setActive(link) {
+    if (link === activeLink) return;
+    if (activeLink) activeLink.classList.remove("active");
+    if (link) link.classList.add("active");
+    activeLink = link;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const match = targets.find((t) => t.el === entry.target);
+        if (match) setActive(match.link);
+      });
+    },
+    { rootMargin: "-96px 0px -70% 0px", threshold: 0 }
+  );
+
+  targets.forEach((t) => observer.observe(t.el));
+  if (targets.length) setActive(targets[0].link);
+})();
+</script>
 </body>
 </html>

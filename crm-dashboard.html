@@ -326,6 +326,32 @@
             </div>
           </div>
 
+          <div class="calc-row2">
+            <div class="calc-field">
+              <label>Product Category</label>
+              <select id="calcCategory">
+                <option value="">Select category (optional)</option>
+                <option value="Rings">Rings</option>
+                <option value="Bangle">Bangle</option>
+                <option value="Bracelets">Bracelets</option>
+                <option value="Earrings">Earrings</option>
+                <option value="Pendants">Pendants</option>
+                <option value="Charms">Charms</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="calc-field">
+              <label>Size</label>
+              <select id="calcSize" disabled>
+                <option value="">No sizing for this category</option>
+              </select>
+            </div>
+          </div>
+          <div class="calc-field">
+            <label>Quantity (pieces)</label>
+            <input type="number" id="calcQty" min="1" step="1" value="1" style="max-width:140px;" />
+          </div>
+
           <div class="calc-field">
             <label>Diamond Quality</label>
             <select id="calcDiamondQuality">
@@ -1239,9 +1265,36 @@
     renderCalcOutput();
   }
 
+  // Same size sets as the product-based Quotation Generator above
+  // (RING_SIZE_FALLBACK/BANGLE_SIZE_FALLBACK/BRACELET_SIZE_FALLBACK),
+  // keyed by the category dropdown here. Categories with no standard
+  // sizing (Earrings, Pendants, Charms, Other) leave the size <select>
+  // disabled with no options.
+  const CALC_CATEGORY_SIZES = {
+    Rings: RING_SIZE_FALLBACK,
+    Bangle: BANGLE_SIZE_FALLBACK,
+    Bracelets: BRACELET_SIZE_FALLBACK,
+  };
+
+  function refreshCalcSizeOptions() {
+    const category = document.getElementById("calcCategory").value;
+    const sizeSelect = document.getElementById("calcSize");
+    const sizes = CALC_CATEGORY_SIZES[category];
+    if (sizes && sizes.length) {
+      sizeSelect.disabled = false;
+      sizeSelect.innerHTML = sizes.map((s) => `<option value="${s}">${s}</option>`).join("");
+    } else {
+      sizeSelect.disabled = true;
+      sizeSelect.innerHTML = `<option value="">No sizing for this category</option>`;
+    }
+  }
+
   function renderCalcOutput() {
     const weight = Number(document.getElementById("calcGoldWeight").value) || 0;
     const karat = document.getElementById("calcKarat").value;
+    const category = document.getElementById("calcCategory").value;
+    const size = document.getElementById("calcSize").value.trim();
+    const qty = Math.max(1, Number(document.getElementById("calcQty").value) || 1);
     const diamondQuality = document.getElementById("calcDiamondQuality").value;
     const diamondCt = Number(document.getElementById("calcDiamondCt").value) || 0;
     const diamondRate = Number(document.getElementById("calcDiamondRate").value) || 0;
@@ -1255,9 +1308,15 @@
     const makingCharge = weight > 0 ? Math.max(weight * makingPerGram, makingMin) : 0;
     const subtotal = goldCost + diamondCost + makingCharge;
     const gst = subtotal * (gstPct / 100);
-    const total = subtotal + gst;
+    const pricePerPiece = subtotal + gst;
+    const grandTotal = pricePerPiece * qty;
 
     const rows = [];
+    if (category || size) {
+      rows.push(`<div class="quote-spec-row section-title">Product Details</div>`);
+      if (category) rows.push(`<div class="quote-spec-row">Category: <strong>${escapeHtml(category)}</strong></div>`);
+      if (size) rows.push(`<div class="quote-spec-row">Size: <strong>${escapeHtml(size)}</strong></div>`);
+    }
     rows.push(`<div class="quote-spec-row section-title">Price Break Up</div>`);
     rows.push(`<div class="quote-spec-row">Gold (${KARAT_LABELS[karat] || karat}, ${weight || 0}g): <strong>${money(goldCost)}</strong></div>`);
     if (diamondQuality) {
@@ -1265,7 +1324,9 @@
     }
     rows.push(`<div class="quote-spec-row">Making: <strong>${money(makingCharge)}</strong></div>`);
     rows.push(`<div class="quote-spec-row">GST (${gstPct || 0}%): <strong>${money(gst)}</strong></div>`);
-    rows.push(`<div class="quote-total-row"><span>Total Price</span><span>${money(total)}</span></div>`);
+    rows.push(`<div class="quote-spec-row">Price per Piece: <strong>${money(pricePerPiece)}</strong></div>`);
+    rows.push(`<div class="quote-spec-row">Quantity: <strong>${qty}</strong></div>`);
+    rows.push(`<div class="quote-total-row"><span>Total Price${qty > 1 ? ` (${qty} pcs)` : ""}</span><span>${money(grandTotal)}</span></div>`);
     if (!calcGoldRate24ktPerGram) {
       rows.push(`<p class="quote-approx-note">No live gold rate found in gold_rates — gold cost shown as ₹0 until that's set.</p>`);
     }
@@ -1273,10 +1334,17 @@
   }
 
   [
-    "calcGoldWeight", "calcKarat", "calcDiamondCt", "calcDiamondRate",
+    "calcGoldWeight", "calcKarat", "calcQty", "calcDiamondCt", "calcDiamondRate",
     "calcMakingPerGram", "calcMakingMin", "calcGst",
   ].forEach((id) => {
     document.getElementById(id).addEventListener("input", renderCalcOutput);
+  });
+
+  document.getElementById("calcSize").addEventListener("change", renderCalcOutput);
+
+  document.getElementById("calcCategory").addEventListener("change", () => {
+    refreshCalcSizeOptions();
+    renderCalcOutput();
   });
 
   document.getElementById("calcDiamondQuality").addEventListener("change", (e) => {
