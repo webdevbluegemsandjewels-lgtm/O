@@ -400,12 +400,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function validatePhone() {
     const digits = phoneInput.value.trim().replace(/\D/g, "");
-    const ok = digits.length >= 7 && digits.length <= 12;
+    const ok = digits.length === geoPhoneLenForDial(phoneCountryCode.value);
     setFieldValid(phoneInput, ok);
     return ok;
   }
   emailInput.addEventListener("blur", validateEmail);
   phoneInput.addEventListener("blur", validatePhone);
+
+  // Stops the shopper from typing past the selected country's expected
+  // digit count (e.g. 10 for India) instead of only flagging it on blur.
+  capPhoneInput(phoneInput, phoneCountryCode);
+  phoneInput.addEventListener("input", () => capPhoneInput(phoneInput, phoneCountryCode));
+  phoneCountryCode.addEventListener("change", () => capPhoneInput(phoneInput, phoneCountryCode));
 
   function goToRedirectTarget() {
     const params = new URLSearchParams(window.location.search);

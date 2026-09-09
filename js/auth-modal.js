@@ -14,6 +14,106 @@
   let modalEl = null;
   let resolveFn = null;
 
+  // js/geo-data.js (GEO_COUNTRIES/GEO_INDIA_STATES/GEO_INDIA_CITIES)
+  // isn't guaranteed to already be on the page — this modal is
+  // injected on ~20 different pages, most of which don't otherwise
+  // need that dataset. Load it on demand instead of adding the
+  // <script> tag everywhere.
+  let geoDataPromise = null;
+  function ensureGeoData() {
+    if (typeof GEO_COUNTRIES !== "undefined") return Promise.resolve();
+    if (geoDataPromise) return geoDataPromise;
+    geoDataPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "js/geo-data.js";
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Could not load geo-data.js"));
+      document.head.appendChild(script);
+    });
+    return geoDataPromise;
+  }
+
+  // Same India-first country/dial-code dataset and State/City
+  // cascade + free-text fallback used on signup.html and
+  // contact.html — see js/geo-data.js.
+  async function populateGeoFields(modal) {
+    await ensureGeoData();
+
+    const phoneCode = modal.querySelector('[data-role="signup-phone-code"]');
+    const country = modal.querySelector('[data-role="signup-country"]');
+    const state = modal.querySelector('[data-role="signup-state"]');
+    const stateText = modal.querySelector('[data-role="signup-state-text"]');
+    const city = modal.querySelector('[data-role="signup-city"]');
+    const cityText = modal.querySelector('[data-role="signup-city-text"]');
+    if (!phoneCode || phoneCode.dataset.populated) return;
+    phoneCode.dataset.populated = "true";
+
+    phoneCode.innerHTML = GEO_COUNTRIES.map((c) => `<option value="${c.dial}">${c.dial} ${c.name}</option>`).join("");
+    country.innerHTML = GEO_COUNTRIES.map((c) => `<option value="${c.name}">${c.name}</option>`).join("");
+    phoneCode.value = "+91";
+    country.value = "India";
+
+    // Stops the shopper from typing past the selected country's
+    // expected digit count (e.g. 10 for India) instead of only
+    // flagging it on submit.
+    const phoneInput = modal.querySelector('[data-role="signup-phone"]');
+    capPhoneInput(phoneInput, phoneCode);
+    phoneInput.addEventListener("input", () => capPhoneInput(phoneInput, phoneCode));
+    phoneCode.addEventListener("change", () => capPhoneInput(phoneInput, phoneCode));
+
+    function populateCity(stateName) {
+      const cities = GEO_INDIA_CITIES[stateName];
+      if (cities && cities.length) {
+        city.innerHTML = `<option value="">Select city</option>` + cities.map((c) => `<option value="${c}">${c}</option>`).join("");
+        city.style.display = "";
+        cityText.style.display = "none";
+        cityText.required = false;
+        city.required = true;
+      } else {
+        city.style.display = "none";
+        city.required = false;
+        cityText.value = "";
+        cityText.style.display = "";
+        cityText.required = true;
+      }
+    }
+    function refreshStateAndCity() {
+      if (country.value === "India") {
+        state.innerHTML = `<option value="">Select state</option>` + GEO_INDIA_STATES.map((s) => `<option value="${s}">${s}</option>`).join("");
+        state.style.display = "";
+        stateText.style.display = "none";
+        stateText.required = false;
+        state.required = true;
+        populateCity(state.value);
+      } else {
+        state.style.display = "none";
+        state.required = false;
+        stateText.value = "";
+        stateText.style.display = "";
+        stateText.required = true;
+        city.style.display = "none";
+        city.required = false;
+        cityText.value = "";
+        cityText.style.display = "";
+        cityText.required = true;
+      }
+    }
+    country.addEventListener("change", refreshStateAndCity);
+    state.addEventListener("change", () => populateCity(state.value));
+    refreshStateAndCity();
+  }
+
+  function currentState(modal) {
+    const state = modal.querySelector('[data-role="signup-state"]');
+    const stateText = modal.querySelector('[data-role="signup-state-text"]');
+    return state.style.display === "none" ? stateText.value.trim() : state.value;
+  }
+  function currentCity(modal) {
+    const city = modal.querySelector('[data-role="signup-city"]');
+    const cityText = modal.querySelector('[data-role="signup-city-text"]');
+    return city.style.display === "none" ? cityText.value.trim() : city.value;
+  }
+
   function buildModal() {
     const wrap = document.createElement("div");
     wrap.className = "auth-modal-backdrop";
@@ -74,6 +174,7 @@
           <div class="auth-field">
             <label>Email</label>
             <input type="email" required autocomplete="email" data-role="signup-email" />
+            <p class="field-error" data-role="signup-email-error" style="display:none; color:#a9432f; font-size:.74rem; margin-top:.35rem;">Enter a valid email address.</p>
           </div>
           <div class="auth-field">
             <label>Password</label>
@@ -82,7 +183,11 @@
           </div>
           <div class="auth-field">
             <label>Phone</label>
-            <input type="tel" required autocomplete="tel" data-role="signup-phone" />
+            <div style="display:grid; grid-template-columns: 108px 1fr; gap:.5rem;">
+              <select data-role="signup-phone-code" aria-label="Country code"></select>
+              <input type="tel" required autocomplete="tel" inputmode="numeric" placeholder="10-digit number" data-role="signup-phone" />
+            </div>
+            <p class="field-error" data-role="signup-phone-error" style="display:none; color:#a9432f; font-size:.74rem; margin-top:.35rem;">Enter a valid phone number.</p>
           </div>
           <div class="auth-field">
             <label>Address line 1</label>
@@ -92,14 +197,20 @@
             <label>Address line 2 <span class="hint-inline">(optional)</span></label>
             <input type="text" autocomplete="address-line2" data-role="signup-address2" />
           </div>
+          <div class="auth-field">
+            <label>Country</label>
+            <select required data-role="signup-country"></select>
+          </div>
           <div class="auth-field auth-field-row">
             <div>
-              <label>City</label>
-              <input type="text" required autocomplete="address-level2" data-role="signup-city" />
+              <label>State</label>
+              <select required data-role="signup-state"></select>
+              <input type="text" required autocomplete="address-level1" data-role="signup-state-text" style="display:none;" />
             </div>
             <div>
-              <label>State</label>
-              <input type="text" required autocomplete="address-level1" data-role="signup-state" />
+              <label>City</label>
+              <select required data-role="signup-city"></select>
+              <input type="text" required autocomplete="address-level2" data-role="signup-city-text" style="display:none;" />
             </div>
           </div>
           <div class="auth-field">
@@ -139,6 +250,7 @@
     modal.querySelector('[data-role="signup-form"]').style.display = tab === "signup" ? "block" : "none";
     modal.querySelector('[data-role="forgot-section"]').style.display = "none";
     modal.querySelector('[data-role="otp-section"]').style.display = "none";
+    if (tab === "signup") populateGeoFields(modal);
     const heading = modal.querySelector('[data-role="modal-heading"]');
     const subtitle = modal.querySelector('[data-role="modal-subtitle"]');
     if (heading && subtitle) {
@@ -303,21 +415,46 @@
     });
 
     // --- Signup ---
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     modal.querySelector('[data-role="signup-form"]').addEventListener("submit", async (e) => {
       e.preventDefault();
       hideMessages(modal);
+
+      const emailInput = modal.querySelector('[data-role="signup-email"]');
+      const emailError = modal.querySelector('[data-role="signup-email-error"]');
+      const phoneInput = modal.querySelector('[data-role="signup-phone"]');
+      const phoneError = modal.querySelector('[data-role="signup-phone-error"]');
+      const phoneCodeSelect = modal.querySelector('[data-role="signup-phone-code"]');
+      const emailOk = EMAIL_RE.test(emailInput.value.trim());
+      const phoneDigits = phoneInput.value.trim().replace(/\D/g, "");
+      const phoneOk = phoneDigits.length === geoPhoneLenForDial(phoneCodeSelect.value);
+      emailError.style.display = emailOk ? "none" : "block";
+      phoneError.style.display = phoneOk ? "none" : "block";
+      if (!emailOk || !phoneOk) {
+        showError(modal, "Please fix the highlighted fields before continuing.");
+        (emailOk ? phoneInput : emailInput).focus();
+        return;
+      }
+
+      const state = currentState(modal);
+      const city = currentCity(modal);
+      if (!state || !city) {
+        showError(modal, "Please select your state and city.");
+        return;
+      }
+
       const btn = modal.querySelector('[data-role="signup-submit"]');
       btn.disabled = true;
       btn.textContent = "Creating account…";
 
       const fullName = modal.querySelector('[data-role="signup-name"]').value.trim();
-      const email = modal.querySelector('[data-role="signup-email"]').value.trim();
+      const email = emailInput.value.trim();
       const password = modal.querySelector('[data-role="signup-password"]').value;
-      const phone = modal.querySelector('[data-role="signup-phone"]').value.trim();
+      const phoneCode = modal.querySelector('[data-role="signup-phone-code"]').value;
+      const phone = `${phoneCode} ${phoneInput.value.trim()}`;
       const addressLine1 = modal.querySelector('[data-role="signup-address1"]').value.trim();
       const addressLine2 = modal.querySelector('[data-role="signup-address2"]').value.trim();
-      const city = modal.querySelector('[data-role="signup-city"]').value.trim();
-      const state = modal.querySelector('[data-role="signup-state"]').value.trim();
+      const country = modal.querySelector('[data-role="signup-country"]').value;
       const pincode = modal.querySelector('[data-role="signup-pincode"]').value.trim();
 
       const { data, error } = await supabaseClient.auth.signUp({
@@ -331,6 +468,7 @@
             address_line2: addressLine2,
             city,
             state,
+            country,
             pincode,
           },
         },

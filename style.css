@@ -1817,11 +1817,11 @@ body.auth-modal-open{ overflow: hidden; }
 }
 .auth-modal .auth-field label .hint-inline{ text-transform:none; letter-spacing:normal; font-size:.64rem; opacity:.75; }
 .auth-modal .auth-field-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.auth-modal .auth-field input{
+.auth-modal .auth-field input, .auth-modal .auth-field select{
   width:100%; background:#fff; border: 1px solid rgba(58,42,28,.14); border-radius: 14px;
   padding: .58rem 1rem; font-family: inherit; font-size: .8rem; color: var(--arch-brown, #3A2A1C);
 }
-.auth-modal .auth-field input:focus{ border-color: var(--arch-gold, #B08D57); outline:none; box-shadow: 0 0 0 3px rgba(176,141,87,.16); }
+.auth-modal .auth-field input:focus, .auth-modal .auth-field select:focus{ border-color: var(--arch-gold, #B08D57); outline:none; box-shadow: 0 0 0 3px rgba(176,141,87,.16); }
 .auth-modal .auth-field .hint{ font-size:.66rem; opacity:.65; margin-top:.3rem; }
 .auth-modal .auth-submit{
   width:100%; justify-content:center; margin-top:.2rem;

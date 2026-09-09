@@ -188,6 +188,13 @@
   phoneCountryCode.value = "+91";
   countrySelect.value = "India";
 
+  // Stops the shopper from typing past the selected country's expected
+  // digit count (e.g. 10 for India) instead of only flagging it later.
+  const phoneInput = document.getElementById("phone");
+  capPhoneInput(phoneInput, phoneCountryCode);
+  phoneInput.addEventListener("input", () => capPhoneInput(phoneInput, phoneCountryCode));
+  phoneCountryCode.addEventListener("change", () => capPhoneInput(phoneInput, phoneCountryCode));
+
   function populateCitySelect(state) {
     const cities = GEO_INDIA_CITIES[state];
     if (cities && cities.length) {
@@ -275,7 +282,7 @@
       firstName: document.getElementById("fname").value.trim(),
       lastName: document.getElementById("lname").value.trim(),
       email: document.getElementById("email").value.trim(),
-      phone: `${phoneCountryCode.value} ${document.getElementById("phone").value.trim()}`,
+      phone: `${phoneCountryCode.value} ${phoneInput.value.trim()}`,
       topic,
       country: countrySelect.value,
       state,

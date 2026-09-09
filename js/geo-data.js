@@ -8,51 +8,73 @@
    worth shipping for a site that only delivers within India today.
    ========================================================= */
 
-// { name, iso2, dial } — India first since it's the default/primary market.
+// { name, iso2, dial, len } — India first since it's the default/primary
+// market. `len` is the typical national mobile-number digit length for
+// that country (used to cap the phone <input> as the shopper types —
+// see capPhoneInput() usage in signup.html / js/auth-modal.js). It's an
+// approximation for UX purposes (some countries have more than one
+// valid length); it's not a substitute for real phone validation.
 const GEO_COUNTRIES = [
-  { name: "India", iso2: "IN", dial: "+91" },
-  { name: "United States", iso2: "US", dial: "+1" },
-  { name: "United Kingdom", iso2: "GB", dial: "+44" },
-  { name: "United Arab Emirates", iso2: "AE", dial: "+971" },
-  { name: "Australia", iso2: "AU", dial: "+61" },
-  { name: "Canada", iso2: "CA", dial: "+1" },
-  { name: "Singapore", iso2: "SG", dial: "+65" },
-  { name: "Saudi Arabia", iso2: "SA", dial: "+966" },
-  { name: "Qatar", iso2: "QA", dial: "+974" },
-  { name: "Kuwait", iso2: "KW", dial: "+965" },
-  { name: "Bahrain", iso2: "BH", dial: "+973" },
-  { name: "Oman", iso2: "OM", dial: "+968" },
-  { name: "Nepal", iso2: "NP", dial: "+977" },
-  { name: "Bangladesh", iso2: "BD", dial: "+880" },
-  { name: "Sri Lanka", iso2: "LK", dial: "+94" },
-  { name: "Pakistan", iso2: "PK", dial: "+92" },
-  { name: "Germany", iso2: "DE", dial: "+49" },
-  { name: "France", iso2: "FR", dial: "+33" },
-  { name: "Italy", iso2: "IT", dial: "+39" },
-  { name: "Spain", iso2: "ES", dial: "+34" },
-  { name: "Netherlands", iso2: "NL", dial: "+31" },
-  { name: "Switzerland", iso2: "CH", dial: "+41" },
-  { name: "Sweden", iso2: "SE", dial: "+46" },
-  { name: "Ireland", iso2: "IE", dial: "+353" },
-  { name: "New Zealand", iso2: "NZ", dial: "+64" },
-  { name: "South Africa", iso2: "ZA", dial: "+27" },
-  { name: "Japan", iso2: "JP", dial: "+81" },
-  { name: "South Korea", iso2: "KR", dial: "+82" },
-  { name: "China", iso2: "CN", dial: "+86" },
-  { name: "Hong Kong", iso2: "HK", dial: "+852" },
-  { name: "Malaysia", iso2: "MY", dial: "+60" },
-  { name: "Thailand", iso2: "TH", dial: "+66" },
-  { name: "Indonesia", iso2: "ID", dial: "+62" },
-  { name: "Philippines", iso2: "PH", dial: "+63" },
-  { name: "Vietnam", iso2: "VN", dial: "+84" },
-  { name: "Brazil", iso2: "BR", dial: "+55" },
-  { name: "Mexico", iso2: "MX", dial: "+52" },
-  { name: "Russia", iso2: "RU", dial: "+7" },
-  { name: "Turkey", iso2: "TR", dial: "+90" },
-  { name: "Egypt", iso2: "EG", dial: "+20" },
-  { name: "Nigeria", iso2: "NG", dial: "+234" },
-  { name: "Kenya", iso2: "KE", dial: "+254" },
+  { name: "India", iso2: "IN", dial: "+91", len: 10 },
+  { name: "United States", iso2: "US", dial: "+1", len: 10 },
+  { name: "United Kingdom", iso2: "GB", dial: "+44", len: 10 },
+  { name: "United Arab Emirates", iso2: "AE", dial: "+971", len: 9 },
+  { name: "Australia", iso2: "AU", dial: "+61", len: 9 },
+  { name: "Canada", iso2: "CA", dial: "+1", len: 10 },
+  { name: "Singapore", iso2: "SG", dial: "+65", len: 8 },
+  { name: "Saudi Arabia", iso2: "SA", dial: "+966", len: 9 },
+  { name: "Qatar", iso2: "QA", dial: "+974", len: 8 },
+  { name: "Kuwait", iso2: "KW", dial: "+965", len: 8 },
+  { name: "Bahrain", iso2: "BH", dial: "+973", len: 8 },
+  { name: "Oman", iso2: "OM", dial: "+968", len: 8 },
+  { name: "Nepal", iso2: "NP", dial: "+977", len: 10 },
+  { name: "Bangladesh", iso2: "BD", dial: "+880", len: 10 },
+  { name: "Sri Lanka", iso2: "LK", dial: "+94", len: 9 },
+  { name: "Pakistan", iso2: "PK", dial: "+92", len: 10 },
+  { name: "Germany", iso2: "DE", dial: "+49", len: 11 },
+  { name: "France", iso2: "FR", dial: "+33", len: 9 },
+  { name: "Italy", iso2: "IT", dial: "+39", len: 10 },
+  { name: "Spain", iso2: "ES", dial: "+34", len: 9 },
+  { name: "Netherlands", iso2: "NL", dial: "+31", len: 9 },
+  { name: "Switzerland", iso2: "CH", dial: "+41", len: 9 },
+  { name: "Sweden", iso2: "SE", dial: "+46", len: 9 },
+  { name: "Ireland", iso2: "IE", dial: "+353", len: 9 },
+  { name: "New Zealand", iso2: "NZ", dial: "+64", len: 9 },
+  { name: "South Africa", iso2: "ZA", dial: "+27", len: 9 },
+  { name: "Japan", iso2: "JP", dial: "+81", len: 10 },
+  { name: "South Korea", iso2: "KR", dial: "+82", len: 10 },
+  { name: "China", iso2: "CN", dial: "+86", len: 11 },
+  { name: "Hong Kong", iso2: "HK", dial: "+852", len: 8 },
+  { name: "Malaysia", iso2: "MY", dial: "+60", len: 10 },
+  { name: "Thailand", iso2: "TH", dial: "+66", len: 9 },
+  { name: "Indonesia", iso2: "ID", dial: "+62", len: 11 },
+  { name: "Philippines", iso2: "PH", dial: "+63", len: 10 },
+  { name: "Vietnam", iso2: "VN", dial: "+84", len: 9 },
+  { name: "Brazil", iso2: "BR", dial: "+55", len: 11 },
+  { name: "Mexico", iso2: "MX", dial: "+52", len: 10 },
+  { name: "Russia", iso2: "RU", dial: "+7", len: 10 },
+  { name: "Turkey", iso2: "TR", dial: "+90", len: 10 },
+  { name: "Egypt", iso2: "EG", dial: "+20", len: 10 },
+  { name: "Nigeria", iso2: "NG", dial: "+234", len: 10 },
+  { name: "Kenya", iso2: "KE", dial: "+254", len: 9 },
 ];
+
+// Looked up by dial code when capping the phone <input> length. Falls
+// back to 15 (the E.164 max) if a dial code somehow isn't found.
+function geoPhoneLenForDial(dial) {
+  const match = GEO_COUNTRIES.find((c) => c.dial === dial);
+  return match ? match.len : 15;
+}
+
+// Strips non-digits and truncates to the selected country's expected
+// length, live as the shopper types — shared by signup.html and the
+// login/signup popup (js/auth-modal.js).
+function capPhoneInput(phoneInput, phoneCodeSelect) {
+  const maxLen = geoPhoneLenForDial(phoneCodeSelect.value);
+  phoneInput.setAttribute("maxlength", String(maxLen));
+  const digitsOnly = phoneInput.value.replace(/\D/g, "").slice(0, maxLen);
+  if (digitsOnly !== phoneInput.value) phoneInput.value = digitsOnly;
+}
 
 // 28 states + 8 union territories.
 const GEO_INDIA_STATES = [
