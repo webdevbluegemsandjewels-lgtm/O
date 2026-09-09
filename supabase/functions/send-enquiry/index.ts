@@ -45,7 +45,11 @@ async function sendEnquiryEmail(enquiry: {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
   topic: string;
+  country: string;
+  state: string;
+  city: string;
   message: string;
 }) {
   if (!RESEND_API_KEY) throw new Error("Missing RESEND_API_KEY");
@@ -67,7 +71,9 @@ async function sendEnquiryEmail(enquiry: {
           <p style="font-size:14px; line-height:1.7; color:#2a271f;">
             <strong>Name:</strong> ${escapeHtml(enquiry.firstName)} ${escapeHtml(enquiry.lastName)}<br/>
             <strong>Email:</strong> ${escapeHtml(enquiry.email)}<br/>
-            <strong>Topic:</strong> ${escapeHtml(enquiry.topic)}
+            <strong>Phone:</strong> ${escapeHtml(enquiry.phone)}<br/>
+            <strong>Topic:</strong> ${escapeHtml(enquiry.topic)}<br/>
+            <strong>Location:</strong> ${escapeHtml([enquiry.city, enquiry.state, enquiry.country].filter(Boolean).join(", "))}
           </p>
           <p style="font-size:14px; line-height:1.7; color:#2a271f; white-space:pre-wrap;">${escapeHtml(enquiry.message)}</p>
         </div>
@@ -95,7 +101,11 @@ serve(async (req) => {
     const firstName = typeof body?.firstName === "string" ? body.firstName.trim() : "";
     const lastName = typeof body?.lastName === "string" ? body.lastName.trim() : "";
     const email = typeof body?.email === "string" ? body.email.trim() : "";
+    const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
     const topic = typeof body?.topic === "string" ? body.topic.trim() : "General question";
+    const country = typeof body?.country === "string" ? body.country.trim() : "";
+    const state = typeof body?.state === "string" ? body.state.trim() : "";
+    const city = typeof body?.city === "string" ? body.city.trim() : "";
     const message = typeof body?.message === "string" ? body.message.trim() : "";
 
     if (!firstName || !lastName || !email || !message) {
@@ -106,7 +116,11 @@ serve(async (req) => {
       first_name: firstName,
       last_name: lastName,
       email,
+      phone,
       topic,
+      country,
+      state,
+      city,
       message,
     });
 
@@ -115,7 +129,7 @@ serve(async (req) => {
     }
 
     try {
-      await sendEnquiryEmail({ firstName, lastName, email, topic, message });
+      await sendEnquiryEmail({ firstName, lastName, email, phone, topic, country, state, city, message });
     } catch (emailError) {
       // The enquiry is already saved in the database at this point —
       // don't fail the whole request just because the notification

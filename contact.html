@@ -98,6 +98,13 @@
             <input id="email" type="email" required />
           </div>
           <div class="form-field">
+            <label for="phone">Phone</label>
+            <div style="display:grid; grid-template-columns: 108px 1fr; gap:.6rem;">
+              <select id="phoneCountryCode" aria-label="Country code"></select>
+              <input id="phone" type="tel" required inputmode="numeric" placeholder="10-digit number" />
+            </div>
+          </div>
+          <div class="form-field">
             <label for="topic">Topic</label>
             <select id="topic">
               <option>General question</option>
@@ -105,7 +112,26 @@
               <option>Care &amp; repairs</option>
               <option>Retail partnership</option>
               <option>Press</option>
+              <option>Other</option>
             </select>
+          </div>
+          <div class="form-field" id="topicOtherField" style="display:none;">
+            <label for="topicOther">Please specify</label>
+            <input id="topicOther" type="text" placeholder="Tell us the topic" />
+          </div>
+          <div class="form-field">
+            <label for="country">Country</label>
+            <select id="country" required></select>
+          </div>
+          <div class="form-field">
+            <label for="state">State</label>
+            <select id="state" required></select>
+            <input id="stateText" type="text" required style="display:none;" />
+          </div>
+          <div class="form-field">
+            <label for="city">City</label>
+            <select id="city" required></select>
+            <input id="cityText" type="text" required style="display:none;" />
           </div>
           <div class="form-field full">
             <label for="message">Message</label>
@@ -133,6 +159,7 @@
 </button>
 
 <script src="js/supabaseClient.js"></script>
+<script src="js/geo-data.js"></script>
 <script src="js/auth-modal.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/products.js"></script>
@@ -143,6 +170,87 @@
 <script src="js/cookie-consent.js"></script>
 <script src="js/guide-modals.js"></script>
 <script>
+  // ---------- Dynamic country code / country / state / city (same
+  // dataset + fallback pattern as signup.html — see js/geo-data.js) ----------
+  const phoneCountryCode = document.getElementById("phoneCountryCode");
+  const countrySelect = document.getElementById("country");
+  const stateSelect = document.getElementById("state");
+  const stateText = document.getElementById("stateText");
+  const citySelect = document.getElementById("city");
+  const cityText = document.getElementById("cityText");
+
+  phoneCountryCode.innerHTML = GEO_COUNTRIES.map((c) =>
+    `<option value="${c.dial}">${c.dial} ${c.name}</option>`
+  ).join("");
+  countrySelect.innerHTML = GEO_COUNTRIES.map((c) =>
+    `<option value="${c.name}">${c.name}</option>`
+  ).join("");
+  phoneCountryCode.value = "+91";
+  countrySelect.value = "India";
+
+  function populateCitySelect(state) {
+    const cities = GEO_INDIA_CITIES[state];
+    if (cities && cities.length) {
+      citySelect.innerHTML = `<option value="">Select city</option>` +
+        cities.map((c) => `<option value="${c}">${c}</option>`).join("");
+      citySelect.style.display = "";
+      cityText.style.display = "none";
+      cityText.required = false;
+      citySelect.required = true;
+    } else {
+      citySelect.style.display = "none";
+      citySelect.required = false;
+      cityText.value = "";
+      cityText.style.display = "";
+      cityText.required = true;
+    }
+  }
+
+  function refreshStateAndCityFields() {
+    if (countrySelect.value === "India") {
+      stateSelect.innerHTML = `<option value="">Select state</option>` +
+        GEO_INDIA_STATES.map((s) => `<option value="${s}">${s}</option>`).join("");
+      stateSelect.style.display = "";
+      stateText.style.display = "none";
+      stateText.required = false;
+      stateSelect.required = true;
+      populateCitySelect(stateSelect.value);
+    } else {
+      stateSelect.style.display = "none";
+      stateSelect.required = false;
+      stateText.value = "";
+      stateText.style.display = "";
+      stateText.required = true;
+      citySelect.style.display = "none";
+      citySelect.required = false;
+      cityText.value = "";
+      cityText.style.display = "";
+      cityText.required = true;
+    }
+  }
+
+  countrySelect.addEventListener("change", refreshStateAndCityFields);
+  stateSelect.addEventListener("change", () => populateCitySelect(stateSelect.value));
+  refreshStateAndCityFields();
+
+  function currentState() {
+    return stateSelect.style.display === "none" ? stateText.value.trim() : stateSelect.value;
+  }
+  function currentCity() {
+    return citySelect.style.display === "none" ? cityText.value.trim() : citySelect.value;
+  }
+
+  // ---------- Topic "Other" reveals a free-text field ----------
+  const topicSelect = document.getElementById("topic");
+  const topicOtherField = document.getElementById("topicOtherField");
+  const topicOtherInput = document.getElementById("topicOther");
+  topicSelect.addEventListener("change", () => {
+    const isOther = topicSelect.value === "Other";
+    topicOtherField.style.display = isOther ? "" : "none";
+    topicOtherInput.required = isOther;
+    if (!isOther) topicOtherInput.value = "";
+  });
+
   // Saves to public.enquiries and emails info@orenkafine.com via the
   // send-enquiry Edge Function (see supabase/functions/send-enquiry).
   document.getElementById("contactForm").addEventListener("submit", async (e) => {
@@ -152,11 +260,26 @@
     const note = document.getElementById("contactFormNote");
     const original = btn.textContent;
 
+    const state = currentState();
+    const city = currentCity();
+    if (!state || !city) {
+      note.textContent = "Please select your state and city.";
+      note.style.color = "#b3261e";
+      return;
+    }
+    const topic = topicSelect.value === "Other"
+      ? topicOtherInput.value.trim() || "Other"
+      : topicSelect.value;
+
     const payload = {
       firstName: document.getElementById("fname").value.trim(),
       lastName: document.getElementById("lname").value.trim(),
       email: document.getElementById("email").value.trim(),
-      topic: document.getElementById("topic").value,
+      phone: `${phoneCountryCode.value} ${document.getElementById("phone").value.trim()}`,
+      topic,
+      country: countrySelect.value,
+      state,
+      city,
       message: document.getElementById("message").value.trim(),
     };
 
@@ -172,6 +295,11 @@
       btn.textContent = "Sent!";
       note.textContent = "Thank you — we've received your message and will get back to you shortly.";
       form.reset();
+      phoneCountryCode.value = "+91";
+      countrySelect.value = "India";
+      refreshStateAndCityFields();
+      topicOtherField.style.display = "none";
+      topicOtherInput.required = false;
       setTimeout(() => {
         btn.textContent = original;
         btn.disabled = false;
