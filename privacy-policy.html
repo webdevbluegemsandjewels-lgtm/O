@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Privacy Policy — OrenkaFine</title>
+<meta name="description" content="OrenkaFine's Privacy Policy — what personal data we collect, how and why we use it, and your rights as a data principal under applicable Indian law." />
+<meta name="robots" content="noindex, follow" />
+<link rel="icon" href="/logo/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/logo/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/logo/favicon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/logo/apple-touch-icon.png">
+<link rel="manifest" href="/logo/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .legal-page section:not(.legal-hero){ padding: 1rem 0; background: #fff; }
+  .legal-hero{
+    background: var(--bone, #f3eee4); color: var(--ink);
+    padding: 3.2rem 0 2.4rem;
+  }
+  .legal-hero .breadcrumb{ color: var(--ink-soft); font-size: .85rem; margin-bottom: .8rem; }
+  .legal-hero .breadcrumb a{ color: var(--ink-soft); }
+  .legal-hero h1{ font-size: clamp(2rem, 4vw, 2.8rem); color: var(--ink); margin-bottom: .4rem; }
+  .legal-hero p{ color: var(--ink-soft); font-size: .92rem; }
+
+  .legal-wrap{ max-width: 1140px; margin: 0 auto; }
+
+  .legal-shell{ display: grid; grid-template-columns: 250px 1fr; gap: 2.8rem; align-items: start; }
+
+  .legal-sidebar{
+    position: sticky; top: 96px;
+    max-height: calc(100vh - 120px); overflow-y: auto;
+    padding-right: .6rem;
+  }
+  .legal-sidebar-group{ margin-bottom: 1.6rem; }
+  .legal-sidebar-group h2{
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--gold); margin-bottom: .7rem;
+  }
+  .legal-sidebar-group ul{ list-style: none; margin: 0; padding: 0; }
+  .legal-sidebar-group ul li{ margin: 0; }
+  .legal-sidebar-group ul li a{
+    display: block; padding: .34rem 0 .34rem .7rem; margin-bottom: 1px;
+    font-size: .82rem; line-height: 1.4; color: var(--ink-soft);
+    border-left: 2px solid transparent; transition: color .15s, border-color .15s;
+  }
+  .legal-sidebar-group ul li a:hover{ color: var(--ink); }
+  .legal-sidebar-group ul li a.active{
+    color: var(--gold); border-left-color: var(--gold); font-weight: 600;
+  }
+  .legal-content{ min-width: 0; }
+  @media (max-width: 900px){
+    .legal-shell{ grid-template-columns: 1fr; }
+    .legal-sidebar{
+      position: static; max-height: none; overflow-y: visible;
+      background: #f7f4ec; border: 1px solid var(--line); border-radius: 12px;
+      padding: 1.2rem 1.4rem; margin-bottom: 2rem;
+    }
+    .legal-sidebar-group ul{ columns: 2; column-gap: 1.6rem; }
+  }
+  @media (max-width: 560px){
+    .legal-sidebar-group ul{ columns: 1; }
+  }
+
+  .legal-doc{ margin-bottom: 2.4rem; scroll-margin-top: 90px; }
+  .legal-doc-title{ font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: .3rem; }
+  .legal-doc-sub{ color: var(--ink-soft); font-size: .92rem; margin-bottom: .3rem; }
+  .legal-doc-meta{ color: var(--ink-soft); font-size: .82rem; margin-bottom: 1.6rem; }
+
+  .legal-note{
+    background: #fdf6e3; border-left: 3px solid var(--gold);
+    border-radius: 4px; padding: 1rem 1.3rem; margin-bottom: 2rem;
+    font-size: .86rem; line-height: 1.75; color: #6b4f1e;
+  }
+
+  .legal-doc h2.clause{
+    font-size: 1.15rem; font-family: var(--font-body); font-weight: 700;
+    text-transform: uppercase; letter-spacing: .02em;
+    color: var(--ink); margin: 2.4rem 0 .8rem; padding-top: .4rem;
+    border-top: 1px solid var(--line); scroll-margin-top: 90px;
+  }
+  .legal-doc h3.sub-clause{
+    font-size: .98rem; font-family: var(--font-body); font-weight: 700;
+    margin: 1.4rem 0 .5rem; scroll-margin-top: 90px;
+  }
+  .legal-doc p{ color: var(--ink-soft); line-height: 1.75; margin-bottom: .8rem; font-size: .92rem; }
+  .legal-doc ul{ margin: 0 0 .9rem 0; padding-left: 1.3rem; color: var(--ink-soft); font-size: .92rem; line-height: 1.75; }
+  .legal-doc ul li{ margin-bottom: .3rem; }
+  .legal-doc strong{ color: var(--ink); }
+
+  .legal-doc .doc-footer{
+    text-align: center; margin-top: 2.4rem; padding-top: 1.6rem;
+    border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .82rem;
+  }
+</style>
+</head>
+<body class="legal-page">
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="our-journey.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+      <a href="my-orders.html" data-my-orders-link style="display:none;">My Orders</a>
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <a class="icon-btn" href="login.html" aria-label="Login" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <button class="icon-btn" aria-label="Wishlist"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></button>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="legal-hero">
+  <div class="container">
+    <p class="breadcrumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Privacy Policy</p>
+    <h1>Privacy Policy</h1>
+    <p>What personal data OrenkaFine collects, how and why we use it, and the rights available to you as a data principal.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container legal-wrap">
+
+    <div class="legal-shell">
+      <nav class="legal-sidebar" id="legalSidebar" aria-label="Privacy Policy sections">
+        <div class="legal-sidebar-group">
+          <h2>Privacy Policy</h2>
+          <ul>
+            <li><a href="#pp-doc">Overview</a></li>
+            <li><a href="#pp-1">1. Introduction</a></li>
+            <li><a href="#pp-2">2. Who We Are</a></li>
+            <li><a href="#pp-3">3. Definitions</a></li>
+            <li><a href="#pp-4">4. Personal Data We Collect</a></li>
+            <li><a href="#pp-5">5. How We Collect Personal Data</a></li>
+            <li><a href="#pp-6">6. Purposes for Which We Use Personal Data</a></li>
+            <li><a href="#pp-7">7. Legal Basis for Processing</a></li>
+            <li><a href="#pp-8">8. Cookies and Tracking Technologies</a></li>
+            <li><a href="#pp-9">9. Sharing and Disclosure of Personal Data</a></li>
+            <li><a href="#pp-10">10. Cross‑Border Transfer of Personal Data</a></li>
+            <li><a href="#pp-11">11. Data Retention</a></li>
+            <li><a href="#pp-12">12. Data Security</a></li>
+            <li><a href="#pp-13">13. Personal Data Breach Notification</a></li>
+            <li><a href="#pp-14">14. Children's Data</a></li>
+            <li><a href="#pp-15">15. Your Rights as a Data Principal</a></li>
+            <li><a href="#pp-16">16. Consent Manager</a></li>
+            <li><a href="#pp-17">17. Grievance Officer / DPO Contact</a></li>
+            <li><a href="#pp-18">18. Third‑Party Links</a></li>
+            <li><a href="#pp-19">19. Changes to This Policy</a></li>
+            <li><a href="#pp-20">20. Governing Law and Jurisdiction</a></li>
+            <li><a href="#pp-21">21. Acknowledgement</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="legal-content">
+
+    <article class="legal-doc" id="pp-doc">
+      <h1 class="legal-doc-title"><a href="index.html">Orenkafine</a> Privacy Policy</h1>
+      <p class="legal-doc-meta">Effective Date: 4 September 2026 &nbsp;|&nbsp; Last Updated: 4 September 2026</p>
+
+      <div class="legal-note">
+        <strong>Note on current legal status (as of September 2026):</strong> This Policy is drafted with reference to the Information Technology Act, 2000 and the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011 ("SPDI Rules"), together with the Digital Personal Data Protection Act, 2023 ("DPDP Act") and the Digital Personal Data Protection Rules, 2025 ("DPDP Rules"), which were notified on 13 November 2025. The DPDP framework is being brought into force in phases: the Data Protection Board of India and certain provisions are already operative; Consent Manager provisions take effect in November 2026; and full substantive compliance and penalty provisions are scheduled to take effect on 13 May 2027. Until the DPDP Act is fully in force, the IT Act, 2000 and SPDI Rules, 2011 continue to apply to the collection and disclosure of sensitive personal data. Orenkafine will update this Policy as further provisions come into force.
+      </div>
+
+      <h2 class="clause" id="pp-1">1. Introduction</h2>
+      <p>Orenkafine ("Orenkafine", "we", "us", "our") respects the privacy of individuals who access or use our website, mobile interface, online store and related services (collectively, the "Platform").</p>
+      <p>This Privacy Policy explains what personal data we collect, how and why we collect and use it, with whom it may be shared, how long we retain it, and the rights available to you as a data principal under applicable Indian law.</p>
+      <p>This Policy applies to visitors, registered users and Customers of the Platform, and should be read together with our <a href="terms.html">Terms &amp; Conditions</a> and other policies referenced there.</p>
+      <p>By accessing the Platform or providing your personal data to us, you acknowledge that you have read and understood this Policy. Where consent is required by law for a particular processing activity, we will seek your free, specific, informed, unconditional and unambiguous consent separately, and you may withdraw such consent at any time as described in Clause 15.</p>
+
+      <h2 class="clause" id="pp-2">2. Who We Are — Data Fiduciary Details</h2>
+      <p>For the purposes of applicable data protection law, Orenkafine is the "Data Fiduciary" in respect of personal data collected through the Platform.</p>
+      <ul>
+        <li>Brand Name: Orenkafine</li>
+        <li>Legal Entity: BLUE GEMS &amp; JEWELS LIMITED</li>
+        <li>Registered/Principal Business Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
+        <li>Customer Care Email: Info@orenkafine.com</li>
+        <li>Customer Care Phone: +91 86559 64188</li>
+        <li>Data Protection Officer / Grievance Officer: Mayur Hitendra Parmar</li>
+        <li>Data Protection Officer / Grievance Email: Info@orenkafine.com</li>
+        <li>GSTIN: 27AAKCB0949A2ZW</li>
+        <li>CIN/LLPIN/Registration No.: U36911MH2021PLC366424</li>
+      </ul>
+      <p>Where Orenkafine qualifies as a "Significant Data Fiduciary" under the DPDP Act (based on volume and sensitivity of personal data processed, as may be notified by the Central Government), it shall appoint a Data Protection Officer based in India and undertake such additional compliance measures (including periodic data protection impact assessments and audits) as may be prescribed.</p>
+
+      <h2 class="clause" id="pp-3">3. Definitions</h2>
+      <p>"Personal Data" means any data about an individual who is identifiable by or in relation to such data.</p>
+      <p>"Data Principal" means the individual to whom the personal data relates, and, where such individual is a child, includes the parent or lawful guardian of such child.</p>
+      <p>"Data Fiduciary" means the entity which, alone or with others, determines the purpose and means of processing of personal data — here, Orenkafine.</p>
+      <p>"Processing" means an operation performed on personal data, including collection, recording, storage, use, sharing, disclosure, erasure or destruction.</p>
+      <p>"Consent Manager" means a person registered with the Data Protection Board of India who enables a Data Principal to give, manage, review or withdraw consent through an accessible, transparent platform, once such framework becomes operative.</p>
+      <p>"Sensitive Personal Data or Information" (under the SPDI Rules) includes financial information such as bank account or payment instrument details, to the limited extent such rules continue to apply.</p>
+
+      <h2 class="clause" id="pp-4">4. Personal Data We Collect</h2>
+      <p>We may collect the following categories of personal data, depending on how you interact with the Platform:</p>
+
+      <h3 class="sub-clause">4.1 Identity and Contact Information</h3>
+      <ul>
+        <li>Name, gender, date of birth (where relevant for personalisation or age verification);</li>
+        <li>Email address, phone number, postal/delivery address;</li>
+        <li>Account login credentials (where you create an account).</li>
+      </ul>
+
+      <h3 class="sub-clause">4.2 Order and Transaction Information</h3>
+      <ul>
+        <li>Products viewed, added to cart, wish‑listed or purchased;</li>
+        <li>Order history, invoices, customisation and engraving instructions, ring size and similar personalisation details;</li>
+        <li>Correspondence relating to an Order, return, exchange or complaint.</li>
+      </ul>
+
+      <h3 class="sub-clause">4.3 Payment Information</h3>
+      <p>Payments are processed by third‑party, RBI‑regulated payment gateways and financial service providers. Orenkafine does not store full card numbers, CVV or net banking credentials on its own servers; such information is collected and processed directly by the relevant payment gateway in accordance with its own privacy policy and applicable RBI guidelines. We may receive limited transaction metadata (such as payment status, method used, and a masked/last‑four‑digit card reference) from the payment gateway for order verification and record keeping.</p>
+
+      <h3 class="sub-clause">4.4 Identity/High‑Value Transaction Verification</h3>
+      <p>For high‑value jewellery transactions, we may collect additional verification information such as government‑issued identification details, billing information, or other information reasonably required for fraud prevention, anti‑money laundering compliance or legal compliance, as described in our Terms &amp; Conditions.</p>
+
+      <h3 class="sub-clause">4.5 Device and Technical Information</h3>
+      <ul>
+        <li>IP address, browser type and version, device identifiers, operating system;</li>
+        <li>Log data, pages visited, time spent, referring/exit pages, click patterns;</li>
+        <li>Approximate location derived from IP address or, where permitted, precise location if you enable location services.</li>
+      </ul>
+
+      <h3 class="sub-clause">4.6 Communications and Marketing Preferences</h3>
+      <ul>
+        <li>Records of communications between you and our customer support team;</li>
+        <li>Marketing and communication preferences, including opt‑in/opt‑out status;</li>
+        <li>Content you submit voluntarily, such as reviews, photographs, ratings or feedback.</li>
+      </ul>
+
+      <h3 class="sub-clause">4.7 Cookies and Similar Technologies</h3>
+      <p>See Clause 8 (Cookies and Tracking Technologies) below.</p>
+
+      <h2 class="clause" id="pp-5">5. How We Collect Personal Data</h2>
+      <p>We collect personal data:</p>
+      <ul>
+        <li>Directly from you, when you create an account, place an Order, contact customer support, submit a review, or otherwise interact with the Platform;</li>
+        <li>Automatically, through cookies, SDKs and similar technologies as you browse the Platform;</li>
+        <li>From third parties, such as payment gateways (limited transaction status), logistics/delivery partners (delivery status), and, where you choose to sign in using a third‑party account, from that third‑party service, subject to your permissions there.</li>
+      </ul>
+
+      <h2 class="clause" id="pp-6">6. Purposes for Which We Use Personal Data</h2>
+      <p>We use personal data for the following purposes:</p>
+      <ul>
+        <li>To create and manage your account;</li>
+        <li>To process and fulfil Orders, including customisation, manufacturing, hallmarking, invoicing and delivery;</li>
+        <li>To process payments and prevent payment fraud;</li>
+        <li>To communicate Order confirmations, shipping updates, delivery notifications and security alerts;</li>
+        <li>To provide customer support and address complaints, returns, exchanges and warranty claims;</li>
+        <li>To carry out identity/verification checks for high‑value transactions and to prevent fraud, unauthorised transactions or misuse of promotional offers;</li>
+        <li>To send marketing communications, where you have opted in, and to allow you to opt out at any time;</li>
+        <li>To personalise your experience on the Platform, including product recommendations;</li>
+        <li>To maintain security of the Platform, investigate suspicious activity and enforce our Terms &amp; Conditions;</li>
+        <li>To comply with applicable legal, tax, accounting and regulatory obligations, including retention of invoices under GST law and responding to lawful requests from courts, regulators or law enforcement agencies;</li>
+        <li>To improve the Platform, including through aggregated or anonymised analytics.</li>
+      </ul>
+
+      <h2 class="clause" id="pp-7">7. Legal Basis for Processing</h2>
+      <p>Under the DPDP Act, Orenkafine processes personal data on the basis of:</p>
+      <ul>
+        <li>Your free, specific, informed, unconditional and unambiguous consent, given through a clear affirmative action, for purposes such as marketing communications and optional personalisation features; and</li>
+        <li>"Certain legitimate uses" recognised under the DPDP Act, including processing necessary for the performance of a contract to which you are a party (such as fulfilling an Order), compliance with law (such as tax and consumer protection obligations), and other legitimate purposes as permitted by law, for which separate consent is not additionally required.</li>
+      </ul>
+      <p>Where we rely on your consent, you may withdraw it at any time, without affecting the lawfulness of processing carried out before such withdrawal, and without affecting our ability to continue processing where another legal basis (such as contract performance or legal obligation) applies.</p>
+
+      <h2 class="clause" id="pp-8">8. Cookies and Tracking Technologies</h2>
+      <p>The Platform uses cookies, web beacons, SDKs and similar technologies to:</p>
+      <ul>
+        <li>Enable core Platform functionality (such as maintaining your cart and session);</li>
+        <li>Remember your preferences;</li>
+        <li>Understand how the Platform is used, through analytics tools;</li>
+        <li>Support advertising and retargeting, where permitted and where you have not opted out.</li>
+      </ul>
+      <p>You can control cookies through your browser settings; disabling certain cookies may affect Platform functionality. Where required by law, we will present a cookie consent mechanism allowing you to accept or reject non‑essential cookies before they are set. See our <a href="cookie-policy.html">Cookie Policy</a> for full details.</p>
+
+      <h2 class="clause" id="pp-9">9. Sharing and Disclosure of Personal Data</h2>
+      <p>We do not sell personal data. We may share personal data with:</p>
+      <ul>
+        <li>Payment gateways and financial institutions, to process payments;</li>
+        <li>Logistics and delivery partners, to fulfil and deliver Orders, including for high‑value delivery security procedures such as OTP or signature verification;</li>
+        <li>Manufacturing, hallmarking, certification and quality assurance partners, to the extent necessary to produce and verify Products, including Personalised Products;</li>
+        <li>Cloud hosting, IT infrastructure and customer support service providers, engaged under confidentiality and data processing obligations;</li>
+        <li>Analytics and marketing service providers, where you have consented to marketing communications or non‑essential cookies;</li>
+        <li>Professional advisors (legal, accounting, audit), as reasonably necessary;</li>
+        <li>Government authorities, regulators, courts or law enforcement agencies, where required by applicable law, in connection with legal proceedings, or to protect the rights, property or safety of Orenkafine, our Customers or the public;</li>
+        <li>A successor entity, in connection with a merger, acquisition, restructuring or sale of business assets, subject to that entity being bound by equivalent privacy protections.</li>
+      </ul>
+
+      <h2 class="clause" id="pp-10">10. Cross‑Border Transfer of Personal Data</h2>
+      <p>Some of our service providers (such as certain cloud hosting, analytics or payment infrastructure providers) may store or process personal data outside India.</p>
+      <p>Under the DPDP Act, cross‑border transfer of personal data is permitted except to countries restricted by the Central Government by notification. Where we transfer personal data outside India, we take reasonable steps to ensure it continues to receive a level of protection consistent with this Policy and applicable law.</p>
+
+      <h2 class="clause" id="pp-11">11. Data Retention</h2>
+      <p>We retain personal data only for as long as necessary to fulfil the purposes described in this Policy, including:</p>
+      <ul>
+        <li>For the duration of your account being active, plus a reasonable period thereafter to address disputes or comply with legal obligations;</li>
+        <li>Order, invoice and transaction records, generally for the period required under applicable tax (GST) and companies law record‑keeping requirements (typically not less than 8 years for statutory financial records, unless a longer period applies under applicable law);</li>
+        <li>Identity verification records collected for high‑value transactions, for the period required for fraud prevention and legal compliance purposes;</li>
+        <li>Marketing preference data, until you withdraw consent or opt out, and for a reasonable period thereafter to record that withdrawal.</li>
+      </ul>
+      <p>Where personal data is no longer necessary for the purpose for which it was collected and retention is not otherwise required by law, we will erase or anonymise it, including on withdrawal of consent or on your request under Clause 15, subject to our right to retain data as required or permitted by applicable law.</p>
+
+      <h2 class="clause" id="pp-12">12. Data Security</h2>
+      <p>We implement reasonable security practices and procedures, including administrative, technical and physical safeguards, appropriate to the nature of the personal data, to protect it against unauthorised access, alteration, disclosure or destruction, consistent with the SPDI Rules and the DPDP Act.</p>
+      <p>While we take reasonable steps to protect personal data, no method of transmission or storage over the internet is completely secure, and we cannot guarantee absolute security.</p>
+
+      <h2 class="clause" id="pp-13">13. Personal Data Breach Notification</h2>
+      <p>In the event of a personal data breach, Orenkafine shall, in accordance with the DPDP Act and DPDP Rules, notify the Data Protection Board of India and affected Data Principals without undue delay, providing information regarding the nature of the breach, its likely consequences, and the measures taken or proposed to mitigate risk, in the manner and within the timeframes prescribed by applicable law.</p>
+
+      <h2 class="clause" id="pp-14">14. Children's Data</h2>
+      <p>The Platform is intended for use by individuals who are at least eighteen (18) years of age. Orenkafine does not knowingly collect personal data from children (individuals under 18 years of age) except where such use is undertaken with the verifiable consent and direct supervision of a parent or lawful guardian, as contemplated in our Terms &amp; Conditions.</p>
+      <p>In accordance with the DPDP Act, where we become aware that we are processing a child's personal data, we do not undertake tracking or behavioural monitoring of children, and we do not carry out targeted advertising directed at children.</p>
+      <p>If you believe a child has provided personal data to us without appropriate parental/guardian consent, please contact us using the details in Clause 17 so that we can take appropriate action, including deletion of such data.</p>
+
+      <h2 class="clause" id="pp-15">15. Your Rights as a Data Principal</h2>
+      <p>Subject to applicable law and its phased implementation timelines, you have the following rights in relation to your personal data:</p>
+      <ul>
+        <li><strong>Right to Access</strong> — to obtain a summary of the personal data we process about you and the processing activities undertaken;</li>
+        <li><strong>Right to Correction and Updating</strong> — to request correction of inaccurate or misleading personal data, completion of incomplete data, and updating of personal data;</li>
+        <li><strong>Right to Erasure</strong> — to request erasure of personal data that is no longer necessary for the purpose for which it was collected, subject to our right/obligation to retain data as required by law;</li>
+        <li><strong>Right to Withdraw Consent</strong> — to withdraw consent previously given, at any time, with effect for future processing;</li>
+        <li><strong>Right to Grievance Redressal</strong> — to have a readily available means of registering a grievance with us, and, if unresolved, to escalate it to the Data Protection Board of India once fully operative;</li>
+        <li><strong>Right to Nominate</strong> — to nominate another individual to exercise your rights in the event of death or incapacity, in the manner prescribed under the DPDP Rules.</li>
+      </ul>
+      <p>To exercise any of these rights, please contact us using the details in Clause 17. We may need to verify your identity before acting on a request, and may decline a request to the extent permitted by law (for example, where retention is required for legal or regulatory compliance).</p>
+
+      <h2 class="clause" id="pp-16">16. Consent Manager</h2>
+      <p>Once the Consent Manager framework under the DPDP Act and DPDP Rules becomes operative (scheduled from November 2026), Orenkafine will, where applicable, enable Data Principals to give, manage, review and withdraw consent through a registered Consent Manager, in addition to the mechanisms described in this Policy.</p>
+
+      <h2 class="clause" id="pp-17">17. Grievance Officer / Data Protection Officer — Contact Us</h2>
+      <p>For any questions, concerns or grievances regarding this Policy or our processing of your personal data, or to exercise the rights described in Clause 15, please contact:</p>
+      <ul>
+        <li>Name: Mayur Hitendra Parmar</li>
+        <li>Designation: Grievance Officer / Data Protection Officer</li>
+        <li>Email: Info@orenkafine.com</li>
+        <li>Phone: +91 86559 64188</li>
+        <li>Postal Address: Building No./Flat No.: A‑42, Name Of Premises/Building: Giriraj Ind Estate, Road/Street: Mahakali Caves Road, Andheri East, Locality/Sub Locality: Chakala MIDC, City/Town/Village: Mumbai, District: Mumbai Suburban, State: Maharashtra, PIN Code: 400093</li>
+      </ul>
+      <p>We will acknowledge receipt of your query or grievance within forty‑eight (48) hours and endeavour to resolve it within one (1) month of receipt, consistent with the timelines applicable to consumer grievances under our Terms &amp; Conditions. If you are not satisfied with our response, you may, once the relevant provisions are in force, approach the Data Protection Board of India, or pursue other remedies available under applicable law, including through the National Consumer Helpline (1915) or the e‑Daakhil portal (edaakhil.nic.in) for consumer‑related grievances.</p>
+
+      <h2 class="clause" id="pp-18">18. Third‑Party Links</h2>
+      <p>The Platform may contain links to third‑party websites or services (including social media pages and payment gateways). This Policy does not apply to such third‑party services, and we encourage you to review their respective privacy policies before providing any personal data to them.</p>
+
+      <h2 class="clause" id="pp-19">19. Changes to This Policy</h2>
+      <p>We may update this Policy from time to time to reflect changes in our practices, technology, legal or regulatory requirements, including as further provisions of the DPDP Act and DPDP Rules come into force. The updated Policy will be published on the Platform with a revised "Last Updated" date. Where a change is material, we will provide an appropriate notice, including, where required, by seeking fresh consent.</p>
+
+      <h2 class="clause" id="pp-20">20. Governing Law and Jurisdiction</h2>
+      <p>This Policy shall be governed by the laws of India, including the Information Technology Act, 2000, the SPDI Rules, and the DPDP Act and DPDP Rules, as applicable and as they come into force.</p>
+      <p>Subject to the jurisdiction of the Data Protection Board of India (once operative) and any mandatory consumer or statutory forum, courts/authorities at Mumbai City, Maharashtra, India shall have jurisdiction over disputes arising in connection with this Policy.</p>
+
+      <h2 class="clause" id="pp-21">21. Acknowledgement</h2>
+      <p>By using the Platform or providing your personal data to us, you acknowledge that you have read and understood this Privacy Policy and the manner in which your personal data will be collected, used, shared and protected as described herein.</p>
+
+      <div class="doc-footer">
+        <a href="index.html">ORENKAFINE</a> — Jewellery Designed to Be Remembered.<br>
+        &copy; 2026 Orenkafine. All Rights Reserved.
+      </div>
+    </article>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+<p class="footer-credit">Developed by <a href="https://www.linkedin.com/in/amandubal/" target="_blank" rel="noopener">Aman Dubal</a> | WebDev@BGJ</p>
+
+<button class="to-top" aria-label="Back to top">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/cookie-consent.js"></script>
+<script src="js/guide-modals.js"></script>
+<script>
+// Scrollspy for the sidebar nav — highlights the link for whichever
+// section heading (or document title) is currently nearest the top of
+// the viewport as the user scrolls, so the sidebar stacks section-by-
+// section instead of a static "on this page" list.
+(function () {
+  const sidebar = document.getElementById("legalSidebar");
+  if (!sidebar) return;
+  const links = Array.from(sidebar.querySelectorAll("a[href^='#']"));
+  const targets = links
+    .map((link) => ({ link, el: document.getElementById(link.getAttribute("href").slice(1)) }))
+    .filter((t) => t.el);
+
+  let activeLink = null;
+  function setActive(link) {
+    if (link === activeLink) return;
+    if (activeLink) activeLink.classList.remove("active");
+    if (link) link.classList.add("active");
+    activeLink = link;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const match = targets.find((t) => t.el === entry.target);
+        if (match) setActive(match.link);
+      });
+    },
+    { rootMargin: "-96px 0px -70% 0px", threshold: 0 }
+  );
+
+  targets.forEach((t) => observer.observe(t.el));
+  if (targets.length) setActive(targets[0].link);
+})();
+</script>
+</body>
+</html>
