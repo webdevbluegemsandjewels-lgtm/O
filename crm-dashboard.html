@@ -1093,7 +1093,6 @@
       p_size_id: selectedSize ? selectedSize.id : null,
     });
     if (calcError) console.warn("calculate_product_price RPC failed, using legacy fallback:", calcError.message, { selectedSize, quoteState });
-    console.log("[quote debug] size:", quoteState.size, "| quoteSizes:", quoteSizes.map((s) => s.size), "| selectedSize:", selectedSize, "| rpc calc:", calc);
 
     if (calc && calc[0] && calc[0].is_calculated) {
       const row = calc[0];
@@ -1125,9 +1124,7 @@
       ? Number(selectedSize.gold_weight_grams)
       : (quoteProduct.gold_weight_grams ? Number(quoteProduct.gold_weight_grams) : null);
     const legacy = quoteComputeAdjustedPrice(basePrice, weight, quoteState.karat);
-    const finalPrice = legacy.price * quoteDiamondMultiplier();
-    console.log("[quote debug] legacy path — weight:", weight, "| goldRate24kt:", quoteGoldRate24kt, "| isExact:", legacy.isExact, "| finalPrice:", finalPrice);
-    return { price: finalPrice, isExact: legacy.isExact, breakdown: null };
+    return { price: legacy.price * quoteDiamondMultiplier(), isExact: legacy.isExact, breakdown: null };
   }
 
   async function renderQuoteOutput() {
