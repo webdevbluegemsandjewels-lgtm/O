@@ -1094,7 +1094,29 @@
     });
 
     if (calc && calc[0] && calc[0].is_calculated) {
-      return { price: Number(calc[0].final_price), isExact: true, breakdown: calc[0] };
+      const row = calc[0];
+      // This product has no real per-size weight row (quoteSizes
+      // empty) — the RPC priced it off the product's own flat
+      // gold_weight_grams, which ignores which fallback size (e.g.
+      // ring size 06 vs 16) was picked. Approximate the extra gold
+      // for a bigger size the same way the legacy formula below does,
+      // so Size still moves the price for these products too.
+      if (!selectedSize && quoteSizes.length === 0) {
+        const mult = quoteSizeWeightMultiplier();
+        if (mult !== 1) {
+          const goldCost = Number(row.gold_cost) * mult;
+          const subtotal = goldCost + Number(row.diamond_cost) + Number(row.making_charge);
+          const impliedGstRate = Number(row.subtotal) > 0 ? Number(row.gst) / Number(row.subtotal) : 0;
+          const gst = subtotal * impliedGstRate;
+          const finalPrice = subtotal + gst;
+          return {
+            price: finalPrice,
+            isExact: true,
+            breakdown: { ...row, gold_cost: goldCost, subtotal, gst, final_price: finalPrice },
+          };
+        }
+      }
+      return { price: Number(row.final_price), isExact: true, breakdown: row };
     }
 
     const weight = selectedSize
