@@ -162,7 +162,7 @@
         </form>
 
         <div data-role="forgot-section" style="display:none;">
-          <p style="margin-bottom:.7rem; font-size:.76rem; color:var(--ink-soft); line-height:1.5;">Enter your account email and we'll send you a link to reset your password.</p>
+          <p style="margin-bottom:.7rem; font-size:.76rem; color:var(--ink-soft); line-height:1.5; text-align:center;">Enter your account email and we'll send you a link to reset your password.</p>
           <div class="auth-field">
             <label>Email</label>
             <input type="email" required autocomplete="email" data-role="forgot-email" />

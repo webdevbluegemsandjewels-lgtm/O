@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title id="pageTitle">Product — OrenkaFine</title>
+<title id="pageTitle">Product OrenkaFine</title>
 <meta name="description" id="pageDesc" content="OrenkaFine fine and fashion jewelry." />
 <link rel="icon" href="/logo/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32x32.png">
@@ -294,7 +294,7 @@
     <div id="loadingState" style="padding: 4rem 0; text-align:center; color: var(--ink-soft);">Loading product…</div>
     <div id="notFoundState" style="display:none; padding: 4rem 0; text-align:center; color: var(--ink-soft);">
       <h2 style="font-family:var(--font-display); color:var(--ink); margin-bottom:.5rem;">Coming Soon</h2>
-      <p>This piece isn't available right now — stay tuned, or explore what we do have in store.</p>
+      <p>This piece isn't available right now stay tuned, or explore what we do have in store.</p>
       <a href="collections.html" class="btn btn-gold" style="margin-top:1rem;">Explore Other Products</a>
     </div>
 
@@ -330,7 +330,7 @@
           <span class="old" id="priceOld" style="display:none;"></span>
           <span class="save" id="priceSave" style="display:none;"></span>
         </div>
-        <p class="price-approx-note" id="priceApproxNote">Estimated price for this metal type — final price confirmed at checkout.</p>
+        <p class="price-approx-note" id="priceApproxNote">Estimated price for this metal type final price confirmed at checkout.</p>
 
         <p class="points-note" id="pointsNote"></p>
 
@@ -382,7 +382,7 @@
 
         <label class="policy-consent-row">
           <input type="checkbox" id="policyConsentCheck" />
-          <span>Please read the <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a> and <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a> — tick to confirm you agree before adding to cart.</span>
+          <span>Please read the <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a> and <a href="terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a> tick to confirm you agree before adding to cart.</span>
         </label>
         <p class="policy-consent-error" id="policyConsentError">Please tick the box above to confirm you've read our Privacy Policy and Terms &amp; Conditions before adding to cart.</p>
 
@@ -465,7 +465,7 @@
       </div>
 
       <div id="reviewsList" style="display:flex; flex-direction:column; gap:1.4rem;"></div>
-      <p id="noReviews" style="display:none; color:var(--ink-soft);">No reviews yet — be the first to share your thoughts.</p>
+      <p id="noReviews" style="display:none; color:var(--ink-soft);">No reviews yet be the first to share your thoughts.</p>
     </div>
   </div>
 </section>
@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  document.getElementById("pageTitle").textContent = `${product.name} — OrenkaFine`;
+  document.getElementById("pageTitle").textContent = `${product.name} OrenkaFine`;
   document.getElementById("pageDesc").setAttribute("content", (product.description || "").slice(0, 155));
   document.getElementById("breadcrumbName").textContent = product.name;
 

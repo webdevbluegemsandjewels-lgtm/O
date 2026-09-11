@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Order Confirmed — OrenkaFine</title>
+<title>Order Confirmed OrenkaFine</title>
 <link rel="icon" href="/logo/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/logo/favicon-48x48.png">
@@ -100,13 +100,13 @@
       <div class="success-banner">
         <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="#4a7c59" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
         <h1 class="section-title" style="margin-bottom:.6rem;">Thank you for shopping with us</h1>
-        <p>Your payment has gone through and your order is confirmed. Please take a note of your Payment ID below — our customer executive will call you shortly to confirm your order. Your order will dispatch within 7 days, and we'll email you once it ships.</p>
+        <p>Your payment has gone through and your order is confirmed. Please take a note of your Payment ID below our customer executive will call you shortly to confirm your order. Your order will dispatch within 7 days, and we'll email you once it ships.</p>
       </div>
 
       <div class="order-meta-row">
         <div><span>Order Number</span><strong id="orderNumber"></strong></div>
         <div><span>Date</span><strong id="orderDate"></strong></div>
-        <div><span>Payment ID</span><strong id="orderPaymentId">—</strong></div>
+        <div><span>Payment ID</span><strong id="orderPaymentId"> </strong></div>
         <div><span>Total</span><strong id="orderTotal"></strong></div>
         <div><span>Payment Method</span><strong id="orderPayment">Razorpay</strong></div>
       </div>
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("orderSubtotal").textContent = money(order.total);
   document.getElementById("orderTotalLine").textContent = money(order.total);
 
-  const statusLabel = { pending: "Payment pending", paid: "Paid — being prepared", failed: "Payment failed", cancelled: "Cancelled" };
+  const statusLabel = { pending: "Payment pending", paid: "Paid being prepared", failed: "Payment failed", cancelled: "Cancelled" };
   document.getElementById("orderStatus").textContent = statusLabel[order.status] || order.status;
 
   const addressLines = [
