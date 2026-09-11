@@ -974,7 +974,15 @@
   // the picked fallback size number.
   function quoteSizeWeightMultiplier() {
     if (quoteSizes.length) return 1;
-    const sizeNum = parseInt(quoteState.size, 10);
+    const sizeNum = parseFloat(quoteState.size);
+    if (!sizeNum) return 1;
+    return 1 + (sizeNum - SIZE_BASELINE) * SIZE_WEIGHT_STEP_PCT;
+  }
+  // Same approximation, for the Custom Price Calculator's manually
+  // typed gold weight (no real per-size data possible there — it's
+  // for a piece that isn't in the catalog at all).
+  function calcSizeWeightMultiplier(size) {
+    const sizeNum = parseFloat(size);
     if (!sizeNum) return 1;
     return 1 + (sizeNum - SIZE_BASELINE) * SIZE_WEIGHT_STEP_PCT;
   }
@@ -1325,10 +1333,14 @@
   }
 
   function renderCalcOutput() {
-    const weight = Number(document.getElementById("calcGoldWeight").value) || 0;
+    const enteredWeight = Number(document.getElementById("calcGoldWeight").value) || 0;
     const karat = document.getElementById("calcKarat").value;
     const category = document.getElementById("calcCategory").value;
     const size = document.getElementById("calcSize").value.trim();
+    // The typed weight is treated as the size-6/ring-size-10 baseline
+    // (same convention as the Quotation Generator above) — a bigger
+    // size scales it up, a smaller one scales it down.
+    const weight = enteredWeight * calcSizeWeightMultiplier(size);
     const qty = Math.max(1, Number(document.getElementById("calcQty").value) || 1);
     const diamondQuality = document.getElementById("calcDiamondQuality").value;
     const diamondCt = Number(document.getElementById("calcDiamondCt").value) || 0;

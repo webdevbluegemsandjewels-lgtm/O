@@ -700,7 +700,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const SIZE_WEIGHT_STEP_PCT = 0.02;
   function sizeWeightMultiplier() {
     if (sizeIsReal) return 1;
-    const sizeNum = parseInt(selectedAttrs.size, 10);
+    const sizeNum = parseFloat(selectedAttrs.size);
     if (!sizeNum) return 1;
     return 1 + (sizeNum - SIZE_BASELINE) * SIZE_WEIGHT_STEP_PCT;
   }
@@ -966,12 +966,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const selectedVariant = diamondVariants.find((v) => v.diamond_quality === selectedAttrs.diamond) || null;
     const selectedSize = currentSize();
 
-    const { data: calc } = await supabaseClient.rpc("calculate_product_price", {
+    const { data: calc, error: calcError } = await supabaseClient.rpc("calculate_product_price", {
       p_product_id: product.id,
       p_karat: selectedKarat,
       p_variant_id: selectedVariant ? selectedVariant.id : null,
       p_size_id: selectedSize ? selectedSize.id : null,
     });
+    if (calcError) console.warn("calculate_product_price RPC failed, using legacy fallback:", calcError.message, { selectedSize, selectedAttrs });
 
     if (calc && calc[0] && calc[0].is_calculated) {
       return { price: Number(calc[0].final_price), isExact: true, breakdown: calc[0] };
