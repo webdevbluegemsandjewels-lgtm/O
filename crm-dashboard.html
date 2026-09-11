@@ -1086,12 +1086,13 @@
     const selectedVariant = quoteVariants.find((v) => v.diamond_quality === quoteState.diamond) || null;
     const selectedSize = quoteCurrentSize();
 
-    const { data: calc } = await supabaseClient.rpc("calculate_product_price", {
+    const { data: calc, error: calcError } = await supabaseClient.rpc("calculate_product_price", {
       p_product_id: quoteProduct.id,
       p_karat: quoteState.karat,
       p_variant_id: selectedVariant ? selectedVariant.id : null,
       p_size_id: selectedSize ? selectedSize.id : null,
     });
+    if (calcError) console.warn("calculate_product_price RPC failed, using legacy fallback:", calcError.message, { selectedSize, quoteState });
 
     if (calc && calc[0] && calc[0].is_calculated) {
       const row = calc[0];
