@@ -910,6 +910,8 @@
   const BANGLE_SIZE_FALLBACK = ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5"];
   const BRACELET_SIZE_FALLBACK = ["06", "07", "08"];
   const ASSUMED_GOLD_SHARE_OF_PRICE = 0.65;
+  const SIZE_BASELINE = 10;
+  const SIZE_WEIGHT_STEP_PCT = 0.02;
 
   let quoteAllProducts = null;
   let quoteGoldRate24kt = null;
@@ -959,12 +961,22 @@
     const karatRatio =
       (KARAT_PURITY[karatKey] * KARAT_WEIGHT_MULTIPLIER[karatKey]) /
       (KARAT_PURITY["18kt"] * KARAT_WEIGHT_MULTIPLIER["18kt"]);
-    const goldShare = basePrice * ASSUMED_GOLD_SHARE_OF_PRICE;
+    const goldShare = basePrice * ASSUMED_GOLD_SHARE_OF_PRICE * quoteSizeWeightMultiplier();
     const nonGoldShare = basePrice * (1 - ASSUMED_GOLD_SHARE_OF_PRICE);
     return { price: Math.max(0, nonGoldShare + goldShare * karatRatio), isExact: false };
   }
   function quoteCurrentSize() {
     return quoteSizes.find((s) => s.size === quoteState.size) || null;
+  }
+  // Same fallback formula as product.html's sizeWeightMultiplier(): only
+  // needed when this product has no real per-size weight row (quoteSizes
+  // empty) — approximates a bigger/smaller size's extra gold weight off
+  // the picked fallback size number.
+  function quoteSizeWeightMultiplier() {
+    if (quoteSizes.length) return 1;
+    const sizeNum = parseInt(quoteState.size, 10);
+    if (!sizeNum) return 1;
+    return 1 + (sizeNum - SIZE_BASELINE) * SIZE_WEIGHT_STEP_PCT;
   }
 
   async function ensureGoldRate() {
