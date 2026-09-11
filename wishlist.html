@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Wishlist OrenkaFine</title>
+<meta name="description" content="Everything you've saved at OrenkaFine, all in one place." />
+<link rel="icon" href="/logo/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/logo/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/logo/favicon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/logo/apple-touch-icon.png">
+<link rel="manifest" href="/logo/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  .wishlist-section{ padding: 2.4rem 0 5rem; }
+  .wishlist-section h1.section-title{ margin-bottom: .3rem; }
+  .wishlist-sub{ color: var(--ink-soft); font-size: .92rem; margin-bottom: 2rem; }
+  .wishlist-empty{ text-align:center; padding: 4rem 1rem; color: var(--ink-soft); }
+  .wishlist-loading{ text-align:center; padding: 3rem 1rem; color: var(--ink-soft); }
+  @media (max-width: 900px){ .product-grid{ grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="container">
+    <span>Complimentary gift wrapping on every order</span>
+    <span>Fast delivery &middot; Secure checkout</span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">OrenkaFine<small>Fine &amp; Light Weight Jewellery</small></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="collections.html">Collections</a>
+      <a href="about.html">The House</a>
+      <a href="our-journey.html">Our Story</a>
+      <a href="contact.html">Contact</a>
+      <a href="my-orders.html" data-my-orders-link style="display:none;">My Orders</a>
+    </nav>
+    <div class="header-icons">
+      <a class="icon-btn" href="account.html" aria-label="Account" data-account-link><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></a>
+      <a class="icon-btn" href="wishlist.html" aria-label="Wishlist" style="border-color: var(--gold);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7.5-4.6-10-9C.5 8.5 2 4 6.2 4 8.7 4 10.7 5.6 12 7.4 13.3 5.6 15.3 4 17.8 4 22 4 23.5 8.5 22 12c-2.5 4.4-10 9-10 9z"/></svg></a>
+      <a class="icon-btn" href="cart.html" aria-label="Shopping bag" style="position:relative;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span data-cart-count style="position:absolute;top:-4px;right:-4px;background:var(--gold);color:#fff;font-size:.62rem;font-weight:600;min-width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;padding:0 3px;"></span>
+      </a>
+      <button class="icon-btn nav-toggle" aria-label="Menu" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<section class="wishlist-section">
+  <div class="container">
+    <h1 class="section-title">My Wishlist</h1>
+    <p class="wishlist-sub">Everything you've saved, all in one place.</p>
+
+    <div id="wishlistLoading" class="wishlist-loading">Loading your wishlist…</div>
+
+    <div id="wishlistEmpty" class="wishlist-empty" style="display:none;">
+      <p>You haven't saved anything yet.</p>
+      <a href="collections.html" class="btn btn-gold" style="margin-top:1.2rem;">Explore Collections</a>
+    </div>
+
+    <div id="wishlistGrid" class="product-grid"></div>
+  </div>
+</section>
+
+<footer class="site-footer" id="footer"></footer>
+<p class="footer-credit">Developed by <a href="https://www.linkedin.com/in/amandubal/" target="_blank" rel="noopener">Aman Dubal</a> | WebDev@BGJ</p>
+
+<script src="js/supabaseClient.js"></script>
+<script src="js/products-db.js"></script>
+<script src="js/auth-modal.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/likes.js"></script>
+<script src="js/main.js"></script>
+<script src="js/footer.js"></script>
+<script src="js/cookie-consent.js"></script>
+<script src="js/guide-modals.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const loadingEl = document.getElementById("wishlistLoading");
+  const emptyEl = document.getElementById("wishlistEmpty");
+  const gridEl = document.getElementById("wishlistGrid");
+
+  const user = await requireAuth();
+  if (!user) return; // requireAuth already redirected to login
+
+  const { data: rows, error } = await supabaseClient
+    .from("wishlist")
+    .select("product_id, product_name, liked_at")
+    .eq("user_id", user.id)
+    .order("liked_at", { ascending: false });
+
+  loadingEl.style.display = "none";
+
+  if (error) {
+    console.warn("Could not load wishlist:", error.message);
+    emptyEl.style.display = "block";
+    return;
+  }
+
+  if (!rows || rows.length === 0) {
+    emptyEl.style.display = "block";
+    return;
+  }
+
+  const productIds = rows.map((r) => r.product_id);
+  const [{ data: products }, livePrices] = await Promise.all([
+    supabaseClient.from("products").select("*").in("id", productIds),
+    loadLivePriceMap(),
+  ]);
+
+  const productsById = {};
+  (products || []).forEach((p) => { productsById[p.id] = p; });
+
+  // Keep the shopper's own save order (most recently liked first) —
+  // a product removed/deactivated since being liked just won't have a
+  // matching row here and is skipped rather than showing a broken card.
+  const cards = rows
+    .map((r) => productsById[r.product_id])
+    .filter(Boolean)
+    .map((row) => mapDbProductToCard(row, undefined, livePrices[row.id]));
+
+  if (!cards.length) {
+    emptyEl.style.display = "block";
+    return;
+  }
+
+  gridEl.innerHTML = cards.map(productCardHTML).join("");
+
+  // Unsaving a product here (heart click) should drop its card
+  // immediately rather than leaving a still-liked-looking heart on a
+  // page whose whole point is "things I've saved".
+  gridEl.addEventListener("wish:changed", (e) => {
+    if (e.detail.liked) return;
+    const btn = e.target.closest("[data-product-id]");
+    const card = btn && btn.closest(".product-card");
+    if (!card) return;
+    card.style.transition = "opacity .25s ease";
+    card.style.opacity = "0";
+    setTimeout(() => {
+      card.remove();
+      if (!gridEl.children.length) emptyEl.style.display = "block";
+    }, 250);
+  });
+});
+</script>
+</body>
+</html>

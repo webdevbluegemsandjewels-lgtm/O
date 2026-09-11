@@ -316,8 +316,8 @@ function productCardHTML(p) {
         ${p.discount ? `<span class="discount-ribbon">${p.discount} OFF</span>` : ""}
         ${(p.tag && !p.discount) ? `<span class="product-tag">${p.tag}</span>` : ""}
         ${p.id ? `
-        <button type="button" class="product-wish" data-wish-toggle data-product-id="${p.id}" data-product-name="${escapeHtml(p.name)}" aria-label="Like ${escapeHtml(p.name)}">
-          <span class="wish-icon">&hearts;</span><span class="wish-count" data-role="wish-count">0</span>
+        <button type="button" class="product-wish" data-wish-toggle data-product-id="${p.id}" data-product-name="${escapeHtml(p.name)}" aria-label="Save ${escapeHtml(p.name)} to wishlist">
+          <span class="wish-icon">&hearts;</span>
         </button>` : ""}
         <img src="${primaryImage}" data-secondary="${secondaryImage}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" />
       </div>

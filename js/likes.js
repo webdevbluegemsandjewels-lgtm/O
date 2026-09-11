@@ -1,27 +1,18 @@
-/* Product "like"/wishlist toggling — shared by the product-grid heart
-   button (js/main.js's productCardHTML, rendered on index.html/
-   collections.html) and product.html's own single-product like button.
-   Both just need a <button data-wish-toggle data-product-id="..."
-   data-product-name="..."> with a nested [data-role="wish-count"] span;
-   everything else (click handling, count/liked-state hydration) is
-   wired up here automatically. */
+/* Product wishlist toggling — shared by the product-grid heart button
+   (js/main.js's productCardHTML, rendered on index.html/collections.html/
+   product.html's "You may also like" row) and product.html's own
+   single-product save button. Both just need a
+   <button data-wish-toggle data-product-id="..." data-product-name="...">
+   (optionally with a nested [data-role="wish-label"] span to swap
+   "Save to Wishlist" / "Saved") — everything else (click handling,
+   liked-state hydration) is wired up here automatically.
 
-async function fetchLikeCounts(productIds) {
-  if (!productIds.length) return {};
-  const { data, error } = await supabaseClient
-    .from("product_likes")
-    .select("product_id, like_count")
-    .in("product_id", productIds);
-  if (error) {
-    console.warn("Could not load like counts:", error.message);
-    return {};
-  }
-  const map = {};
-  (data || []).forEach((row) => { map[row.product_id] = row.like_count; });
-  return map;
-}
+   Purely a private "did I save this" toggle — no public like counts
+   are shown or stored (see supabase/2026-09-11_product_likes.sql for
+   the removed count-tracking table this replaced). See wishlist.html
+   for where a signed-in visitor reviews everything they've saved. */
 
-async function fetchUserLikedSet(userId, productIds) {
+async function fetchUserWishlistSet(userId, productIds) {
   if (!userId || !productIds.length) return new Set();
   const { data, error } = await supabaseClient
     .from("wishlist")
@@ -35,10 +26,26 @@ async function fetchUserLikedSet(userId, productIds) {
   return new Set((data || []).map((row) => row.product_id));
 }
 
-// Hydrates every not-yet-hydrated like button under `root` with its
-// real count + whether the current visitor has already liked it.
-// Safe to call repeatedly (e.g. after a grid re-renders on filter
-// change) — already-hydrated buttons are skipped.
+function setWishButtonState(btn, liked, silent) {
+  btn.classList.toggle("liked", liked);
+  btn.dataset.liked = liked ? "true" : "false";
+  const labelEl = btn.querySelector('[data-role="wish-label"]');
+  if (labelEl) labelEl.textContent = liked ? "Saved" : "Save to Wishlist";
+  // Lets a page like wishlist.html react (e.g. remove the card) the
+  // moment a save is actually confirmed/undone, without needing to
+  // know anything about how the toggle itself works.
+  if (!silent) {
+    btn.dispatchEvent(new CustomEvent("wish:changed", {
+      bubbles: true,
+      detail: { liked, productId: btn.dataset.productId },
+    }));
+  }
+}
+
+// Hydrates every not-yet-hydrated wish button under `root` with
+// whether the current visitor has already saved that product. Safe
+// to call repeatedly (e.g. after a grid re-renders on filter change)
+// — already-hydrated buttons are skipped.
 async function hydrateProductWishButtons(root = document) {
   const buttons = Array.from(root.querySelectorAll("[data-wish-toggle][data-product-id]:not([data-hydrated])"))
     .filter((b) => b.dataset.productId);
@@ -46,20 +53,11 @@ async function hydrateProductWishButtons(root = document) {
 
   const ids = [...new Set(buttons.map((b) => b.dataset.productId))];
   const user = typeof getCurrentUser === "function" ? await getCurrentUser() : null;
-  const [counts, likedSet] = await Promise.all([
-    fetchLikeCounts(ids),
-    fetchUserLikedSet(user ? user.id : null, ids),
-  ]);
+  const likedSet = await fetchUserWishlistSet(user ? user.id : null, ids);
 
   buttons.forEach((btn) => {
     btn.dataset.hydrated = "true";
-    const id = btn.dataset.productId;
-    const countEl = btn.querySelector('[data-role="wish-count"]');
-    if (countEl) countEl.textContent = counts[id] || 0;
-    if (likedSet.has(id)) {
-      btn.classList.add("liked");
-      btn.dataset.liked = "true";
-    }
+    if (likedSet.has(btn.dataset.productId)) setWishButtonState(btn, true, /* silent */ true);
   });
 }
 
@@ -71,15 +69,14 @@ async function toggleProductLike(button) {
   const user = typeof requireAuth === "function" ? await requireAuth() : null;
   if (!user) return;
 
-  const countEl = button.querySelector('[data-role="wish-count"]');
-  const currentCount = Number(countEl ? countEl.textContent : 0) || 0;
   const wasLiked = button.dataset.liked === "true";
 
-  // Optimistic UI so the count/heart respond instantly.
+  // Optimistic UI so the heart responds instantly, but held silent —
+  // the "wish:changed" event only fires once the write actually
+  // succeeds, so a listener (e.g. wishlist.html removing a card)
+  // never has to unwind a failed/rolled-back guess.
   button.disabled = true;
-  button.classList.toggle("liked", !wasLiked);
-  button.dataset.liked = wasLiked ? "false" : "true";
-  if (countEl) countEl.textContent = Math.max(0, currentCount + (wasLiked ? -1 : 1));
+  setWishButtonState(button, !wasLiked, /* silent */ true);
 
   try {
     if (wasLiked) {
@@ -107,11 +104,10 @@ async function toggleProductLike(button) {
       // 23505 = unique_violation (already liked, e.g. a double click race) — treat as success.
       if (error && error.code !== "23505") throw error;
     }
+    setWishButtonState(button, !wasLiked); // confirmed — now tell listeners.
   } catch (err) {
     console.warn("Could not update wishlist:", err.message || err);
-    button.classList.toggle("liked", wasLiked);
-    button.dataset.liked = wasLiked ? "true" : "false";
-    if (countEl) countEl.textContent = currentCount;
+    setWishButtonState(button, wasLiked, /* silent */ true);
   } finally {
     button.disabled = false;
   }
@@ -128,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   hydrateProductWishButtons(document);
   // Product grids render their cards asynchronously (DB fetch, filter
   // changes) well after DOMContentLoaded, so keep watching for new
-  // like buttons showing up anywhere on the page.
+  // wish buttons showing up anywhere on the page.
   const observer = new MutationObserver(() => hydrateProductWishButtons(document));
   observer.observe(document.body, { childList: true, subtree: true });
 });
