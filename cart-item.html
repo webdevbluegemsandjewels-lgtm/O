@@ -194,8 +194,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("itemImage").src = typeof toBucketUrl === "function" ? toBucketUrl(item.image) : item.image;
     document.getElementById("itemImage").alt = item.name;
     document.getElementById("itemName").textContent = item.name;
-    document.getElementById("itemLineTotal").textContent = money(item.price * item.qty);
-    document.getElementById("itemUnitPrice").textContent = item.qty > 1 ? `(${money(item.price)} each)` : "";
+    // Round the unit price first, then multiply — rounding the exact
+    // (fractional-paise) total independently could land ₹1 off from
+    // "rounded unit × qty", which wouldn't match what a shopper sees
+    // if they check the math themselves.
+    const roundedUnitPrice = Math.round(Number(item.price));
+    document.getElementById("itemLineTotal").textContent = money(roundedUnitPrice * item.qty);
+    document.getElementById("itemUnitPrice").textContent = item.qty > 1 ? `(${money(roundedUnitPrice)} each)` : "";
     document.getElementById("itemQty").textContent = item.qty;
 
     const specs = [
