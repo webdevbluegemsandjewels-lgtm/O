@@ -163,7 +163,7 @@ create trigger on_cart_item_removed_cancel_reminder
   for each row execute function public.cancel_cart_reminder();
 
 -- =========================================================
--- Hourly schedule that calls the send-cart-reminder Edge Function,
+-- Hourly schedule that calls theAA send-cart-reminder Edge Function,
 -- which actually emails everything due (status='pending' and
 -- scheduled_at <= now()) and flips it to 'sent'.
 --

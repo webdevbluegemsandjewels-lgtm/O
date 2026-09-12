@@ -1338,13 +1338,21 @@
     const gstPct = Number(document.getElementById("calcGst").value) || 0;
 
     const purity = KARAT_PURITY[karat] || 0;
-    const goldCost = calcGoldRate24ktPerGram ? weight * purity * calcGoldRate24ktPerGram : 0;
+    // Gold Weight is entered as its 9kt-baseline figure (same convention
+    // as products.gold_weight_grams) — switching Karat scales the actual
+    // gram weight up exactly like product.html's KARAT_WEIGHT_MULTIPLIER
+    // does (14kt/18kt alloys use more gold for the same design), rather
+    // than pricing the typed number as-is regardless of karat.
+    const weightMultiplier = KARAT_WEIGHT_MULTIPLIER[karat] || 1;
+    const effectiveWeight = weight * weightMultiplier;
+    const goldCost = calcGoldRate24ktPerGram ? effectiveWeight * purity * calcGoldRate24ktPerGram : 0;
     const diamondCost = diamondQuality ? diamondCt * diamondRate : 0;
-    const makingCharge = weight > 0 ? Math.max(weight * makingPerGram, makingMin) : 0;
+    const makingCharge = effectiveWeight > 0 ? Math.max(effectiveWeight * makingPerGram, makingMin) : 0;
     const subtotal = goldCost + diamondCost + makingCharge;
     const gst = subtotal * (gstPct / 100);
     const pricePerPiece = subtotal + gst;
     const grandTotal = pricePerPiece * qty;
+    const qtyTag = qty > 1 ? ` &times; ${qty}` : "";
 
     const rows = [];
     if (category || size) {
@@ -1352,13 +1360,13 @@
       if (category) rows.push(`<div class="quote-spec-row">Category: <strong>${escapeHtml(category)}</strong></div>`);
       if (size) rows.push(`<div class="quote-spec-row">Size: <strong>${escapeHtml(size)}</strong></div>`);
     }
-    rows.push(`<div class="quote-spec-row section-title">Price Break Up</div>`);
-    rows.push(`<div class="quote-spec-row">Gold (${KARAT_LABELS[karat] || karat}, ${weight || 0}g): <strong>${money(goldCost)}</strong></div>`);
+    rows.push(`<div class="quote-spec-row section-title">Price Break Up${qty > 1 ? ` (for ${qty} pcs)` : ""}</div>`);
+    rows.push(`<div class="quote-spec-row">Gold (${KARAT_LABELS[karat] || karat}, ${effectiveWeight ? effectiveWeight.toFixed(2) : 0}g${weightMultiplier !== 1 && weight ? ` — ${weight}g at 9kt` : ""}${qtyTag}): <strong>${money(goldCost * qty)}</strong></div>`);
     if (diamondQuality) {
-      rows.push(`<div class="quote-spec-row">Diamond (${diamondQuality}, ${diamondCt || 0} ct): <strong>${money(diamondCost)}</strong></div>`);
+      rows.push(`<div class="quote-spec-row">Diamond (${diamondQuality}, ${diamondCt || 0} ct${qtyTag}): <strong>${money(diamondCost * qty)}</strong></div>`);
     }
-    rows.push(`<div class="quote-spec-row">Making: <strong>${money(makingCharge)}</strong></div>`);
-    rows.push(`<div class="quote-spec-row">GST (${gstPct || 0}%): <strong>${money(gst)}</strong></div>`);
+    rows.push(`<div class="quote-spec-row">Making${qtyTag}: <strong>${money(makingCharge * qty)}</strong></div>`);
+    rows.push(`<div class="quote-spec-row">GST (${gstPct || 0}%${qtyTag}): <strong>${money(gst * qty)}</strong></div>`);
     rows.push(`<div class="quote-spec-row">Price per Piece: <strong>${money(pricePerPiece)}</strong></div>`);
     rows.push(`<div class="quote-spec-row">Quantity: <strong>${qty}</strong></div>`);
     rows.push(`<div class="quote-total-row"><span>Total Price${qty > 1 ? ` (${qty} pcs)` : ""}</span><span>${money(grandTotal)}</span></div>`);
