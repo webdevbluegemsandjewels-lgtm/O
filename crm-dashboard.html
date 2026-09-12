@@ -1311,6 +1311,28 @@
     Bracelets: BRACELET_SIZE_FALLBACK,
   };
 
+  // Approximates how much extra gold a bigger size needs, since this
+  // calculator has no real product to look up per-size weight from
+  // (that's what product_sizes is for on an actual product). Rings
+  // reuse the same baseline/step already used by the product-based
+  // Quote tool above (quoteSizeWeightMultiplier); Bracelets mirror the
+  // real +5%-per-0.5-size pattern seeded for Diamond Shree/Trishul
+  // Gold Bracelet (supabase/2026-09-11_trishul_bracelet_sizes.sql);
+  // Bangle has no real precedent yet, so it uses an analogous +5% per
+  // 0.1 step off a mid-range size.
+  const CALC_SIZE_WEIGHT_CONFIG = {
+    Rings: { baseline: SIZE_BASELINE, stepUnit: 1, stepPct: SIZE_WEIGHT_STEP_PCT },
+    Bracelets: { baseline: 6, stepUnit: 0.5, stepPct: 0.05 },
+    Bangle: { baseline: 2.2, stepUnit: 0.1, stepPct: 0.05 },
+  };
+  function calcSizeWeightMultiplier(category, sizeStr) {
+    const config = CALC_SIZE_WEIGHT_CONFIG[category];
+    const sizeNum = parseFloat(sizeStr);
+    if (!config || !sizeStr || Number.isNaN(sizeNum)) return 1;
+    const steps = (sizeNum - config.baseline) / config.stepUnit;
+    return 1 + steps * config.stepPct;
+  }
+
   function refreshCalcSizeOptions() {
     const category = document.getElementById("calcCategory").value;
     const sizeSelect = document.getElementById("calcSize");
@@ -1344,7 +1366,8 @@
     // does (14kt/18kt alloys use more gold for the same design), rather
     // than pricing the typed number as-is regardless of karat.
     const weightMultiplier = KARAT_WEIGHT_MULTIPLIER[karat] || 1;
-    const effectiveWeight = weight * weightMultiplier;
+    const sizeMultiplier = calcSizeWeightMultiplier(category, size);
+    const effectiveWeight = weight * weightMultiplier * sizeMultiplier;
     const goldCost = calcGoldRate24ktPerGram ? effectiveWeight * purity * calcGoldRate24ktPerGram : 0;
     const diamondCost = diamondQuality ? diamondCt * diamondRate : 0;
     const makingCharge = effectiveWeight > 0 ? Math.max(effectiveWeight * makingPerGram, makingMin) : 0;
