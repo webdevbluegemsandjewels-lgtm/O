@@ -309,7 +309,12 @@ async function clearCart() {
 
 async function getSubtotal() {
   const items = await getItems();
-  return items.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
+  // Round each item's unit price to whole rupees before multiplying by
+  // qty (same fix as cart.html's row price) — item.price carries
+  // fractional paise from the gold-rate pricing math, and summing the
+  // exact fractional totals then rounding once at the end can land ₹1+
+  // off from what a shopper sees on each row (rounded unit × qty).
+  return items.reduce((sum, i) => sum + Math.round(Number(i.price)) * i.qty, 0);
 }
 
 async function updateCartBadge() {

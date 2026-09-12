@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `
     <div class="co-item">
       <span>${i.name} × ${i.qty}${details ? ` <small style="color:var(--ink-soft);">(${details})</small>` : ""}</span>
-      <span>${money(i.price * i.qty)}</span>
+      <span>${money(Math.round(Number(i.price)) * i.qty)}</span>
     </div>
   `;
   }).join("");

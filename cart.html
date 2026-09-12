@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <a href="${detailHref}" style="display:inline-block; margin-top:.5rem; font-size:.78rem; color:var(--ink-soft); text-decoration:underline;">View Details</a>
         </div>
         <div class="cart-row-right">
-          <span class="cart-row-price">${money(item.price * item.qty)}</span>
+          <span class="cart-row-price">${money(Math.round(Number(item.price)) * item.qty)}</span>
           <button type="button" class="cart-remove" data-action="remove">Remove</button>
         </div>
       </div>

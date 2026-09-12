@@ -92,7 +92,15 @@ serve(async (req) => {
     const orderItems = cartRows.map((row: any) => {
       const basePrice = row.basePrice;
       const claimedPrice = row.unit_price != null ? Number(row.unit_price) : basePrice;
-      const price = claimedPrice > 0 && claimedPrice >= basePrice * MIN_PRICE_RATIO ? claimedPrice : basePrice;
+      const exactPrice = claimedPrice > 0 && claimedPrice >= basePrice * MIN_PRICE_RATIO ? claimedPrice : basePrice;
+      // Rounded to whole rupees here (not just when formatting for
+      // display) so the amount actually charged, the order total, and
+      // the per-item price stored in order_items all agree exactly
+      // with what checkout.html showed the customer before they paid
+      // — unit_price carries fractional paise from the gold-rate
+      // pricing math, which would otherwise let the real charge land a
+      // few paise off the whole-rupee total shown on screen.
+      const price = Math.round(exactPrice);
       return {
         source: row.source,
         product_id: row.product_id,
